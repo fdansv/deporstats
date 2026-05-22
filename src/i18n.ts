@@ -92,8 +92,16 @@ export const translations = {
         stat: "Do 1,9 PPG ao fútbol de supervivencia.",
       },
       {
+        id: "goles",
+        kicker: "05 / Os goles",
+        title: "Ás veces un equipo enteiro cabía nun nome.",
+        body:
+          "Cada barra é a produción ligueira do Dépor. A franxa amarela é o máximo goleador desa tempada: cando medra demasiado, a historia deixa de ser coral.",
+        stat: "Makaay 2002-03: 29 goles, Bota de Ouro e saída inmediata cara ao Bayern.",
+      },
+      {
         id: "ascensor",
-        kicker: "05 / O ascensor roto",
+        kicker: "06 / O ascensor roto",
         title: "Hai descensos. E logo está debuxar unha escaleira cara ao soto.",
         body:
           "O club que fora campión de Liga en 2000 xogou catro anos seguidos entre Segunda División B e Primeira RFEF. Nun gráfico limpo, iso parece unha decisión xeométrica. Na vida real foi ruído.",
@@ -101,7 +109,7 @@ export const translations = {
       },
       {
         id: "rivais",
-        kicker: "06 / A lista de rivais",
+        kicker: "07 / A lista de rivais",
         title: "O calendario pasou de ameazar a dar vértixe.",
         body:
           "A traxedia estatística precisa nomes. Cando unha historia inclúe Milan e Manchester United nun extremo, e logo Celta B, Unionistas ou Guijuelo no outro, o eixo Y xa non abonda.",
@@ -109,7 +117,7 @@ export const translations = {
       },
       {
         id: "riazor",
-        kicker: "07 / Riazor",
+        kicker: "08 / Riazor",
         title: "Riazor quedoulle grande á Primeira RFEF.",
         body:
           "O que sostén a parte esperanzadora non é só a táboa. É que, nos anos máis pequenos do calendario, Riazor seguiu parecendo demasiado grande para a categoría.",
@@ -117,7 +125,7 @@ export const translations = {
       },
       {
         id: "porta",
-        kicker: "08 / A porta de volta",
+        kicker: "09 / A porta de volta",
         title: "A 21 de maio de 2026, a liña volve tocar a porta.",
         body:
           "Con 74 puntos en 40 partidos, o Dépor está en ascenso directo. Isto aínda non é final. Precisamente por iso funciona como final provisional: hai unha escaleira e agora apunta cara arriba.",
@@ -133,6 +141,7 @@ export const translations = {
     sourceNotes: {
       "Football-Data.co.uk": "CSV de partidos en Primeira e Segunda.",
       BDFutbol: "Historial do club e tempadas anteriores ao arquivo CSV.",
+      StatsCrew: "Goles por xogador nas tempadas con táboa de anotación.",
       AS: "Contexto da carreira polo ascenso en maio de 2026.",
       LaLiga: "Clasificación oficial de LaLiga Hypermotion.",
       Transfermarkt: "Evolución de asistencia media por tempada e competición.",
@@ -249,6 +258,15 @@ export const translations = {
         label2000: "a máquina aínda funciona",
         label2020: "a liña deixa de parecer profesional",
       },
+      scorers: {
+        title: "Goles: equipo e goleador",
+        otherGoals: "resto do equipo e goles en propia",
+        topScorer: "máximo goleador",
+        axis: "goles de Liga",
+        outlierTitle: "2002-03 · Makaay",
+        outlierBody: "29 goles, Bota de Ouro e logo Bayern",
+        provisional: "dato provisional",
+      },
       tier: {
         title: "Altitude competitiva por tempada",
         label2000: "campión arriba de todo",
@@ -358,8 +376,16 @@ export const translations = {
         stat: "Del 1,9 PPG al fútbol de supervivencia.",
       },
       {
+        id: "goles",
+        kicker: "05 / Los goles",
+        title: "A veces un equipo entero cabía en un nombre.",
+        body:
+          "Cada barra es la producción liguera del Dépor. La franja amarilla es el máximo goleador de esa temporada: cuando crece demasiado, la historia deja de ser coral.",
+        stat: "Makaay 2002-03: 29 goles, Bota de Oro y salida inmediata hacia el Bayern.",
+      },
+      {
         id: "ascensor",
-        kicker: "05 / El ascensor roto",
+        kicker: "06 / El ascensor roto",
         title: "Hay descensos. Y luego está dibujar una escalera hacia el sótano.",
         body:
           "El club que fue campeón de Liga en 2000 jugó cuatro años seguidos entre Segunda División B y Primera RFEF. En un gráfico limpio, eso parece una decisión geométrica. En la vida real fue ruido.",
@@ -367,7 +393,7 @@ export const translations = {
       },
       {
         id: "rivais",
-        kicker: "06 / La lista de rivales",
+        kicker: "07 / La lista de rivales",
         title: "El calendario pasó de amenazar a dar vértigo.",
         body:
           "La tragedia estadística necesita nombres. Cuando una historia incluye Milan y Manchester United en un extremo, y luego Celta B, Unionistas o Guijuelo en el otro, el eje Y ya no alcanza.",
@@ -375,7 +401,7 @@ export const translations = {
       },
       {
         id: "riazor",
-        kicker: "07 / Riazor",
+        kicker: "08 / Riazor",
         title: "A Riazor le quedó pequeña la Primera RFEF.",
         body:
           "Lo que sostiene la parte esperanzadora no es solo la tabla. Es que, en los años más pequeños del calendario, Riazor siguió pareciendo demasiado grande para la categoría.",
@@ -383,7 +409,7 @@ export const translations = {
       },
       {
         id: "porta",
-        kicker: "08 / La puerta de vuelta",
+        kicker: "09 / La puerta de vuelta",
         title: "El 21 de mayo de 2026, la línea vuelve a tocar la puerta.",
         body:
           "Con 74 puntos en 40 partidos, el Dépor está en ascenso directo. Esto aún no es final. Precisamente por eso funciona como final provisional: hay una escalera y ahora apunta hacia arriba.",
@@ -399,6 +425,7 @@ export const translations = {
     sourceNotes: {
       "Football-Data.co.uk": "CSV de partidos en Primera y Segunda.",
       BDFutbol: "Historial del club y temporadas anteriores al archivo CSV.",
+      StatsCrew: "Goles por jugador en las temporadas con tabla de anotación.",
       AS: "Contexto de la carrera por el ascenso en mayo de 2026.",
       LaLiga: "Clasificación oficial de LaLiga Hypermotion.",
       Transfermarkt: "Evolución de asistencia media por temporada y competición.",
@@ -515,6 +542,15 @@ export const translations = {
         label2000: "la máquina aún funciona",
         label2020: "la línea deja de parecer profesional",
       },
+      scorers: {
+        title: "Goles: equipo y goleador",
+        otherGoals: "resto del equipo y goles en propia",
+        topScorer: "máximo goleador",
+        axis: "goles de Liga",
+        outlierTitle: "2002-03 · Makaay",
+        outlierBody: "29 goles, Bota de Oro y luego Bayern",
+        provisional: "dato provisional",
+      },
       tier: {
         title: "Altitud competitiva por temporada",
         label2000: "campeón arriba de todo",
@@ -624,8 +660,16 @@ export const translations = {
         stat: "From 1.9 PPG to survival football.",
       },
       {
+        id: "goles",
+        kicker: "05 / The goals",
+        title: "Sometimes an entire team fit inside one name.",
+        body:
+          "Each bar is Depor's league scoring output. The yellow stack is that season's leading scorer: when it gets too tall, the story stops being collective.",
+        stat: "Makaay 2002-03: 29 goals, the Golden Shoe, then Bayern.",
+      },
+      {
         id: "ascensor",
-        kicker: "05 / The broken elevator",
+        kicker: "06 / The broken elevator",
         title: "There are relegations. Then there is drawing a staircase to the basement.",
         body:
           "The club that won La Liga in 2000 spent four straight years between Segunda Division B and Primera RFEF. On a clean chart, that looks like geometry. In real life it was noise.",
@@ -633,7 +677,7 @@ export const translations = {
       },
       {
         id: "rivais",
-        kicker: "06 / The rivals list",
+        kicker: "07 / The rivals list",
         title: "The fixture list went from threatening to dizzying.",
         body:
           "Statistical tragedy needs names. When one story includes Milan and Manchester United at one end, then Celta B, Unionistas or Guijuelo at the other, the Y axis is no longer enough.",
@@ -641,7 +685,7 @@ export const translations = {
       },
       {
         id: "riazor",
-        kicker: "07 / Riazor",
+        kicker: "08 / Riazor",
         title: "Riazor was too big for Primera RFEF.",
         body:
           "The hopeful part is not only held up by the table. It is that, during the smallest years in the calendar, Riazor still looked too large for the category.",
@@ -649,7 +693,7 @@ export const translations = {
       },
       {
         id: "porta",
-        kicker: "08 / The way back",
+        kicker: "09 / The way back",
         title: "On May 21, 2026, the line is knocking at the door again.",
         body:
           "With 74 points from 40 matches, Depor sits in an automatic promotion place. This is not final yet. That is exactly why it works as a provisional ending: there is a staircase, and now it points upward.",
@@ -665,6 +709,7 @@ export const translations = {
     sourceNotes: {
       "Football-Data.co.uk": "Primera and Segunda match CSVs.",
       BDFutbol: "Club history and seasons before the CSV archive.",
+      StatsCrew: "Player goals in seasons with a scoring table.",
       AS: "Context for the promotion race in May 2026.",
       LaLiga: "Official LaLiga Hypermotion standings.",
       Transfermarkt: "Average attendance by season and competition.",
@@ -780,6 +825,15 @@ export const translations = {
         median: "median",
         label2000: "the machine still works",
         label2020: "the line stops looking professional",
+      },
+      scorers: {
+        title: "Goals: team and scorer",
+        otherGoals: "rest of team and own goals",
+        topScorer: "leading scorer",
+        axis: "league goals",
+        outlierTitle: "2002-03 · Makaay",
+        outlierBody: "29 goals, Golden Shoe, then Bayern",
+        provisional: "provisional data",
       },
       tier: {
         title: "Competitive altitude by season",

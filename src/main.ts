@@ -154,6 +154,24 @@ type AttendanceRecord = {
   source: string;
 };
 
+type TopScorerData = {
+  season: string;
+  players: string[];
+  goals: number;
+  source: string;
+  sourceUrl: string;
+  provisional?: boolean;
+};
+
+type ScorerStackRow = Season & {
+  topScorers: string[];
+  topScorerGoals: number;
+  otherGoals: number;
+  topScorerSource: string;
+  topScorerSourceUrl: string;
+  provisional: boolean;
+};
+
 type StoryData = {
   generated_at: string;
   current_status_date: string;
@@ -339,11 +357,61 @@ const OPPONENT_MOMENTS: OpponentMoment[] = [
     labelDy: -12,
   },
 ];
+
+const statsCrewSeasonUrl = (year: number) => `https://www.statscrew.com/worldfootball/stats/t-DEPCO346/y-${year}`;
+const bdfutbolSeasonUrl = (season: string) => `https://www.bdfutbol.com/en/t/t${season}13.html`;
+const TOP_SCORERS: TopScorerData[] = [
+  { season: "1990-91", players: ["Uralde"], goals: 15, source: "BDFutbol", sourceUrl: bdfutbolSeasonUrl("1990-91") },
+  { season: "1991-92", players: ["Uralde"], goals: 8, source: "StatsCrew", sourceUrl: statsCrewSeasonUrl(1991) },
+  { season: "1992-93", players: ["Bebeto"], goals: 29, source: "StatsCrew", sourceUrl: statsCrewSeasonUrl(1992) },
+  { season: "1993-94", players: ["Bebeto"], goals: 16, source: "StatsCrew", sourceUrl: statsCrewSeasonUrl(1993) },
+  { season: "1994-95", players: ["Bebeto"], goals: 16, source: "StatsCrew", sourceUrl: statsCrewSeasonUrl(1994) },
+  { season: "1995-96", players: ["Bebeto"], goals: 25, source: "StatsCrew", sourceUrl: statsCrewSeasonUrl(1995) },
+  { season: "1996-97", players: ["Rivaldo"], goals: 21, source: "StatsCrew", sourceUrl: statsCrewSeasonUrl(1996) },
+  { season: "1997-98", players: ["Djalminha"], goals: 8, source: "StatsCrew", sourceUrl: statsCrewSeasonUrl(1997) },
+  { season: "1998-99", players: ["Turu Flores"], goals: 14, source: "StatsCrew", sourceUrl: statsCrewSeasonUrl(1998) },
+  { season: "1999-00", players: ["Roy Makaay"], goals: 22, source: "StatsCrew", sourceUrl: statsCrewSeasonUrl(1999) },
+  { season: "2000-01", players: ["Diego Tristán"], goals: 19, source: "StatsCrew", sourceUrl: statsCrewSeasonUrl(2000) },
+  { season: "2001-02", players: ["Diego Tristán"], goals: 20, source: "StatsCrew", sourceUrl: statsCrewSeasonUrl(2001) },
+  { season: "2002-03", players: ["Roy Makaay"], goals: 29, source: "StatsCrew", sourceUrl: statsCrewSeasonUrl(2002) },
+  { season: "2003-04", players: ["Walter Pandiani"], goals: 13, source: "StatsCrew", sourceUrl: statsCrewSeasonUrl(2003) },
+  { season: "2004-05", players: ["Luque"], goals: 11, source: "StatsCrew", sourceUrl: statsCrewSeasonUrl(2004) },
+  { season: "2005-06", players: ["Diego Tristán"], goals: 12, source: "StatsCrew", sourceUrl: statsCrewSeasonUrl(2005) },
+  { season: "2006-07", players: ["Arizmendi"], goals: 5, source: "StatsCrew", sourceUrl: statsCrewSeasonUrl(2006) },
+  { season: "2007-08", players: ["Xisco"], goals: 9, source: "StatsCrew", sourceUrl: statsCrewSeasonUrl(2007) },
+  { season: "2008-09", players: ["Lafita"], goals: 8, source: "StatsCrew", sourceUrl: statsCrewSeasonUrl(2008) },
+  { season: "2009-10", players: ["Riki"], goals: 8, source: "StatsCrew", sourceUrl: statsCrewSeasonUrl(2009) },
+  { season: "2010-11", players: ["Adrián"], goals: 8, source: "StatsCrew", sourceUrl: statsCrewSeasonUrl(2010) },
+  { season: "2011-12", players: ["Lassad Nouioui"], goals: 14, source: "StatsCrew", sourceUrl: statsCrewSeasonUrl(2011) },
+  { season: "2012-13", players: ["Riki"], goals: 13, source: "StatsCrew", sourceUrl: statsCrewSeasonUrl(2012) },
+  { season: "2013-14", players: ["Borja Bastón"], goals: 10, source: "StatsCrew", sourceUrl: statsCrewSeasonUrl(2013) },
+  { season: "2014-15", players: ["Lucas Pérez"], goals: 6, source: "StatsCrew", sourceUrl: statsCrewSeasonUrl(2014) },
+  { season: "2015-16", players: ["Lucas Pérez"], goals: 17, source: "StatsCrew", sourceUrl: statsCrewSeasonUrl(2015) },
+  { season: "2016-17", players: ["Florin Andone"], goals: 12, source: "StatsCrew", sourceUrl: statsCrewSeasonUrl(2016) },
+  { season: "2017-18", players: ["Adrián"], goals: 9, source: "StatsCrew", sourceUrl: statsCrewSeasonUrl(2017) },
+  { season: "2018-19", players: ["Quique"], goals: 16, source: "StatsCrew", sourceUrl: statsCrewSeasonUrl(2018) },
+  { season: "2019-20", players: ["Aketxe"], goals: 7, source: "StatsCrew", sourceUrl: statsCrewSeasonUrl(2019) },
+  { season: "2020-21", players: ["Miku"], goals: 7, source: "BDFutbol", sourceUrl: bdfutbolSeasonUrl("2020-21") },
+  { season: "2021-22", players: ["Alberto Quiles"], goals: 18, source: "BDFutbol", sourceUrl: bdfutbolSeasonUrl("2021-22") },
+  { season: "2022-23", players: ["Alberto Quiles"], goals: 16, source: "StatsCrew", sourceUrl: statsCrewSeasonUrl(2022) },
+  { season: "2023-24", players: ["Lucas Pérez"], goals: 12, source: "BDFutbol", sourceUrl: bdfutbolSeasonUrl("2023-24") },
+  { season: "2024-25", players: ["Yeremay"], goals: 15, source: "BDFutbol", sourceUrl: bdfutbolSeasonUrl("2024-25") },
+  {
+    season: "2025-26",
+    players: ["Yeremay", "Eddahchouri"],
+    goals: 11,
+    source: "BDFutbol",
+    sourceUrl: bdfutbolSeasonUrl("2025-26"),
+    provisional: true,
+  },
+];
+
 const CHAPTER_RENDERERS: Record<string, ChartRenderer> = {
   nube: drawGoalDiffCloud,
   cume: drawTitlePath,
   alto: drawFinishTimeline,
   fuga: drawPpgDrift,
+  goles: drawTopScorerStack,
   ascensor: drawTierAltitude,
   rivais: drawOpponentWall,
   riazor: drawAttendance,
@@ -726,6 +794,7 @@ function renderChapter({
 function renderSources(data: StoryData): HTMLElement {
   const footer = document.createElement("footer");
   footer.className = "sources";
+  const sources = sourceLinks(data);
   footer.innerHTML = `
     <div>
       <p class="eyebrow">${currentCopy.sources.kicker}</p>
@@ -735,7 +804,7 @@ function renderSources(data: StoryData): HTMLElement {
       </p>
     </div>
     <ul>
-      ${data.sources
+      ${sources
         .map(
           (source) =>
             `<li><a href="${source.url}" target="_blank" rel="noreferrer">${source.name}</a><span>${sourceNote(source)}</span></li>`,
@@ -1252,6 +1321,123 @@ function drawPpgDrift(element: HTMLElement, data: StoryData) {
   drawSeasonTicks(svg, seasons, x, height - margin.bottom + 30, width < 560);
   chartTitle(svg, margin.left, 34, currentCopy.charts.ppg.title);
   axisLabel(svg, 18, margin.top + 16, "PPG");
+}
+
+function drawTopScorerStack(element: HTMLElement, data: StoryData) {
+  const { svg, tooltip, width, height } = baseSvg(element);
+  const margin = { ...responsiveMargin(width), bottom: width < 560 ? 76 : 60 };
+  const rows = topScorerRows(data);
+  const maxGoals = Math.ceil(Math.max(80, d3.max(rows, (d) => d.gf) ?? 80) / 20) * 20;
+  const x = d3
+    .scaleBand()
+    .domain(rows.map((d) => d.season))
+    .range([margin.left, width - margin.right])
+    .padding(width < 560 ? 0.1 : 0.16);
+  const y = d3.scaleLinear().domain([0, maxGoals]).range([height - margin.bottom, margin.top + 44]);
+  const topColor = "#febe10";
+  const otherColor = "rgba(255,255,255,0.46)";
+
+  drawGrid(svg, undefined, y, width, height, margin, d3.range(0, maxGoals + 1, 20));
+  svg
+    .append("g")
+    .attr("class", "scorer-bars")
+    .selectAll("rect.scorer-other")
+    .data(rows)
+    .join("rect")
+    .attr("class", "scorer-other")
+    .attr("x", (d) => x(d.season) ?? 0)
+    .attr("y", (d) => y(d.otherGoals))
+    .attr("width", x.bandwidth())
+    .attr("height", (d) => y(0) - y(d.otherGoals))
+    .attr("fill", otherColor)
+    .attr("stroke", "rgba(255,255,255,0.42)")
+    .attr("stroke-width", 1);
+  svg
+    .append("g")
+    .attr("class", "scorer-tops")
+    .selectAll("rect.scorer-top")
+    .data(rows)
+    .join("rect")
+    .attr("class", "scorer-top")
+    .attr("x", (d) => x(d.season) ?? 0)
+    .attr("y", (d) => y(d.gf))
+    .attr("width", x.bandwidth())
+    .attr("height", (d) => Math.max(1, y(d.otherGoals) - y(d.gf)))
+    .attr("fill", topColor)
+    .attr("stroke", LOW_BLUE)
+    .attr("stroke-width", 1.2);
+
+  const hitAreas = svg
+    .append("g")
+    .selectAll("rect.scorer-hit")
+    .data(rows)
+    .join("rect")
+    .attr("class", "tooltip-hit scorer-hit")
+    .attr("x", (d) => x(d.season) ?? 0)
+    .attr("y", (d) => y(d.gf))
+    .attr("width", x.bandwidth())
+    .attr("height", (d) => y(0) - y(d.gf))
+    .attr("fill", "transparent")
+    .attr("pointer-events", "all");
+  bindTooltip(hitAreas, tooltip, scorerTooltip);
+
+  if (x.bandwidth() >= 11) {
+    svg
+      .selectAll("text.scorer-goals")
+      .data(rows.filter((d) => d.topScorerGoals >= 10))
+      .join("text")
+      .attr("class", "bar-label scorer-goals")
+      .attr("x", (d) => (x(d.season) ?? 0) + x.bandwidth() / 2)
+      .attr("y", (d) => (y(d.gf) + y(d.otherGoals)) / 2 + 4)
+      .attr("text-anchor", "middle")
+      .attr("fill", LOW_BLUE)
+      .text((d) => d.topScorerGoals);
+  }
+
+  const outlier = rows.find((row) => row.season === "2002-03");
+  if (outlier) {
+    const pointX = (x(outlier.season) ?? margin.left) + x.bandwidth() / 2;
+    const pointY = y(outlier.gf);
+    const labelWidth = width < 560 ? 154 : 190;
+    const box = label(
+      svg,
+      width < 560 ? margin.left + 8 : pointX - labelWidth * 0.38,
+      width < 560 ? margin.top + 6 : pointY - 96,
+      currentCopy.charts.scorers.outlierTitle,
+      currentCopy.charts.scorers.outlierBody,
+      labelWidth,
+    );
+    labelLeader(svg, pointX, pointY, box, topColor);
+  }
+
+  if (width >= 560) {
+    chartLegend(
+      svg,
+      [
+        { label: currentCopy.charts.scorers.otherGoals, color: otherColor },
+        { label: currentCopy.charts.scorers.topScorer, color: topColor },
+      ],
+      width < 700 ? margin.left : margin.left + 154,
+      width < 700 ? margin.top + 36 : margin.top + 16,
+      width - (width < 700 ? margin.left : margin.left + 154) - margin.right - 8,
+    );
+  }
+  svg
+    .selectAll("text.scorer-season")
+    .data(scorerSeasonTicks(rows, width < 560))
+    .join("text")
+    .attr("class", "axis-text season-tick scorer-season")
+    .attr("x", (d) => (x(d.season) ?? 0) + x.bandwidth() / 2)
+    .attr("y", height - 24)
+    .attr("text-anchor", "middle")
+    .text((d) => (d.provisional ? `${d.season}*` : d.season));
+  chartTitle(svg, margin.left, 34, currentCopy.charts.scorers.title);
+  if (width >= 560) {
+    axisLabel(svg, 18, margin.top + 22, currentCopy.charts.scorers.axis);
+  }
+  if (rows.some((row) => row.provisional)) {
+    axisLabel(svg, width - margin.right, height - 12, currentCopy.charts.scorers.provisional);
+  }
 }
 
 function drawTierAltitude(element: HTMLElement, data: StoryData) {
@@ -2041,6 +2227,57 @@ function titleWarningColor(season: string) {
   return BLUE;
 }
 
+function topScorerRows(data: StoryData): ScorerStackRow[] {
+  const scorersBySeason = new Map(TOP_SCORERS.map((row) => [row.season, row]));
+  return data.seasons
+    .filter((season) => season.season_start >= 1990)
+    .flatMap((season): ScorerStackRow[] => {
+      const scorer = scorersBySeason.get(season.season);
+      if (!scorer) return [];
+      return [
+        {
+          ...season,
+          topScorers: scorer.players,
+          topScorerGoals: scorer.goals,
+          otherGoals: Math.max(0, season.gf - scorer.goals),
+          topScorerSource: scorer.source,
+          topScorerSourceUrl: scorer.sourceUrl,
+          provisional: Boolean(scorer.provisional),
+        },
+      ];
+    });
+}
+
+function scorerTooltip(row: ScorerStackRow): TooltipContent {
+  const share = Math.round((row.topScorerGoals / row.gf) * 100);
+  const provisional = row.provisional ? ` ${currentCopy.charts.scorers.provisional}.` : "";
+  return {
+    title: `${row.season} · ${topScorerLabel(row.topScorers)}`,
+    body: `${row.topScorerGoals}/${row.gf} ${currentCopy.charts.scorers.axis} (${share}%). ${divisionLabel(row.division)}.${provisional} ${currentCopy.common.source}: ${row.topScorerSource}.`,
+  };
+}
+
+function topScorerLabel(players: string[]) {
+  return players.join(" + ");
+}
+
+function scorerSeasonTicks(rows: ScorerStackRow[], compact: boolean) {
+  const firstSeason = rows[0]?.season_start;
+  const lastSeason = rows[rows.length - 1]?.season_start;
+  if (compact) {
+    return rows.filter(
+      (row) => row.season_start === firstSeason || row.season_start === lastSeason || [2000, 2010].includes(row.season_start),
+    );
+  }
+  const cadence = compact ? 10 : 5;
+  return rows.filter(
+    (row) =>
+      row.season_start === firstSeason ||
+      row.season_start === lastSeason ||
+      (firstSeason !== undefined && row.season_start >= firstSeason + cadence && row.season_start % cadence === 0),
+  );
+}
+
 function fallbackAttendanceSeries(data: StoryData): AttendancePoint[] {
   const seasonsByName = new Map(data.seasons.map((season) => [season.season, season]));
   return data.attendance_callouts
@@ -2469,6 +2706,18 @@ function stateLabel(state: string) {
 
 function sourceNote(source: SourceLink) {
   return currentCopy.sourceNotes[source.name as keyof typeof currentCopy.sourceNotes] ?? source.note;
+}
+
+function sourceLinks(data: StoryData): SourceLink[] {
+  const sources = [...data.sources];
+  if (!sources.some((source) => source.name === "StatsCrew")) {
+    sources.splice(2, 0, {
+      name: "StatsCrew",
+      url: "https://www.statscrew.com/worldfootball/stats/t-DEPCO346",
+      note: "Player goals in seasons with a scoring table.",
+    });
+  }
+  return sources;
 }
 
 function attendanceLabel(callout: AttendanceCallout) {
