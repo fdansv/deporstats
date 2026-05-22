@@ -13,8 +13,15 @@ export const translations = {
     html: {
       lang: "gl",
       title: "O Dépor, en datos",
+      socialTitle: "O Dépor, en datos: da Liga de 2000 á porta do regreso",
       description:
         "Un relato de datos sobre o Deportivo de La Coruña: do título de Liga de 2000 á beira do regreso.",
+      socialDescription:
+        "Visualizacións interactivas sobre o Deportivo da Coruña: Liga 1999-00, caída ata a Segunda B e Primeira RFEF, Riazor e carreira polo ascenso en 2025-26.",
+      keywords:
+        "Dépor, Deportivo da Coruña, Deportivo de La Coruña, Riazor, LaLiga, Segunda División, Primeira RFEF, ascenso, datos fútbol",
+      imageAlt: "Gráfico editorial de deporstats sobre o Dépor, Riazor e a volta cara arriba",
+      locale: "gl_ES",
     },
     language: {
       aria: "Selector de idioma",
@@ -42,11 +49,11 @@ export const translations = {
       eyebrow: "Real Club Deportivo da Coruña · relato de datos",
       titleLines: ["O Dépor e a ", "ciencia ", "exacta de ", "caer."],
       lead: (points: number) =>
-        `Un club gaña a Liga no ano 2000. Vinte anos despois está mirando unha ruta que di Segunda B e Primeira RFEF, e preguntándose se tamén hai outro andar por baixo. Agora, con ${points} puntos, volve mirar cara arriba.`,
+        `Un club gaña a Liga no ano 2000. Vinte anos despois acabou mirando unha ruta que dicía Segunda B e Primeira RFEF, e preguntándose se aínda había outro andar por baixo. Agora, con ${points} puntos, volve mirar cara arriba.`,
       statsAria: "Resumo estatístico",
       stats: {
         titlePoints: "puntos no título",
-        tiers: "niveis no eixo",
+        tiers: "categorías percorridas",
         statusDate: (date: string) => `a ${date}`,
       },
       ticker: ["1999-00 CAMPIÓN", "2019-20 DESCENSO", "2023-24 ASCENSO", "2025-26 Á PORTA"],
@@ -103,7 +110,7 @@ export const translations = {
       {
         id: "riazor",
         kicker: "07 / Riazor",
-        title: "O estadio negouse a comportarse como un dato da Primeira RFEF.",
+        title: "Riazor quedoulle grande á Primeira RFEF.",
         body:
           "O que sostén a parte esperanzadora non é só a táboa. É que, nos anos máis pequenos do calendario, Riazor seguiu parecendo demasiado grande para a categoría.",
         stat: "A asistencia converteu a humillación en teimosía.",
@@ -128,16 +135,24 @@ export const translations = {
       BDFutbol: "Historial do club e tempadas anteriores ao arquivo CSV.",
       AS: "Contexto da carreira polo ascenso en maio de 2026.",
       LaLiga: "Clasificación oficial de LaLiga Hypermotion.",
+      Transfermarkt: "Evolución de asistencia media por tempada e competición.",
+      "La Opinión A Coruña": "Contexto local sobre os rexistros recentes de Riazor.",
+      "Quincemil / El Español": "Récord de asistencia en Primeira Federación.",
     },
     attendanceLabels: {
-      "2021-22": "arredor dos 20.000 en Primeira RFEF",
-      "2022-23": "19.028 na Primeira Federación",
-      "2023-24": "Riazor volve encherse para saír do pozo",
+      "2011-12": "Segunda tamén puxo Riazor en modo grande",
+      "2020-21": "a tempada COVID ten asterisco",
+    },
+    attendanceRecordLabels: {
+      "Primera Federación record": "récord da Primeira Federación contra o Barça B",
     },
     attendanceSources: {
       "Wikipedia / prensa": "Wikipedia / prensa",
       Wikipedia: "Wikipedia",
       "prensa / rexistros de asistencia": "prensa / rexistros de asistencia",
+      Transfermarkt: "Transfermarkt",
+      "La Opinión A Coruña": "La Opinión A Coruña",
+      "Quincemil / El Español": "Quincemil / El Español",
     },
     divisions: {
       "Primeira División": "Primeira División",
@@ -212,12 +227,20 @@ export const translations = {
         worstLine: "Peor liña",
       },
       titlePath: {
-        title: "Camiño ao título: puntos acumulados",
+        title: "Avisos antes do título: ritmo de puntos",
         finalTitle: "19/05/2000",
         finalBody: "Riazor: 2-0 ao Espanyol",
+        breakBody: "0-0 co Valencia: a liña rompe no último día",
+        finalStretch: "última recta",
+        warningLines: "avisos anteriores",
+        comparablePoints: "puntos equivalentes",
       },
       finish: {
         title: "Posto na Liga: do medo ao título",
+        topBandLabel: "zona 1º-3º",
+        topBandTitle: "Postos 1º-3º",
+        topBandBody: (hits: number, total: number, start: number, end: number) =>
+          `Entre ${start} e ${end}, o Dépor rematou entre os tres primeiros en ${hits} de ${total} tempadas.`,
       },
       ppg: {
         title: "Puntos por partido e goles",
@@ -242,6 +265,8 @@ export const translations = {
         title: "Asistencia: chamadas de atención",
         labelTitle: "Riazor",
         labelBody: "asistencia aproximada en anos onde a categoría dicía unha cousa e a bancada outra",
+        axis: "asistencia media",
+        partial: "2025-26 parcial",
       },
       promotion: {
         title: "Hypermotion 2025-26: ascenso",
@@ -254,8 +279,15 @@ export const translations = {
     html: {
       lang: "es",
       title: "El Dépor, en datos",
+      socialTitle: "El Dépor, en datos: de la Liga de 2000 a la puerta del regreso",
       description:
         "Un relato de datos sobre el Deportivo de La Coruña: del título de Liga de 2000 al borde del regreso.",
+      socialDescription:
+        "Visualizaciones interactivas sobre el Deportivo de La Coruña: Liga 1999-00, caída hasta Segunda B y Primera RFEF, Riazor y carrera por el ascenso en 2025-26.",
+      keywords:
+        "Dépor, Deportivo de La Coruña, Deportivo La Coruña, Riazor, LaLiga, Segunda División, Primera RFEF, ascenso, datos fútbol",
+      imageAlt: "Gráfico editorial de deporstats sobre el Dépor, Riazor y la vuelta hacia arriba",
+      locale: "es_ES",
     },
     language: {
       aria: "Selector de idioma",
@@ -283,11 +315,11 @@ export const translations = {
       eyebrow: "Real Club Deportivo de La Coruña · relato de datos",
       titleLines: ["El Dépor y la ", "ciencia ", "exacta de ", "caer."],
       lead: (points: number) =>
-        `Un club gana la Liga en el año 2000. Veinte años después está mirando una ruta que dice Segunda B y Primera RFEF, y preguntándose si también hay otro piso por debajo. Ahora, con ${points} puntos, vuelve a mirar hacia arriba.`,
+        `Un club gana la Liga en el año 2000. Veinte años después acabó mirando una ruta que decía Segunda B y Primera RFEF, y preguntándose si todavía había otro piso por debajo. Ahora, con ${points} puntos, vuelve a mirar hacia arriba.`,
       statsAria: "Resumen estadístico",
       stats: {
         titlePoints: "puntos en el título",
-        tiers: "niveles en el eje",
+        tiers: "categorías recorridas",
         statusDate: (date: string) => `a ${date}`,
       },
       ticker: ["1999-00 CAMPEÓN", "2019-20 DESCENSO", "2023-24 ASCENSO", "2025-26 A LA PUERTA"],
@@ -344,7 +376,7 @@ export const translations = {
       {
         id: "riazor",
         kicker: "07 / Riazor",
-        title: "El estadio se negó a comportarse como un dato de Primera RFEF.",
+        title: "A Riazor le quedó pequeña la Primera RFEF.",
         body:
           "Lo que sostiene la parte esperanzadora no es solo la tabla. Es que, en los años más pequeños del calendario, Riazor siguió pareciendo demasiado grande para la categoría.",
         stat: "La asistencia convirtió la humillación en terquedad.",
@@ -369,16 +401,24 @@ export const translations = {
       BDFutbol: "Historial del club y temporadas anteriores al archivo CSV.",
       AS: "Contexto de la carrera por el ascenso en mayo de 2026.",
       LaLiga: "Clasificación oficial de LaLiga Hypermotion.",
+      Transfermarkt: "Evolución de asistencia media por temporada y competición.",
+      "La Opinión A Coruña": "Contexto local sobre los registros recientes de Riazor.",
+      "Quincemil / El Español": "Récord de asistencia en Primera Federación.",
     },
     attendanceLabels: {
-      "2021-22": "alrededor de los 20.000 en Primera RFEF",
-      "2022-23": "19.028 en la Primera Federación",
-      "2023-24": "Riazor vuelve a llenarse para salir del pozo",
+      "2011-12": "Segunda también puso Riazor en modo grande",
+      "2020-21": "la temporada COVID tiene asterisco",
+    },
+    attendanceRecordLabels: {
+      "Primera Federación record": "récord de la Primera Federación contra el Barça B",
     },
     attendanceSources: {
       "Wikipedia / prensa": "Wikipedia / prensa",
       Wikipedia: "Wikipedia",
       "prensa / rexistros de asistencia": "prensa / registros de asistencia",
+      Transfermarkt: "Transfermarkt",
+      "La Opinión A Coruña": "La Opinión A Coruña",
+      "Quincemil / El Español": "Quincemil / El Español",
     },
     divisions: {
       "Primeira División": "Primera División",
@@ -453,12 +493,20 @@ export const translations = {
         worstLine: "Peor línea",
       },
       titlePath: {
-        title: "Camino al título: puntos acumulados",
+        title: "Avisos antes del título: ritmo de puntos",
         finalTitle: "19/05/2000",
         finalBody: "Riazor: 2-0 al Espanyol",
+        breakBody: "0-0 con el Valencia: la línea se rompe el último día",
+        finalStretch: "última recta",
+        warningLines: "avisos anteriores",
+        comparablePoints: "puntos equivalentes",
       },
       finish: {
         title: "Puesto en la Liga: del miedo al título",
+        topBandLabel: "zona 1º-3º",
+        topBandTitle: "Puestos 1º-3º",
+        topBandBody: (hits: number, total: number, start: number, end: number) =>
+          `Entre ${start} y ${end}, el Dépor terminó entre los tres primeros en ${hits} de ${total} temporadas.`,
       },
       ppg: {
         title: "Puntos por partido y goles",
@@ -483,6 +531,8 @@ export const translations = {
         title: "Asistencia: llamadas de atención",
         labelTitle: "Riazor",
         labelBody: "asistencia aproximada en años donde la categoría decía una cosa y la grada otra",
+        axis: "asistencia media",
+        partial: "2025-26 parcial",
       },
       promotion: {
         title: "Hypermotion 2025-26: ascenso",
@@ -495,8 +545,15 @@ export const translations = {
     html: {
       lang: "en",
       title: "Depor, in data",
+      socialTitle: "Depor, in data: from the 2000 La Liga title to the way back",
       description:
         "A data story about Deportivo de La Coruna: from the 2000 La Liga title to the edge of a return.",
+      socialDescription:
+        "Interactive visualizations on Deportivo de La Coruna: the 1999-00 La Liga title, the fall into Segunda B and Primera RFEF, Riazor, and the 2025-26 promotion race.",
+      keywords:
+        "Depor, Deportivo de La Coruna, Deportivo La Coruna, Riazor, LaLiga, Segunda Division, Primera RFEF, promotion, football data",
+      imageAlt: "Editorial deporstats graphic about Depor, Riazor, and the climb back up",
+      locale: "en_US",
     },
     language: {
       aria: "Language selector",
@@ -524,11 +581,11 @@ export const translations = {
       eyebrow: "Real Club Deportivo de La Coruna · data story",
       titleLines: ["Depor and the ", "exact ", "science of ", "falling."],
       lead: (points: number) =>
-        `A club wins La Liga in 2000. Twenty years later it is staring at a route marked Segunda B and Primera RFEF, wondering whether there is another floor below. Now, with ${points} points, it is looking up again.`,
+        `A club wins La Liga in 2000. Twenty years later it found itself staring at a route marked Segunda B and Primera RFEF, wondering whether there was another floor below. Now, with ${points} points, it is looking up again.`,
       statsAria: "Statistical summary",
       stats: {
         titlePoints: "points in the title season",
-        tiers: "levels on the axis",
+        tiers: "tiers crossed",
         statusDate: (date: string) => `as of ${date}`,
       },
       ticker: ["1999-00 CHAMPIONS", "2019-20 RELEGATION", "2023-24 PROMOTION", "2025-26 AT THE DOOR"],
@@ -585,7 +642,7 @@ export const translations = {
       {
         id: "riazor",
         kicker: "07 / Riazor",
-        title: "The stadium refused to behave like a Primera RFEF data point.",
+        title: "Riazor was too big for Primera RFEF.",
         body:
           "The hopeful part is not only held up by the table. It is that, during the smallest years in the calendar, Riazor still looked too large for the category.",
         stat: "Attendance turned humiliation into stubbornness.",
@@ -610,16 +667,24 @@ export const translations = {
       BDFutbol: "Club history and seasons before the CSV archive.",
       AS: "Context for the promotion race in May 2026.",
       LaLiga: "Official LaLiga Hypermotion standings.",
+      Transfermarkt: "Average attendance by season and competition.",
+      "La Opinión A Coruña": "Local context on recent Riazor attendance records.",
+      "Quincemil / El Español": "Primera Federacion attendance record.",
     },
     attendanceLabels: {
-      "2021-22": "around 20,000 in Primera RFEF",
-      "2022-23": "19,028 in Primera Federacion",
-      "2023-24": "Riazor fills again to climb out of the hole",
+      "2011-12": "Segunda still put Riazor in big-stadium mode",
+      "2020-21": "the COVID season needs an asterisk",
+    },
+    attendanceRecordLabels: {
+      "Primera Federación record": "Primera Federacion record against Barca B",
     },
     attendanceSources: {
       "Wikipedia / prensa": "Wikipedia / press",
       Wikipedia: "Wikipedia",
       "prensa / rexistros de asistencia": "press / attendance records",
+      Transfermarkt: "Transfermarkt",
+      "La Opinión A Coruña": "La Opinión A Coruña",
+      "Quincemil / El Español": "Quincemil / El Español",
     },
     divisions: {
       "Primeira División": "Primera Division",
@@ -694,12 +759,20 @@ export const translations = {
         worstLine: "Worst line",
       },
       titlePath: {
-        title: "Road to the title: accumulated points",
+        title: "Warnings before the title: points pace",
         finalTitle: "05/19/2000",
         finalBody: "Riazor: 2-0 over Espanyol",
+        breakBody: "0-0 with Valencia: the line breaks on the final day",
+        finalStretch: "final stretch",
+        warningLines: "earlier warnings",
+        comparablePoints: "equivalent points",
       },
       finish: {
         title: "League finish: from fear to the title",
+        topBandLabel: "1st-3rd zone",
+        topBandTitle: "Places 1st-3rd",
+        topBandBody: (hits: number, total: number, start: number, end: number) =>
+          `Between ${start} and ${end}, Depor finished in the top three in ${hits} of ${total} seasons.`,
       },
       ppg: {
         title: "Points per match and goals",
@@ -724,6 +797,8 @@ export const translations = {
         title: "Attendance: warning signs",
         labelTitle: "Riazor",
         labelBody: "approximate attendance in years when the category said one thing and the stands said another",
+        axis: "average attendance",
+        partial: "2025-26 partial",
       },
       promotion: {
         title: "Hypermotion 2025-26: promotion",

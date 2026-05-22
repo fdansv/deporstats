@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /deporstats/
+
+Sitemap: https://francisco.dance/deporstats/sitemap.xml

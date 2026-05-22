@@ -48,6 +48,20 @@ type TitlePoint = {
   result: "W" | "D" | "L";
 };
 
+type TitleWarningPoint = {
+  season: string;
+  round: number;
+  date: string;
+  comparable_points: number;
+  actual_points: number;
+  opponent: string;
+  venue: "H" | "A";
+  gf: number;
+  ga: number;
+  result: "W" | "D" | "L";
+  finish: number;
+};
+
 type TitleRacePoint = {
   team: string;
   round: number;
@@ -118,6 +132,28 @@ type AttendanceCallout = {
   source: string;
 };
 
+type AttendancePoint = {
+  season: string;
+  season_start: number;
+  division: string;
+  tier: number;
+  attendance: number;
+  matches: number;
+  total: number;
+  source: string;
+  partial?: boolean;
+};
+
+type AttendanceRecord = {
+  id: string;
+  season: string;
+  attendance: number;
+  opponent: string;
+  date: string;
+  label: string;
+  source: string;
+};
+
 type StoryData = {
   generated_at: string;
   current_status_date: string;
@@ -131,6 +167,8 @@ type StoryData = {
   team_colors: Record<string, string>;
   promotion_table: PromotionTeam[];
   milestones: { season: string; title: string; body: string }[];
+  attendance_series?: AttendancePoint[];
+  attendance_records?: AttendanceRecord[];
   attendance_callouts: AttendanceCallout[];
   opponent_wall: { elite: string[]; third_tier: string[]; football_data_opponents: string[] };
   sources: SourceLink[];
@@ -141,6 +179,7 @@ type TooltipContent = { title: string; body: string };
 type TooltipSelection = d3.Selection<HTMLDivElement, unknown, null, undefined>;
 type LegendItem = { label: string; color: string };
 type LabelBox = { x: number; y: number; width: number; height: number };
+type OpponentCardLayout = LabelBox & { moment: OpponentMoment; pointX: number; pointY: number };
 type OpponentMoment = {
   season: string;
   year: number;
@@ -163,6 +202,21 @@ const GRID = "rgba(255,255,255,0.34)";
 const WARN = "#ff624f";
 const LOW_BLUE = "#004b93";
 const MID_BLUE = "#006bcf";
+const ATTENDANCE_COLORS: Record<string, string> = {
+  "Primeira División": "#ffffff",
+  "Segunda División": "#febe10",
+  "Segunda División B": "#ff624f",
+  "Primeira RFEF": "#8fd7ff",
+  "Primeira Federación": "#80f0bd",
+};
+const ATTENDANCE_DIVISION_ORDER = [
+  "Primeira División",
+  "Segunda División",
+  "Segunda División B",
+  "Primeira RFEF",
+  "Primeira Federación",
+];
+const TITLE_WARNING_SEASONS = ["1993-94", "1994-95", "1996-97", "1998-99", "1999-00"];
 const OPPONENT_MOMENTS: OpponentMoment[] = [
   {
     season: "1993-94",
@@ -296,7 +350,11 @@ const CHAPTER_RENDERERS: Record<string, ChartRenderer> = {
   porta: drawPromotionRace,
 };
 
-let currentLanguage: Language = DEFAULT_LANGUAGE;
+const SITE_URL = "https://francisco.dance/deporstats/";
+const DATE_PUBLISHED = "2026-05-21";
+const LANGUAGE_QUERY_PARAM = "lang";
+
+let currentLanguage: Language = initialLanguage();
 let currentCopy = translations[currentLanguage];
 let storyData: StoryData | null = null;
 let resizeObservers: ResizeObserver[] = [];
@@ -310,6 +368,15 @@ if (!app) {
 const root = app;
 
 const storyDataUrl = `${import.meta.env.BASE_URL}data/depor_story.json`;
+
+applyDocumentLanguage();
+
+window.addEventListener("popstate", () => {
+  const nextLanguage = initialLanguage();
+  if (nextLanguage !== currentLanguage) {
+    setLanguage(nextLanguage, { updateUrl: false });
+  }
+});
 
 void fetch(storyDataUrl, { cache: "no-cache" })
   .then((response) => {
@@ -327,7 +394,7 @@ void fetch(storyDataUrl, { cache: "no-cache" })
   });
 
 function renderApp(data: StoryData) {
-  applyDocumentLanguage();
+  applyDocumentLanguage(data);
   snapNavigationCleanup?.();
   snapNavigationCleanup = null;
   resizeObservers.forEach((observer) => observer.disconnect());
@@ -346,13 +413,43 @@ function renderApp(data: StoryData) {
   scrollToInitialHash();
 }
 
-function applyDocumentLanguage() {
+function applyDocumentLanguage(data: StoryData | null = storyData) {
+  const canonicalUrl = languageUrl(currentLanguage);
+  const imageUrl = socialImageUrl(currentLanguage);
   document.documentElement.lang = currentCopy.html.lang;
   document.title = currentCopy.html.title;
-  document.querySelector<HTMLMetaElement>('meta[name="description"]')?.setAttribute("content", currentCopy.html.description);
+  setMetaName("description", currentCopy.html.description);
+  setMetaName("keywords", currentCopy.html.keywords);
+  setMetaName("author", "Francisco Dans");
+  setMetaName("robots", "index, follow, max-image-preview:large");
+  setMetaName("theme-color", "#004b93");
+  setMetaName("twitter:card", "summary_large_image");
+  setMetaName("twitter:title", currentCopy.html.socialTitle);
+  setMetaName("twitter:description", currentCopy.html.socialDescription);
+  setMetaName("twitter:image", imageUrl);
+  setMetaName("twitter:image:alt", currentCopy.html.imageAlt);
+  setMetaProperty("og:type", "article");
+  setMetaProperty("og:site_name", "deporstats");
+  setMetaProperty("og:title", currentCopy.html.socialTitle);
+  setMetaProperty("og:description", currentCopy.html.socialDescription);
+  setMetaProperty("og:url", canonicalUrl);
+  setMetaProperty("og:image", imageUrl);
+  setMetaProperty("og:image:width", "1200");
+  setMetaProperty("og:image:height", "630");
+  setMetaProperty("og:image:alt", currentCopy.html.imageAlt);
+  setMetaProperty("og:locale", currentCopy.html.locale);
+  setOpenGraphAlternateLocales();
+  setMetaProperty("article:published_time", DATE_PUBLISHED);
+  setMetaProperty("article:modified_time", data?.generated_at ?? DATE_PUBLISHED);
+  setCanonical(canonicalUrl);
+  setAlternateLinks();
+  setStructuredData(data, canonicalUrl);
 }
 
-function setLanguage(language: Language) {
+function setLanguage(language: Language, options: { updateUrl?: boolean } = {}) {
+  if (options.updateUrl !== false) {
+    updateLanguageUrl(language);
+  }
   if (language === currentLanguage) return;
   currentLanguage = language;
   currentCopy = translations[currentLanguage];
@@ -361,6 +458,180 @@ function setLanguage(language: Language) {
   } else {
     applyDocumentLanguage();
   }
+}
+
+function initialLanguage(): Language {
+  const urlLanguage = new URLSearchParams(location.search).get(LANGUAGE_QUERY_PARAM);
+  return isLanguage(urlLanguage) ? urlLanguage : DEFAULT_LANGUAGE;
+}
+
+function isLanguage(value: string | null): value is Language {
+  return LANGUAGE_OPTIONS.some(({ code }) => code === value);
+}
+
+function updateLanguageUrl(language: Language) {
+  const url = new URL(location.href);
+  if (language === DEFAULT_LANGUAGE) {
+    url.searchParams.delete(LANGUAGE_QUERY_PARAM);
+  } else {
+    url.searchParams.set(LANGUAGE_QUERY_PARAM, language);
+  }
+  history.pushState(null, "", `${url.pathname}${url.search}${url.hash}`);
+}
+
+function languageUrl(language: Language): string {
+  const url = new URL(SITE_URL);
+  if (language !== DEFAULT_LANGUAGE) {
+    url.searchParams.set(LANGUAGE_QUERY_PARAM, language);
+  }
+  return url.toString();
+}
+
+function socialImageUrl(language: Language): string {
+  return `${SITE_URL}${language === DEFAULT_LANGUAGE ? "social-preview.png" : `social-preview-${language}.png`}`;
+}
+
+function setCanonical(url: string) {
+  const link = ensureHeadElement("link", 'link[rel="canonical"]') as HTMLLinkElement;
+  link.rel = "canonical";
+  link.href = url;
+}
+
+function setAlternateLinks() {
+  document.querySelectorAll<HTMLLinkElement>('link[rel="alternate"][hreflang]').forEach((link) => link.remove());
+  for (const { code } of LANGUAGE_OPTIONS) {
+    const link = document.createElement("link");
+    link.rel = "alternate";
+    link.hreflang = translations[code].html.lang;
+    link.href = languageUrl(code);
+    document.head.append(link);
+  }
+  const defaultLink = document.createElement("link");
+  defaultLink.rel = "alternate";
+  defaultLink.hreflang = "x-default";
+  defaultLink.href = languageUrl(DEFAULT_LANGUAGE);
+  document.head.append(defaultLink);
+}
+
+function setOpenGraphAlternateLocales() {
+  document.querySelectorAll<HTMLMetaElement>('meta[property="og:locale:alternate"]').forEach((meta) => meta.remove());
+  for (const { code } of LANGUAGE_OPTIONS) {
+    if (code === currentLanguage) continue;
+    const meta = document.createElement("meta");
+    meta.setAttribute("property", "og:locale:alternate");
+    meta.content = translations[code].html.locale;
+    document.head.append(meta);
+  }
+}
+
+function setMetaName(name: string, content: string) {
+  const meta = ensureHeadElement("meta", `meta[name="${name}"]`) as HTMLMetaElement;
+  meta.name = name;
+  meta.content = content;
+}
+
+function setMetaProperty(property: string, content: string) {
+  const meta = ensureHeadElement("meta", `meta[property="${property}"]`) as HTMLMetaElement;
+  meta.setAttribute("property", property);
+  meta.content = content;
+}
+
+function ensureHeadElement(tagName: "link" | "meta" | "script", selector: string) {
+  const existing = document.head.querySelector(selector);
+  if (existing) return existing;
+  const element = document.createElement(tagName);
+  document.head.append(element);
+  return element;
+}
+
+function setStructuredData(data: StoryData | null, canonicalUrl: string) {
+  const script = ensureHeadElement("script", "script#structured-data") as HTMLScriptElement;
+  script.id = "structured-data";
+  script.type = "application/ld+json";
+  script.textContent = JSON.stringify(buildStructuredData(data, canonicalUrl));
+}
+
+function buildStructuredData(data: StoryData | null, canonicalUrl: string) {
+  const sourceCitations = data?.sources.map((source) => source.url) ?? [
+    "https://www.football-data.co.uk/spainm.php",
+    "https://www.bdfutbol.com/es/e/e13.html",
+    "https://as.com/futbol/segunda/el-depor-con-dos-balas-para-el-ascenso-y-rivales-sin-margen-de-error-f202605-n/",
+    "https://www.laliga.com/laliga-hypermotion/clasificacion",
+    "https://www.transfermarkt.co/deportivo-la-coruna/besucherzahlenentwicklung/verein/897",
+    "https://www.laopinioncoruna.es/deportivo/2024/06/16/tercera-mejor-asistencia-media-riazor-103876820.html",
+  ];
+  const dateModified = data?.generated_at ?? DATE_PUBLISHED;
+
+  return {
+    "@context": "https://schema.org",
+    "@graph": [
+      {
+        "@type": "Article",
+        "@id": `${canonicalUrl}#article`,
+        url: canonicalUrl,
+        mainEntityOfPage: canonicalUrl,
+        headline: currentCopy.html.socialTitle,
+        name: currentCopy.html.title,
+        description: currentCopy.html.socialDescription,
+        inLanguage: currentCopy.html.lang,
+        isAccessibleForFree: true,
+        datePublished: DATE_PUBLISHED,
+        dateModified,
+        author: {
+          "@type": "Person",
+          name: "Francisco Dans",
+          url: "https://github.com/fdansv",
+        },
+        publisher: {
+          "@type": "Organization",
+          name: "deporstats",
+          url: SITE_URL,
+        },
+        image: {
+          "@type": "ImageObject",
+          url: socialImageUrl(currentLanguage),
+          width: 1200,
+          height: 630,
+          caption: currentCopy.html.imageAlt,
+        },
+        about: [
+          {
+            "@type": "SportsTeam",
+            name: "Real Club Deportivo de La Coruña",
+            alternateName: ["Dépor", "Depor", "Deportivo de La Coruña", "Deportivo La Coruña"],
+            sport: "Football",
+          },
+          {
+            "@type": "SportsActivityLocation",
+            name: "Estadio Abanca-Riazor",
+            address: {
+              "@type": "PostalAddress",
+              addressLocality: "A Coruña",
+              addressRegion: "Galicia",
+              addressCountry: "ES",
+            },
+          },
+        ],
+        keywords: currentCopy.html.keywords.split(", "),
+        citation: sourceCitations,
+      },
+      {
+        "@type": "Dataset",
+        "@id": `${canonicalUrl}#dataset`,
+        name: currentCopy.html.title,
+        description: currentCopy.html.description,
+        inLanguage: currentCopy.html.lang,
+        url: canonicalUrl,
+        dateModified,
+        creator: {
+          "@type": "Person",
+          name: "Francisco Dans",
+        },
+        about: "Real Club Deportivo de La Coruña football results, standings, attendance, and promotion context",
+        citation: sourceCitations,
+      },
+    ],
+  };
 }
 
 function renderHero(data: StoryData): HTMLElement {
@@ -644,111 +915,174 @@ function drawGoalDiffCloud(element: HTMLElement, data: StoryData) {
 function drawTitlePath(element: HTMLElement, data: StoryData) {
   const { svg, tooltip, width, height } = baseSvg(element);
   const margin = responsiveMargin(width);
-  const points = data.title_path;
-  const x = d3.scaleLinear().domain([1, 38]).range([margin.left, width - margin.right]);
-  const y = d3.scaleLinear().domain([0, 72]).range([height - margin.bottom, margin.top]);
+  const paths = buildTitleWarningPaths(data);
+  const titlePath = paths.find((values) => values[0]?.season === "1999-00") ?? [];
+  const contextPaths = paths.filter((values) => values[0]?.season !== "1999-00");
+  const x = d3
+    .scaleLinear()
+    .domain([1, d3.max(paths.flat(), (d) => d.round) ?? 42])
+    .range([margin.left, width - margin.right]);
+  const y = d3
+    .scaleLinear()
+    .domain([0, Math.max(80, d3.max(paths.flat(), (d) => d.comparable_points) ?? 72)])
+    .nice()
+    .range([height - margin.bottom, margin.top]);
   const line = d3
-    .line<TitlePoint>()
+    .line<TitleWarningPoint>()
     .x((d) => x(d.round))
-    .y((d) => y(d.points))
+    .y((d) => y(d.comparable_points))
     .curve(d3.curveStepAfter);
 
-  drawGrid(svg, x, y, width, height, margin, [0, 15, 30, 45, 60, 69]);
-  const contextTeams = d3.group(
-    data.title_race.filter((point) => point.team !== "La Coruna"),
-    (point) => point.team,
-  );
-  for (const [team, values] of contextTeams) {
+  drawGrid(svg, x, y, width, height, margin, [0, 20, 40, 60, 80]);
+  svg
+    .append("rect")
+    .attr("x", x(36))
+    .attr("y", margin.top)
+    .attr("width", width - margin.right - x(36))
+    .attr("height", height - margin.top - margin.bottom)
+    .attr("fill", "rgba(255,255,255,0.08)");
+  svg
+    .append("text")
+    .attr("x", width - margin.right - 4)
+    .attr("y", margin.top + 18)
+    .attr("class", "context-label")
+    .attr("fill", "rgba(255,255,255,0.82)")
+    .attr("text-anchor", "end")
+    .text(currentCopy.charts.titlePath.finalStretch);
+  for (const values of contextPaths) {
     svg
       .append("path")
       .datum(values)
       .attr("fill", "none")
-      .attr("stroke", values[0]?.color ?? "rgba(255,255,255,0.4)")
-      .attr("stroke-width", 2.5)
-      .attr("stroke-opacity", 0.52)
-      .attr(
-        "d",
-        d3
-          .line<TitleRacePoint>()
-          .x((d) => x(d.round))
-          .y((d) => y(d.points))
-          .curve(d3.curveStepAfter),
-      );
+      .attr("stroke", titleWarningColor(values[0]?.season ?? ""))
+      .attr("stroke-width", values[0]?.season === "1993-94" ? 3 : 2)
+      .attr("stroke-opacity", values[0]?.season === "1993-94" ? 0.88 : 0.46)
+      .attr("d", line);
   }
   svg
     .append("path")
-    .datum(points)
+    .datum(titlePath)
     .attr("fill", "none")
     .attr("stroke", BLUE)
     .attr("stroke-width", 5)
     .attr("d", line);
+
+  for (const values of paths) {
+    const lastPoint = values[values.length - 1];
+    if (!lastPoint) continue;
+    svg
+      .append("text")
+      .attr("x", x(lastPoint.round) + (lastPoint.round >= 40 ? -8 : 8))
+      .attr("y", y(lastPoint.comparable_points) + (lastPoint.season === "1993-94" ? -12 : 4))
+      .attr("class", "context-label")
+      .attr("fill", lastPoint.season === "1999-00" ? BLUE : titleWarningColor(lastPoint.season))
+      .attr("text-anchor", lastPoint.round >= 40 ? "end" : "start")
+      .text(`${lastPoint.season} · ${lastPoint.finish}º`);
+  }
+
+  const allPoints = paths.flat();
   svg
     .selectAll("circle")
-    .data(points)
+    .data(allPoints.filter((d) => d.round === 1 || d.round >= 36 || d.result === "L"))
     .join("circle")
     .attr("cx", (d) => x(d.round))
-    .attr("cy", (d) => y(d.points))
-    .attr("r", (d) => (d.result === "W" ? 4.5 : 3))
-    .attr("fill", (d) => (d.result === "L" ? WARN : d.result === "D" ? LOW_BLUE : BLUE))
-    .attr("stroke", DARK)
+    .attr("cy", (d) => y(d.comparable_points))
+    .attr("r", (d) => (d.season === "1999-00" ? 4.8 : 3.6))
+    .attr("fill", (d) => (d.result === "L" ? WARN : d.season === "1999-00" ? BLUE : titleWarningColor(d.season)))
+    .attr("stroke", BLUE)
     .attr("stroke-width", 1.5);
   bindTooltip(
     svg
       .selectAll("circle.title-hit")
-      .data(points)
+      .data(allPoints)
       .join("circle")
       .attr("class", "tooltip-hit title-hit")
       .attr("cx", (d) => x(d.round))
-      .attr("cy", (d) => y(d.points))
+      .attr("cy", (d) => y(d.comparable_points))
       .attr("r", 15),
     tooltip,
     (d) => ({
-      title: `${formatDate(d.date)} · ${currentCopy.common.round} ${d.round}`,
-      body: `${venueLabel(d.venue)}: Dépor ${d.gf}-${d.ga} ${displayTeam(d.opponent)}. ${resultLabel(d.result)}, ${d.points} ${currentCopy.common.points}.`,
+      title: `${d.season} · ${currentCopy.common.round} ${d.round}`,
+      body: `${formatDate(d.date)}. ${venueLabel(d.venue)}: Dépor ${d.gf}-${d.ga} ${displayTeam(d.opponent)}. ${resultLabel(d.result)}, ${d.comparable_points} ${currentCopy.charts.titlePath.comparablePoints}.`,
     }),
   );
 
-  const last = points[points.length - 1];
-  if (last) {
-    label(
+  const collapsePath = paths.find((values) => values[0]?.season === "1993-94");
+  const collapse = collapsePath ? collapsePath[collapsePath.length - 1] : undefined;
+  const titleLast = titlePath[titlePath.length - 1];
+  if (collapse) {
+    const box = label(
       svg,
-      x(last.round) - 170,
-      y(last.points) - 52,
+      x(collapse.round) - 188,
+      y(collapse.comparable_points) - 80,
+      "1993-94",
+      currentCopy.charts.titlePath.breakBody,
+      176,
+    );
+    labelLeader(svg, x(collapse.round), y(collapse.comparable_points), box, WARN);
+  }
+  if (titleLast) {
+    const box = label(
+      svg,
+      x(titleLast.round) - 168,
+      y(titleLast.comparable_points) + 18,
       currentCopy.charts.titlePath.finalTitle,
       currentCopy.charts.titlePath.finalBody,
+      176,
     );
-    svg
-      .append("line")
-      .attr("class", "fixed-label")
-      .attr("x1", x(last.round))
-      .attr("x2", x(last.round))
-      .attr("y1", y(last.points))
-      .attr("y2", y(last.points) - 35)
-      .attr("stroke", DARK)
-      .attr("stroke-width", 2);
+    labelLeader(svg, x(titleLast.round), y(titleLast.comparable_points), box, BLUE);
   }
 
   chartTitle(svg, margin.left, 34, currentCopy.charts.titlePath.title);
   chartLegend(
     svg,
-    [...contextTeams].map(([team, values]) => ({ label: displayTeam(team), color: values[0]?.color ?? BLUE })),
+    [
+      { label: currentCopy.charts.titlePath.warningLines, color: "rgba(255,255,255,0.58)" },
+      { label: "1999-00", color: BLUE },
+    ],
     margin.left,
     54,
     width - margin.left - margin.right,
   );
   axisLabel(svg, width - margin.right, height - 12, currentCopy.common.round);
-  axisLabel(svg, 18, margin.top, currentCopy.common.points);
+  axisLabel(svg, 18, margin.top, currentCopy.charts.titlePath.comparablePoints);
 }
 
 function drawFinishTimeline(element: HTMLElement, data: StoryData) {
   const { svg, tooltip, width, height } = baseSvg(element);
   const margin = responsiveMargin(width);
-  const seasons = data.seasons.filter((season) => season.season_start >= 1990 && season.season_start <= 2005);
+  const seasons = data.seasons.filter((season) => season.season_start >= 1991 && season.season_start <= 2005);
+  const topThree = seasons.filter((season) => season.finish <= 3);
+  const rangeStart = seasons[0]?.season_start ?? 1990;
+  const rangeEnd = (seasons[seasons.length - 1]?.season_start ?? 2005) + 1;
   const x = d3
     .scaleLinear()
     .domain(d3.extent(seasons, (d) => d.season_start) as [number, number])
     .range([margin.left, width - margin.right]);
   const y = d3.scaleLinear().domain([20, 1]).range([height - margin.bottom, margin.top + 24]);
+
+  const topBand = svg
+    .append("rect")
+    .datum({ hits: topThree.length, total: seasons.length, start: rangeStart, end: rangeEnd })
+    .attr("x", margin.left)
+    .attr("y", y(1))
+    .attr("width", width - margin.left - margin.right)
+    .attr("height", y(3) - y(1))
+    .attr("fill", "rgba(255,255,255,0.13)")
+    .attr("stroke", "rgba(255,255,255,0.5)")
+    .attr("stroke-width", 2);
+  bindTooltip(topBand, tooltip, (d) => ({
+    title: currentCopy.charts.finish.topBandTitle,
+    body: currentCopy.charts.finish.topBandBody(d.hits, d.total, d.start, d.end),
+  }));
+  svg
+    .append("text")
+    .attr("x", width - margin.right - 8)
+    .attr("y", y(3) - 8)
+    .attr("class", "context-label")
+    .attr("fill", "rgba(255,255,255,0.86)")
+    .attr("text-anchor", "end")
+    .text(currentCopy.charts.finish.topBandLabel);
 
   drawGrid(svg, x, y, width, height, margin, [1, 5, 10, 15, 20]);
   svg
@@ -775,6 +1109,7 @@ function drawFinishTimeline(element: HTMLElement, data: StoryData) {
     .attr("fill", (d) => (d.season === "1999-00" ? BLUE : d.finish <= 3 ? LOW_BLUE : DARK))
     .attr("stroke", BLUE)
     .attr("stroke-width", 2);
+
   bindTooltip(
     svg
       .selectAll("circle.finish-hit")
@@ -790,10 +1125,6 @@ function drawFinishTimeline(element: HTMLElement, data: StoryData) {
       body: `${divisionLabel(d.division)}: ${d.points} ${currentCopy.common.points}, ${d.wins}-${d.draws}-${d.losses}, ${currentCopy.common.goalDiff} ${signed(d.gd)}.`,
     }),
   );
-
-  for (const season of seasons.filter((d) => ["1991-92", "1992-93", "1999-00", "2003-04"].includes(d.season))) {
-    label(svg, x(season.season_start) - 42, y(season.finish) - 62, season.season, `${season.finish}º`);
-  }
 
   chartTitle(svg, margin.left, 34, currentCopy.charts.finish.title);
   axisLabel(svg, 18, margin.top + 16, currentCopy.common.position);
@@ -1015,8 +1346,8 @@ function drawOpponentWall(element: HTMLElement, data: StoryData) {
     .scaleLinear()
     .domain([-4.8, 4.8])
     .range([height - margin.bottom, margin.top + 44]);
-  const cardWidth = width < 620 ? 122 : 148;
-  const cardHeight = 54;
+  const cardWidth = width < 620 ? 124 : 142;
+  const cardHeight = width < 620 ? 62 : 66;
   const moments = OPPONENT_MOMENTS;
   const yearTicks = [
     { year: 1994, label: "1994" },
@@ -1117,32 +1448,42 @@ function drawOpponentWall(element: HTMLElement, data: StoryData) {
     .attr("stroke-width", 2);
   bindTooltip(dots, tooltip, opponentTooltip);
 
-  for (const moment of moments) {
-    const pointX = x(moment.year);
-    const pointY = y(moment.polarity === "high" ? moment.impact : -moment.impact);
-    const cardX = clamp(pointX + moment.labelDx, margin.left, width - margin.right - cardWidth);
-    const cardY = clamp(pointY + moment.labelDy, margin.top + 42, height - margin.bottom - cardHeight - 8);
-    drawOpponentMomentCard(svg, tooltip, moment, cardX, cardY, cardWidth, cardHeight, pointX, pointY);
+  const layouts = layoutOpponentMomentCards(moments, x, y, centerY, margin, width, height, cardWidth, cardHeight);
+  for (const layout of layouts) {
+    drawOpponentMomentCard(svg, layout);
   }
 }
 
 function drawAttendance(element: HTMLElement, data: StoryData) {
   const { svg, tooltip, width, height } = baseSvg(element);
-  const margin = responsiveMargin(width);
-  const rows = data.attendance_callouts;
+  const margin = { ...responsiveMargin(width), bottom: width < 560 ? 74 : 58 };
+  const rows = (data.attendance_series?.length ? data.attendance_series : fallbackAttendanceSeries(data)).sort(
+    (a, b) => a.season_start - b.season_start,
+  );
+  const records = data.attendance_records ?? [];
+  const calloutsBySeason = new Map(data.attendance_callouts.map((callout) => [callout.season, callout]));
   const x = d3
     .scaleBand()
     .domain(rows.map((d) => d.season))
     .range([margin.left, width - margin.right])
-    .padding(0.2);
+    .padding(0.18);
   const y = d3
     .scaleLinear()
-    .domain([0, d3.max(rows, (d) => d.attendance) ?? 25000])
+    .domain([
+      0,
+      Math.max(
+        30000,
+        d3.max(rows, (d) => d.attendance) ?? 25000,
+        d3.max(records, (d) => d.attendance) ?? 0,
+      ),
+    ])
     .nice()
-    .range([height - margin.bottom, margin.top + 22]);
+    .range([height - margin.bottom, margin.top + 42]);
 
-  drawGrid(svg, undefined, y, width, height, margin, [0, 10000, 20000]);
+  drawGrid(svg, undefined, y, width, height, margin, [0, 10000, 20000, 30000]);
   const bars = svg
+    .append("g")
+    .attr("class", "attendance-bars")
     .selectAll("rect")
     .data(rows)
     .join("rect")
@@ -1150,40 +1491,102 @@ function drawAttendance(element: HTMLElement, data: StoryData) {
     .attr("y", (d) => y(d.attendance))
     .attr("width", x.bandwidth())
     .attr("height", (d) => y(0) - y(d.attendance))
-    .attr("fill", BLUE)
-    .attr("stroke", DARK)
-    .attr("stroke-width", 2);
+    .attr("fill", (d) => attendanceDivisionColor(d.division))
+    .attr("fill-opacity", (d) => (d.partial ? 0.58 : 0.88))
+    .attr("stroke", "rgba(0,46,99,0.95)")
+    .attr("stroke-width", 1.5);
   bindTooltip(bars, tooltip, (d) => ({
     title: `Riazor · ${d.season}`,
-    body: `${formatNumber(d.attendance)} ${currentCopy.common.averageApprox} ${attendanceLabel(d)}. ${currentCopy.common.source}: ${attendanceSource(d)}.`,
+    body: attendanceTooltip(d, calloutsBySeason.get(d.season)),
   }));
+  const recordMarks = svg
+    .append("g")
+    .attr("class", "attendance-records")
+    .selectAll("g")
+    .data(records)
+    .join("g")
+    .attr("transform", (d) => {
+      const row = rows.find((item) => item.season === d.season);
+      const barX = row ? x(row.season) ?? 0 : margin.left;
+      return `translate(${barX},${y(d.attendance)})`;
+    });
+  recordMarks
+    .append("line")
+    .attr("x1", -4)
+    .attr("x2", x.bandwidth() + 4)
+    .attr("y1", 0)
+    .attr("y2", 0)
+    .attr("stroke", BLUE)
+    .attr("stroke-width", 4);
+  recordMarks
+    .append("circle")
+    .attr("cx", x.bandwidth() / 2)
+    .attr("cy", 0)
+    .attr("r", 5.5)
+    .attr("fill", attendanceDivisionColor("Primeira Federación"))
+    .attr("stroke", BLUE)
+    .attr("stroke-width", 2);
+  bindTooltip(recordMarks, tooltip, attendanceRecordTooltip);
   svg
-    .selectAll("text.bar-label")
-    .data(rows)
+    .selectAll("text.attendance-season")
+    .data(attendanceTicks(rows, width < 560))
     .join("text")
-    .attr("class", "bar-label")
+    .attr("class", "axis-text season-tick attendance-season")
     .attr("x", (d) => (x(d.season) ?? 0) + x.bandwidth() / 2)
-    .attr("y", (d) => y(d.attendance) - 12)
+    .attr("y", height - 22)
     .attr("text-anchor", "middle")
-    .text((d) => formatNumber(d.attendance));
-  svg
-    .selectAll("text.season-label")
-    .data(rows)
-    .join("text")
-    .attr("class", "axis-text")
-    .attr("x", (d) => (x(d.season) ?? 0) + x.bandwidth() / 2)
-    .attr("y", height - 18)
-    .attr("text-anchor", "middle")
-    .text((d) => d.season);
+    .text((d) => (d.partial ? `${d.season}*` : d.season));
+
+  chartLegend(
+    svg,
+    attendanceLegendItems(rows),
+    margin.left,
+    margin.top + 16,
+    width - margin.left - margin.right - 8,
+  );
+  for (const callout of data.attendance_callouts) {
+    const row = rows.find((item) => item.season === callout.season);
+    if (!row) continue;
+    const pointX = (x(row.season) ?? 0) + x.bandwidth() / 2;
+    const pointY = y(row.attendance);
+    const labelWidth = width < 560 ? 146 : 178;
+    const labelX = clamp(
+      row.season_start < 2015 ? pointX + 12 : pointX - labelWidth - 12,
+      margin.left,
+      width - margin.right - labelWidth,
+    );
+    const labelY = clamp(
+      row.season_start >= 2023 ? pointY + 18 : row.attendance < 8000 ? pointY - 92 : pointY - 68,
+      margin.top + 60,
+      height - margin.bottom - 74,
+    );
+    const box = label(svg, labelX, labelY, callout.season, attendanceLabel(callout), labelWidth);
+    labelLeader(svg, pointX, pointY, box, attendanceDivisionColor(row.division));
+  }
+  for (const record of records) {
+    const row = rows.find((item) => item.season === record.season);
+    if (!row) continue;
+    const pointX = (x(row.season) ?? 0) + x.bandwidth() / 2;
+    const pointY = y(record.attendance);
+    const labelWidth = width < 560 ? 150 : 184;
+    const labelX = clamp(pointX + 12, margin.left, width - margin.right - labelWidth);
+    const labelY = clamp(pointY + 16, margin.top + 54, height - margin.bottom - 74);
+    const box = label(svg, labelX, labelY, formatNumber(record.attendance), attendanceRecordLabel(record), labelWidth);
+    labelLeader(svg, pointX, pointY, box, BLUE);
+  }
 
   label(
     svg,
     margin.left,
-    margin.top + 12,
+    height - margin.bottom - 72,
     currentCopy.charts.attendance.labelTitle,
     currentCopy.charts.attendance.labelBody,
   );
   chartTitle(svg, margin.left, 34, currentCopy.charts.attendance.title);
+  axisLabel(svg, 18, margin.top + 26, currentCopy.charts.attendance.axis);
+  if (rows.some((row) => row.partial)) {
+    axisLabel(svg, width - margin.right, height - 12, currentCopy.charts.attendance.partial);
+  }
 }
 
 function drawPromotionRace(element: HTMLElement, data: StoryData) {
@@ -1297,17 +1700,104 @@ function drawGrid(
   }
 }
 
-function drawOpponentMomentCard(
-  svg: d3.Selection<SVGSVGElement, unknown, null, undefined>,
-  tooltip: TooltipSelection,
-  moment: OpponentMoment,
-  x: number,
-  y: number,
+function layoutOpponentMomentCards(
+  moments: OpponentMoment[],
+  x: (year: number) => number,
+  y: d3.ScaleLinear<number, number>,
+  centerY: number,
+  margin: { top: number; right: number; bottom: number; left: number },
   width: number,
   height: number,
-  pointX: number,
-  pointY: number,
+  cardWidth: number,
+  cardHeight: number,
+): OpponentCardLayout[] {
+  const pointFor = (moment: OpponentMoment) => ({
+    pointX: x(moment.year),
+    pointY: y(moment.polarity === "high" ? moment.impact : -moment.impact),
+  });
+  const highMaxY = centerY - cardHeight - 14;
+  const high = moments
+    .filter((moment) => moment.polarity === "high")
+    .map((moment) => {
+      const { pointX, pointY } = pointFor(moment);
+      return {
+        moment,
+        pointX,
+        pointY,
+        width: cardWidth,
+        height: cardHeight,
+        x: clamp(pointX + moment.labelDx * (width < 620 ? 0.55 : 0.75), margin.left, width - margin.right - cardWidth),
+        y: clamp(pointY + Math.min(moment.labelDy * 0.72, -24), margin.top + 42, highMaxY),
+      };
+    });
+  resolveCardOverlaps(high, margin.top + 42, highMaxY, 8);
+
+  const low = moments
+    .filter((moment) => moment.polarity === "low")
+    .map((moment) => ({ moment, ...pointFor(moment) }))
+    .sort((a, b) => a.pointX - b.pointX);
+  const lowLayouts: OpponentCardLayout[] = [];
+  const columns = width < 520 ? 1 : 2;
+  const rowGap = 10;
+  const columnGap = 12;
+  const rows = Math.ceil(low.length / columns);
+  const clusterWidth = columns * cardWidth + (columns - 1) * columnGap;
+  const lowCenter = d3.mean(low, (item) => item.pointX) ?? width * 0.7;
+  const startX = clamp(lowCenter - clusterWidth / 2, margin.left, width - margin.right - clusterWidth);
+  const startY = clamp(centerY + 38, centerY + 24, height - margin.bottom - rows * cardHeight - (rows - 1) * rowGap);
+  if (columns === 1) {
+    low.forEach((item, row) => {
+      lowLayouts.push({
+        moment: item.moment,
+        pointX: item.pointX,
+        pointY: item.pointY,
+        width: cardWidth,
+        height: cardHeight,
+        x: startX,
+        y: startY + row * (cardHeight + rowGap),
+      });
+    });
+  } else {
+    const split = Math.ceil(low.length / 2);
+    [low.slice(0, split), low.slice(split)].forEach((column, columnIndex) => {
+      column.forEach((item, row) => {
+        lowLayouts.push({
+          moment: item.moment,
+          pointX: item.pointX,
+          pointY: item.pointY,
+          width: cardWidth,
+          height: cardHeight,
+          x: startX + columnIndex * (cardWidth + columnGap),
+          y: startY + row * (cardHeight + rowGap),
+        });
+      });
+    });
+  }
+
+  return [...high, ...lowLayouts];
+}
+
+function resolveCardOverlaps(cards: LabelBox[], minY: number, maxY: number, gap: number) {
+  const sorted = [...cards].sort((a, b) => a.x - b.x);
+  for (let i = 0; i < sorted.length; i += 1) {
+    let guard = 0;
+    while (sorted.slice(0, i).some((other) => labelBoxesOverlap(sorted[i], other, gap)) && guard < 24) {
+      sorted[i].y = clamp(sorted[i].y + gap, minY, maxY);
+      guard += 1;
+      if (sorted[i].y === maxY) break;
+    }
+  }
+}
+
+function labelBoxesOverlap(a: LabelBox, b: LabelBox, gap = 0) {
+  return a.x < b.x + b.width + gap && a.x + a.width + gap > b.x && a.y < b.y + b.height + gap && a.y + a.height + gap > b.y;
+}
+
+function drawOpponentMomentCard(
+  svg: d3.Selection<SVGSVGElement, unknown, null, undefined>,
+  layout: OpponentCardLayout,
 ) {
+  const { moment, x, y, width, height, pointX, pointY } = layout;
   const color = moment.polarity === "high" ? BLUE : WARN;
   const card = { x, y, width, height };
   const target = nearestLabelEdgePoint(pointX, pointY, card);
@@ -1325,36 +1815,44 @@ function drawOpponentMomentCard(
   const group = svg
     .append("g")
     .datum(moment)
-    .attr("class", "fixed-label opponent-card")
+    .attr("class", "fixed-label opponent-card opponent-tag")
     .attr("transform", `translate(${x},${y})`);
   group
     .append("rect")
+    .attr("class", "opponent-card-bg")
     .attr("width", width)
     .attr("height", height)
-    .attr("fill", LOW_BLUE)
+    .attr("fill", moment.polarity === "high" ? "rgba(0,75,147,0.78)" : "rgba(0,63,127,0.9)");
+  group
+    .append("line")
+    .attr("x1", 0)
+    .attr("x2", width)
+    .attr("y1", 0)
+    .attr("y2", 0)
     .attr("stroke", color)
-    .attr("stroke-width", 2.5);
+    .attr("stroke-width", 3);
   group
     .append("text")
-    .attr("x", 10)
-    .attr("y", 21)
+    .attr("x", 8)
+    .attr("y", 19)
     .attr("class", "opponent-score")
+    .attr("font-size", width < 620 ? 15 : 16)
     .attr("fill", color)
     .text(moment.score);
   group
     .append("text")
-    .attr("x", 10)
-    .attr("y", 39)
+    .attr("x", 8)
+    .attr("y", 41)
     .attr("class", "opponent-name")
-    .attr("font-size", Math.max(10, Math.min(13, width / (moment.opponent.length * 0.64))))
+    .attr("font-size", Math.max(9, Math.min(11.5, width / (moment.opponent.length * 0.7))))
     .text(moment.opponent);
   group
     .append("text")
-    .attr("x", 10)
-    .attr("y", height - 8)
+    .attr("x", 8)
+    .attr("y", height - 9)
     .attr("class", "label-body")
+    .attr("font-size", 8)
     .text(`${moment.season} · ${moment.competition}`);
-  bindTooltip(group, tooltip, opponentTooltip);
 }
 
 function opponentTooltip(moment: OpponentMoment) {
@@ -1499,6 +1997,111 @@ function drawSeasonTicks(
     .text((d) => d.season);
 }
 
+function buildTitleWarningPaths(data: StoryData): TitleWarningPoint[][] {
+  const seasonsByName = new Map(data.seasons.map((season) => [season.season, season]));
+  return TITLE_WARNING_SEASONS.map((season) => {
+    const seasonMeta = seasonsByName.get(season);
+    const pointsForWin = pointsForWinInSeason(season);
+    let comparablePoints = 0;
+    let actualPoints = 0;
+    return data.matches
+      .filter((match) => match.season === season)
+      .sort((a, b) => a.date.localeCompare(b.date))
+      .map((match, index) => {
+        const comparableAward = match.depor_result === "W" ? 3 : match.depor_result === "D" ? 1 : 0;
+        const actualAward = match.depor_result === "W" ? pointsForWin : match.depor_result === "D" ? 1 : 0;
+        comparablePoints += comparableAward;
+        actualPoints += actualAward;
+        return {
+          season,
+          round: index + 1,
+          date: match.date,
+          comparable_points: comparablePoints,
+          actual_points: actualPoints,
+          opponent: match.depor_venue === "H" ? match.away_team : match.home_team,
+          venue: match.depor_venue,
+          gf: match.depor_goals_for,
+          ga: match.depor_goals_against,
+          result: match.depor_result,
+          finish: seasonMeta?.finish ?? 0,
+        };
+      });
+  }).filter((values) => values.length);
+}
+
+function pointsForWinInSeason(season: string) {
+  return Number(season.slice(0, 4)) < 1995 ? 2 : 3;
+}
+
+function titleWarningColor(season: string) {
+  if (season === "1993-94") return "#febe10";
+  if (season === "1994-95") return "#80f0bd";
+  if (season === "1996-97") return "#8fd7ff";
+  if (season === "1998-99") return "rgba(255,255,255,0.64)";
+  return BLUE;
+}
+
+function fallbackAttendanceSeries(data: StoryData): AttendancePoint[] {
+  const seasonsByName = new Map(data.seasons.map((season) => [season.season, season]));
+  return data.attendance_callouts
+    .map((callout) => {
+      const season = seasonsByName.get(callout.season);
+      return {
+        season: callout.season,
+        season_start: season?.season_start ?? Number(callout.season.slice(0, 4)),
+        division: season?.division ?? "",
+        tier: season?.tier ?? 0,
+        attendance: callout.attendance,
+        matches: 0,
+        total: 0,
+        source: callout.source,
+      };
+    })
+    .filter((row) => Number.isFinite(row.season_start));
+}
+
+function attendanceDivisionColor(division: string) {
+  return ATTENDANCE_COLORS[division] ?? BLUE;
+}
+
+function attendanceLegendItems(rows: AttendancePoint[]): LegendItem[] {
+  const divisions = new Set(rows.map((row) => row.division));
+  return ATTENDANCE_DIVISION_ORDER.filter((division) => divisions.has(division)).map((division) => ({
+    label: divisionLabel(division),
+    color: attendanceDivisionColor(division),
+  }));
+}
+
+function attendanceTicks(rows: AttendancePoint[], compact: boolean) {
+  const first = rows[0]?.season_start;
+  const last = rows[rows.length - 1]?.season_start;
+  const cadence = compact ? 5 : 3;
+  return rows.filter(
+    (row) => row.season_start === first || row.season_start === last || row.season_start % cadence === 0 || row.partial,
+  );
+}
+
+function attendanceTooltip(row: AttendancePoint, callout?: AttendanceCallout) {
+  const fragments = [
+    `${formatNumber(row.attendance)} ${currentCopy.common.averageApprox}`,
+    divisionLabel(row.division),
+    `${row.matches} ${currentCopy.common.matches}`,
+  ];
+  if (row.partial) {
+    fragments.push(currentCopy.charts.attendance.partial);
+  }
+  const source = callout?.source ?? row.source;
+  const labelText = callout ? `${attendanceLabel(callout)}. ` : "";
+  return `${labelText}${fragments.join(" · ")}. ${currentCopy.common.source}: ${attendanceSource(source)}.`;
+}
+
+function attendanceRecordTooltip(record: AttendanceRecord) {
+  return {
+    title: `${formatNumber(record.attendance)} · ${record.season}`,
+    body: `${attendanceRecordLabel(record)}. ${formatDate(record.date)} ${currentCopy.common.against} ${displayTeam(record.opponent)}. ${currentCopy.common.source}: ${attendanceSource(record.source)}.`,
+  };
+}
+
 function chartLegend(
   svg: d3.Selection<SVGSVGElement, unknown, null, undefined>,
   items: LegendItem[],
@@ -1546,9 +2149,10 @@ function label(
   y: number,
   title: string,
   body: string,
+  width = 168,
 ): LabelBox {
-  const labelWidth = 168;
-  const bodyLines = wrapLabelText(body);
+  const labelWidth = width;
+  const bodyLines = wrapLabelText(body, Math.max(20, Math.floor((labelWidth - 20) / 6.2)));
   const height = 34 + bodyLines.length * 14;
   const viewBox = svg.attr("viewBox")?.split(/\s+/).map(Number) ?? [];
   const svgWidth = viewBox[2] || labelWidth + 36;
@@ -1625,13 +2229,13 @@ function clamp(value: number, min: number, max: number) {
   return Math.max(min, Math.min(max, value));
 }
 
-function wrapLabelText(text: string) {
+function wrapLabelText(text: string, maxChars = 25) {
   const words = text.split(" ");
   const lines: string[] = [];
   let current = "";
   for (const word of words) {
     const candidate = current ? `${current} ${word}` : word;
-    if (candidate.length <= 25) {
+    if (candidate.length <= maxChars) {
       current = candidate;
       continue;
     }
@@ -1871,8 +2475,12 @@ function attendanceLabel(callout: AttendanceCallout) {
   return currentCopy.attendanceLabels[callout.season as keyof typeof currentCopy.attendanceLabels] ?? callout.label;
 }
 
-function attendanceSource(callout: AttendanceCallout) {
-  return currentCopy.attendanceSources[callout.source as keyof typeof currentCopy.attendanceSources] ?? callout.source;
+function attendanceSource(source: string) {
+  return currentCopy.attendanceSources[source as keyof typeof currentCopy.attendanceSources] ?? source;
+}
+
+function attendanceRecordLabel(record: AttendanceRecord) {
+  return currentCopy.attendanceRecordLabels[record.label as keyof typeof currentCopy.attendanceRecordLabels] ?? record.label;
 }
 
 function tierLabel(tier: number) {

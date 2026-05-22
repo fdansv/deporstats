@@ -1,0 +1,23 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
+  <defs>
+    <clipPath id="badge">
+      <rect width="64" height="64" rx="12" />
+    </clipPath>
+  </defs>
+  <g clip-path="url(#badge)">
+    <rect width="64" height="64" fill="#ffffff" />
+    <rect x="0" width="11" height="64" fill="#005eb8" />
+    <rect x="21" width="11" height="64" fill="#005eb8" />
+    <rect x="42" width="11" height="64" fill="#005eb8" />
+  </g>
+  <rect
+    x="1.5"
+    y="1.5"
+    width="61"
+    height="61"
+    rx="10.5"
+    fill="none"
+    stroke="#005eb8"
+    stroke-width="3"
+  />
+</svg>
