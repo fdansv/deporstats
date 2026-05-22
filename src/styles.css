@@ -612,7 +612,7 @@ h1 span {
 @media (max-width: 860px) {
   html.scroll-magic {
     scroll-padding-top: 48px;
-    scroll-snap-type: y mandatory;
+    scroll-snap-type: y proximity;
   }
 
   .hero,
@@ -690,7 +690,7 @@ h1 span {
   }
 
   .chapter--sequence {
-    --sequence-chart-mobile-height: max(320px, min(46vh, 390px));
+    --sequence-chart-mobile-height: clamp(250px, 34vh, 310px);
   }
 
   .chapter--sequence .chart-shell {
@@ -704,14 +704,33 @@ h1 span {
     min-height: 100vh;
     min-height: 100svh;
     justify-content: flex-start;
-    padding: calc(var(--sequence-chart-mobile-height) + 24px) 20px 58px;
-    opacity: 0.42;
+    padding: calc(var(--sequence-chart-mobile-height) + 72px) 20px 62px;
+    opacity: 0.78;
+    scroll-margin-top: calc(var(--sequence-chart-mobile-height) + 72px);
     scroll-snap-align: start;
     scroll-snap-stop: always;
   }
 
   .chapter--sequence .sequence-panel.is-active {
     opacity: 1;
+  }
+
+  .chapter--sequence .chapter-copy.sequence-panel h2 {
+    font-size: clamp(28px, 8.2vw, 38px);
+    line-height: 1;
+  }
+
+  .chapter--sequence .chapter-copy.sequence-panel p:not(.eyebrow):not(.stat-line) {
+    margin-top: 20px;
+    font-size: clamp(18px, 5vw, 21px);
+    line-height: 1.12;
+  }
+
+  .chapter--sequence .sequence-panel .stat-line {
+    margin-top: 24px;
+    padding: 12px 13px;
+    font-size: clamp(13px, 3.7vw, 16px);
+    line-height: 1.22;
   }
 
   .loss-ledger {
@@ -730,6 +749,8 @@ h1 span {
 
   .loss-ledger__list {
     grid-template-columns: repeat(2, minmax(0, 1fr));
+    max-height: 36vh;
+    overflow-y: auto;
   }
 
   .loss-ledger__list li {
