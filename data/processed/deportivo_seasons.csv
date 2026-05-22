@@ -1,0 +1,37 @@
+season,tier,division,finish,points,matches,wins,draws,losses,gf,ga,state,source,source_url,gd,ppg,gd_per_match,season_start
+1990-91,2,Segunda División,2,48,38,20,8,10,60,32,Ascenso a Primeira,BDFutbol,https://www.bdfutbol.com/es/t/t1990-912a.html,28,1.263,0.737,1990
+1991-92,1,Primeira División,17,31,38,8,15,15,37,48,Salvación na promoción,BDFutbol,https://www.bdfutbol.com/t/t1991-92.html,-11,0.816,-0.289,1991
+1992-93,1,Primeira División,3,54,38,22,10,6,67,33,Súper Dépor,BDFutbol,https://www.bdfutbol.com/es/en/t/t1992-93.html?tab=stats,34,1.421,0.895,1992
+1993-94,1,Primeira División,2,56,38,22,12,4,54,18,Zona alta,Football-Data.co.uk,https://www.football-data.co.uk/mmz4281/9394/SP1.csv,36,1.474,0.947,1993
+1994-95,1,Primeira División,2,51,38,20,11,7,68,32,Zona alta,Football-Data.co.uk,https://www.football-data.co.uk/mmz4281/9495/SP1.csv,36,1.342,0.947,1994
+1995-96,1,Primeira División,9,61,42,16,13,13,63,44,,Football-Data.co.uk,https://www.football-data.co.uk/mmz4281/9596/SP1.csv,19,1.452,0.452,1995
+1996-97,1,Primeira División,3,77,42,21,14,7,57,30,Zona alta,Football-Data.co.uk + posto oficial por criterios de desempate,https://www.bdfutbol.com/es/t/t1996-97.html,27,1.833,0.643,1996
+1997-98,1,Primeira División,12,49,38,12,13,13,44,46,,Football-Data.co.uk,https://www.football-data.co.uk/mmz4281/9798/SP1.csv,-2,1.289,-0.053,1997
+1998-99,1,Primeira División,6,63,38,17,12,9,55,43,Zona alta,Football-Data.co.uk,https://www.football-data.co.uk/mmz4281/9899/SP1.csv,12,1.658,0.316,1998
+1999-00,1,Primeira División,1,69,38,21,6,11,66,44,Campión de Liga,Football-Data.co.uk,https://www.football-data.co.uk/mmz4281/9900/SP1.csv,22,1.816,0.579,1999
+2000-01,1,Primeira División,2,73,38,22,7,9,73,44,Zona alta,Football-Data.co.uk,https://www.football-data.co.uk/mmz4281/0001/SP1.csv,29,1.921,0.763,2000
+2001-02,1,Primeira División,2,68,38,20,8,10,65,41,Zona alta,Football-Data.co.uk,https://www.football-data.co.uk/mmz4281/0102/SP1.csv,24,1.789,0.632,2001
+2002-03,1,Primeira División,3,72,38,22,6,10,67,47,Zona alta,Football-Data.co.uk,https://www.football-data.co.uk/mmz4281/0203/SP1.csv,20,1.895,0.526,2002
+2003-04,1,Primeira División,3,71,38,21,8,9,60,34,Zona alta,Football-Data.co.uk,https://www.football-data.co.uk/mmz4281/0304/SP1.csv,26,1.868,0.684,2003
+2004-05,1,Primeira División,9,51,38,12,15,11,46,50,,Football-Data.co.uk,https://www.football-data.co.uk/mmz4281/0405/SP1.csv,-4,1.342,-0.105,2004
+2005-06,1,Primeira División,8,55,38,15,10,13,47,45,,Football-Data.co.uk,https://www.football-data.co.uk/mmz4281/0506/SP1.csv,2,1.447,0.053,2005
+2006-07,1,Primeira División,13,47,38,12,11,15,32,45,,Football-Data.co.uk,https://www.football-data.co.uk/mmz4281/0607/SP1.csv,-13,1.237,-0.342,2006
+2007-08,1,Primeira División,8,52,38,15,7,16,46,47,,Football-Data.co.uk,https://www.football-data.co.uk/mmz4281/0708/SP1.csv,-1,1.368,-0.026,2007
+2008-09,1,Primeira División,7,58,38,16,10,12,48,47,,Football-Data.co.uk,https://www.football-data.co.uk/mmz4281/0809/SP1.csv,1,1.526,0.026,2008
+2009-10,1,Primeira División,10,47,38,13,8,17,35,49,,Football-Data.co.uk,https://www.football-data.co.uk/mmz4281/0910/SP1.csv,-14,1.237,-0.368,2009
+2010-11,1,Primeira División,18,43,38,10,13,15,31,47,Descenso,Football-Data.co.uk,https://www.football-data.co.uk/mmz4281/1011/SP1.csv,-16,1.132,-0.421,2010
+2011-12,2,Segunda División,1,91,42,29,4,9,76,45,Ascenso,Football-Data.co.uk,https://www.football-data.co.uk/mmz4281/1112/SP2.csv,31,2.167,0.738,2011
+2012-13,1,Primeira División,19,35,38,8,11,19,47,70,Descenso,Football-Data.co.uk,https://www.football-data.co.uk/mmz4281/1213/SP1.csv,-23,0.921,-0.605,2012
+2013-14,2,Segunda División,2,69,42,19,12,11,48,36,Ascenso,Football-Data.co.uk,https://www.football-data.co.uk/mmz4281/1314/SP2.csv,12,1.643,0.286,2013
+2014-15,1,Primeira División,16,35,38,7,14,17,35,60,,Football-Data.co.uk + posto oficial por criterios de desempate,https://en.wikipedia.org/wiki/Deportivo_de_La_Coru%C3%B1a,-25,0.921,-0.658,2014
+2015-16,1,Primeira División,15,42,38,8,18,12,45,61,,Football-Data.co.uk,https://www.football-data.co.uk/mmz4281/1516/SP1.csv,-16,1.105,-0.421,2015
+2016-17,1,Primeira División,16,36,38,8,12,18,43,61,,Football-Data.co.uk,https://www.football-data.co.uk/mmz4281/1617/SP1.csv,-18,0.947,-0.474,2016
+2017-18,1,Primeira División,18,29,38,6,11,21,38,76,Descenso,Football-Data.co.uk,https://www.football-data.co.uk/mmz4281/1718/SP1.csv,-38,0.763,-1.0,2017
+2018-19,2,Segunda División,6,68,42,17,17,8,50,32,,Football-Data.co.uk,https://www.football-data.co.uk/mmz4281/1819/SP2.csv,18,1.619,0.429,2018
+2019-20,2,Segunda División,19,51,42,12,15,15,43,60,Descenso,Football-Data.co.uk,https://www.football-data.co.uk/mmz4281/1920/SP2.csv,-17,1.214,-0.405,2019
+2020-21,3,Segunda División B,4,39,24,11,6,7,22,13,Primeiro ano en Segunda División B,Wikipedia/BDFutbol,https://en.wikipedia.org/wiki/Deportivo_de_La_Coru%C3%B1a,9,1.625,0.375,2020
+2021-22,3,Primeira RFEF,2,74,38,22,8,8,59,29,Cae no play-off,Wikipedia/BDFutbol,https://en.wikipedia.org/wiki/Deportivo_de_La_Coru%C3%B1a,30,1.947,0.789,2021
+2022-23,3,Primeira Federación,4,67,38,18,13,7,53,29,Outro play-off perdido,AS / Wikipedia,https://resultados.as.com/resultados/futbol/primera_rfef/2022_2023/clasificacion/,24,1.763,0.632,2022
+2023-24,3,Primeira Federación,1,78,38,22,12,4,64,27,Campión e ascenso a Segunda,StatsCrew / Wikipedia,https://www.statscrew.com/worldfootball/stats/t-DEPCO346/y-2023,37,2.053,0.974,2023
+2024-25,2,Segunda División,15,53,42,13,14,15,56,54,,Football-Data.co.uk + posto oficial por criterios de desempate,https://www.bdfutbol.com/en/t/t2024-252a.html,2,1.262,0.048,2024
+2025-26,2,Segunda División,2,74,40,21,11,8,62,42,En ascenso directo a 21/05/2026,Football-Data.co.uk,https://www.football-data.co.uk/mmz4281/2526/SP2.csv,20,1.85,0.5,2025

@@ -1,0 +1,21 @@
+{
+  "name": "deporstats",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "data": "python3 scripts/fetch_football_data.py",
+    "check:data": "python3 scripts/validate_data.py",
+    "dev": "vite --host 127.0.0.1",
+    "build": "tsc && vite build",
+    "preview": "vite preview --host 127.0.0.1"
+  },
+  "dependencies": {
+    "d3": "^7.9.0"
+  },
+  "devDependencies": {
+    "@types/d3": "^7.4.3",
+    "typescript": "^5.8.3",
+    "vite": "^6.3.5"
+  }
+}

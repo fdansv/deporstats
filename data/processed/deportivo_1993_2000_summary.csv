@@ -1,0 +1,8 @@
+season,tier,division,finish,points,matches,wins,draws,losses,gf,ga,gd,ppg,gd_per_match,source,source_url,state,season_start
+1993-94,1,Primeira División,2,56,38,22,12,4,54,18,36,1.474,0.947,Football-Data.co.uk,https://www.football-data.co.uk/mmz4281/9394/SP1.csv,Zona alta,1993
+1994-95,1,Primeira División,2,51,38,20,11,7,68,32,36,1.342,0.947,Football-Data.co.uk,https://www.football-data.co.uk/mmz4281/9495/SP1.csv,Zona alta,1994
+1995-96,1,Primeira División,9,61,42,16,13,13,63,44,19,1.452,0.452,Football-Data.co.uk,https://www.football-data.co.uk/mmz4281/9596/SP1.csv,,1995
+1996-97,1,Primeira División,3,77,42,21,14,7,57,30,27,1.833,0.643,Football-Data.co.uk + posto oficial por criterios de desempate,https://www.bdfutbol.com/es/t/t1996-97.html,Zona alta,1996
+1997-98,1,Primeira División,12,49,38,12,13,13,44,46,-2,1.289,-0.053,Football-Data.co.uk,https://www.football-data.co.uk/mmz4281/9798/SP1.csv,,1997
+1998-99,1,Primeira División,6,63,38,17,12,9,55,43,12,1.658,0.316,Football-Data.co.uk,https://www.football-data.co.uk/mmz4281/9899/SP1.csv,Zona alta,1998
+1999-00,1,Primeira División,1,69,38,21,6,11,66,44,22,1.816,0.579,Football-Data.co.uk,https://www.football-data.co.uk/mmz4281/9900/SP1.csv,Campión de Liga,1999
