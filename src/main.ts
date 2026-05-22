@@ -191,7 +191,7 @@ const OPPONENT_MOMENTS: OpponentMoment[] = [
     note: "The title season did not just survive Madrid; it ran through them.",
     source: "Football-Data",
     sourceUrl: "https://www.football-data.co.uk/mmz4281/9900/SP1.csv",
-    labelDx: -70,
+    labelDx: -42,
     labelDy: -86,
   },
   {
@@ -207,7 +207,7 @@ const OPPONENT_MOMENTS: OpponentMoment[] = [
     source: "UEFA",
     sourceUrl: "https://www.uefa.com/uefachampionsleague/news/017d-0e6a314d9511-4b77428a1884-1000--comeback-kings-deportivo-stun-united/",
     labelDx: 26,
-    labelDy: -36,
+    labelDy: -4,
   },
   {
     season: "2003-04",
@@ -237,7 +237,7 @@ const OPPONENT_MOMENTS: OpponentMoment[] = [
     source: "BDFutbol",
     sourceUrl: "https://www.bdfutbol.com/en/t/t2020-2113.html?tab=partits",
     labelDx: -190,
-    labelDy: 28,
+    labelDy: -96,
   },
   {
     season: "2020-21",
@@ -252,7 +252,7 @@ const OPPONENT_MOMENTS: OpponentMoment[] = [
     source: "BDFutbol",
     sourceUrl: "https://www.bdfutbol.com/en/t/t2020-2113.html?tab=partits",
     labelDx: -235,
-    labelDy: 92,
+    labelDy: -34,
   },
   {
     season: "2020-21",
@@ -267,7 +267,7 @@ const OPPONENT_MOMENTS: OpponentMoment[] = [
     source: "BDFutbol",
     sourceUrl: "https://www.bdfutbol.com/en/t/t2020-2113.html?tab=partits",
     labelDx: -53,
-    labelDy: 28,
+    labelDy: -96,
   },
   {
     season: "2020-21",
@@ -282,7 +282,7 @@ const OPPONENT_MOMENTS: OpponentMoment[] = [
     source: "BDFutbol",
     sourceUrl: "https://www.bdfutbol.com/en/t/t2020-2113.html?tab=partits",
     labelDx: -84,
-    labelDy: 92,
+    labelDy: -34,
   },
 ];
 const CHAPTER_RENDERERS: Record<string, ChartRenderer> = {
