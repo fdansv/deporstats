@@ -2971,22 +2971,25 @@ function setupSnapNavigation() {
   document.documentElement.classList.add("scroll-magic");
 
   const desktopQuery = window.matchMedia("(min-width: 861px)");
+  const mobileQuery = window.matchMedia("(max-width: 860px)");
   const reducedMotionQuery = window.matchMedia("(prefers-reduced-motion: reduce)");
   const cooldownMs = 560;
   const sequenceScrollDurationMs = 1120;
+  const mobileSequenceScrollDurationMs = 420;
   let moveLockedUntil = 0;
   let scrollAnimationFrame = 0;
   let touchStartX: number | null = null;
   let touchStartY: number | null = null;
+  let touchStartSequence: HTMLElement | null = null;
   let touchStartedOnControl = false;
 
   const currentIndex = () => {
-    const scrollTop = window.scrollY;
+    const snapTop = window.scrollY + rootScrollPaddingTop();
     let bestIndex = 0;
     let bestDistance = Number.POSITIVE_INFINITY;
     sections.forEach((section, index) => {
-      const top = section.getBoundingClientRect().top + scrollTop;
-      const distance = Math.abs(top - scrollTop);
+      const top = section.getBoundingClientRect().top + window.scrollY;
+      const distance = Math.abs(top - snapTop);
       if (distance < bestDistance) {
         bestDistance = distance;
         bestIndex = index;
@@ -2996,16 +2999,16 @@ function setupSnapNavigation() {
   };
 
   const directionalIndex = (direction: number) => {
-    const scrollTop = window.scrollY;
+    const snapTop = window.scrollY + rootScrollPaddingTop();
     const offset = direction > 0 ? 24 : -24;
     const positions = sections.map((section, index) => ({
       index,
-      top: section.getBoundingClientRect().top + scrollTop,
+      top: section.getBoundingClientRect().top + window.scrollY,
     }));
     if (direction > 0) {
-      return positions.find((position) => position.top > scrollTop + offset)?.index ?? currentIndex() + direction;
+      return positions.find((position) => position.top > snapTop + offset)?.index ?? currentIndex() + direction;
     }
-    return [...positions].reverse().find((position) => position.top < scrollTop + offset)?.index ?? currentIndex() + direction;
+    return [...positions].reverse().find((position) => position.top < snapTop + offset)?.index ?? currentIndex() + direction;
   };
 
   const updateUrlForSection = (section: HTMLElement) => {
@@ -3051,8 +3054,12 @@ function setupSnapNavigation() {
     const target = sections[clamp(index, 0, sections.length - 1)];
     if (!target) return;
     const sequenceMove = isInternalSequenceMove(current, target);
-    const targetTop = target.getBoundingClientRect().top + window.scrollY;
-    const durationMs = sequenceMove ? sequenceScrollDurationMs : cooldownMs;
+    const targetTop = target.getBoundingClientRect().top + window.scrollY - rootScrollPaddingTop();
+    const durationMs = sequenceMove
+      ? mobileQuery.matches
+        ? mobileSequenceScrollDurationMs
+        : sequenceScrollDurationMs
+      : cooldownMs;
     moveLockedUntil = Date.now() + durationMs * 0.78;
     updateUrlForSection(target);
     if (reducedMotionQuery.matches) {
@@ -3067,8 +3074,8 @@ function setupSnapNavigation() {
     }
   };
 
-  const moveBy = (direction: number) => {
-    if (!desktopQuery.matches) return;
+  const moveBy = (direction: number, allowMobileSequence = false) => {
+    if (!desktopQuery.matches && !(allowMobileSequence && mobileQuery.matches)) return;
     if (Date.now() < moveLockedUntil) return;
     goToIndex(directionalIndex(direction));
   };
@@ -3089,12 +3096,24 @@ function setupSnapNavigation() {
     touchStartedOnControl =
       event.target instanceof Element &&
       Boolean(event.target.closest("a, button, input, textarea, select, [contenteditable='true']"));
+    touchStartSequence =
+      mobileQuery.matches && event.target instanceof Element
+        ? event.target.closest<HTMLElement>(".chapter--sequence")
+        : null;
     touchStartX = touch.clientX;
     touchStartY = touch.clientY;
   };
 
   const onTouchMove = (event: TouchEvent) => {
-    if (!desktopQuery.matches || touchStartedOnControl || touchStartX === null || touchStartY === null) return;
+    const mobileSequenceGesture = mobileQuery.matches && touchStartSequence;
+    if (
+      (!desktopQuery.matches && !mobileSequenceGesture) ||
+      touchStartedOnControl ||
+      touchStartX === null ||
+      touchStartY === null
+    ) {
+      return;
+    }
     const touch = event.touches[0];
     if (!touch) return;
     const deltaX = touchStartX - touch.clientX;
@@ -3105,15 +3124,28 @@ function setupSnapNavigation() {
   };
 
   const onTouchEnd = (event: TouchEvent) => {
-    if (!desktopQuery.matches || touchStartedOnControl || touchStartX === null || touchStartY === null) return;
+    const mobileSequenceGesture = mobileQuery.matches && touchStartSequence;
+    if (
+      (!desktopQuery.matches && !mobileSequenceGesture) ||
+      touchStartedOnControl ||
+      touchStartX === null ||
+      touchStartY === null
+    ) {
+      touchStartSequence = null;
+      return;
+    }
     const touch = event.changedTouches[0];
     if (!touch) return;
     const deltaX = touchStartX - touch.clientX;
     const deltaY = touchStartY - touch.clientY;
     touchStartX = null;
     touchStartY = null;
-    if (Math.abs(deltaY) < 48 || Math.abs(deltaY) < Math.abs(deltaX)) return;
-    moveBy(deltaY > 0 ? 1 : -1);
+    if (Math.abs(deltaY) < 48 || Math.abs(deltaY) < Math.abs(deltaX)) {
+      touchStartSequence = null;
+      return;
+    }
+    moveBy(deltaY > 0 ? 1 : -1, Boolean(mobileSequenceGesture));
+    touchStartSequence = null;
   };
 
   const onKeyDown = (event: KeyboardEvent) => {
