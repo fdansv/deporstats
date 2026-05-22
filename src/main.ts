@@ -1200,14 +1200,37 @@ function goalDiffLabelSettledAmount(position: number) {
 function goalDiffScrollPosition(section: HTMLElement, stateCount: number) {
   const panels = [...section.querySelectorAll<HTMLElement>(".sequence-panel[data-sequence-step]")];
   if (panels.length > 1) {
-    const firstTop = panels[0].getBoundingClientRect().top + window.scrollY;
-    const lastTop = panels[Math.min(panels.length - 1, stateCount - 1)].getBoundingClientRect().top + window.scrollY;
+    const trackedPanels = panels.slice(0, stateCount);
+    if (isMobileSequenceViewport()) {
+      const snapLine = window.scrollY + rootScrollPaddingTop() + 2;
+      let activeIndex = 0;
+      trackedPanels.forEach((panel, index) => {
+        const panelTop = panel.getBoundingClientRect().top + window.scrollY;
+        if (panelTop <= snapLine) {
+          activeIndex = index;
+        }
+      });
+      return activeIndex;
+    }
+
+    const firstTop = trackedPanels[0].getBoundingClientRect().top + window.scrollY;
+    const lastTop = trackedPanels[trackedPanels.length - 1].getBoundingClientRect().top + window.scrollY;
     return clamp(((window.scrollY - firstTop) / Math.max(1, lastTop - firstTop)) * (stateCount - 1), 0, stateCount - 1);
   }
 
   const sectionTop = section.getBoundingClientRect().top + window.scrollY;
   const travel = Math.max(1, section.offsetHeight - window.innerHeight);
   return clamp(((window.scrollY - sectionTop) / travel) * (stateCount - 1), 0, stateCount - 1);
+}
+
+function isMobileSequenceViewport() {
+  return window.matchMedia("(max-width: 860px)").matches;
+}
+
+function rootScrollPaddingTop() {
+  const value = getComputedStyle(document.documentElement).getPropertyValue("scroll-padding-top");
+  const parsed = Number.parseFloat(value);
+  return Number.isFinite(parsed) ? parsed : 0;
 }
 
 function renderGoalDiffGrid(
@@ -3153,7 +3176,7 @@ function scrollToInitialHash() {
       const target = document.querySelector<HTMLElement>(location.hash);
       if (!target) return;
       window.scrollTo({
-        top: target.getBoundingClientRect().top + window.scrollY,
+        top: target.getBoundingClientRect().top + window.scrollY - rootScrollPaddingTop(),
         behavior: "auto",
       });
     });

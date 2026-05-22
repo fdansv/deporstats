@@ -77,10 +77,10 @@ export const translations = {
       },
       {
         id: "alto",
-        kicker: "03 / Vivir no alto",
-        title: "A zona alta deixou de ser unha excepción.",
+        kicker: "03 / A táboa",
+        title: "A diferenza tamén aparecía na clasificación.",
         body:
-          "Entre 1992 e 2004, o Dépor rematou repetidamente entre os mellores e fixo de Riazor unha escala europea. O posto final mostra canto durou esa estabilidade.",
+          "Despois das curvas de goles, a táboa pon orde: entre 1992 e 2004, o Dépor rematou repetidamente entre os mellores e fixo de Riazor unha escala europea.",
         stat: "1992-2004: terceiros, segundos, campións e noites europeas.",
       },
       {
@@ -431,10 +431,10 @@ export const translations = {
       },
       {
         id: "alto",
-        kicker: "03 / Vivir arriba",
-        title: "La zona alta dejó de ser una excepción.",
+        kicker: "03 / La tabla",
+        title: "La diferencia también aparecía en la clasificación.",
         body:
-          "Entre 1992 y 2004, el Dépor terminó repetidamente entre los mejores e hizo de Riazor una escala europea. El puesto final muestra cuánto duró esa estabilidad.",
+          "Después de las curvas de goles, la tabla pone orden: entre 1992 y 2004, el Dépor terminó repetidamente entre los mejores e hizo de Riazor una escala europea.",
         stat: "1992-2004: terceros, segundos, campeones y noches europeas.",
       },
       {
@@ -785,10 +785,10 @@ export const translations = {
       },
       {
         id: "alto",
-        kicker: "03 / Living high",
-        title: "The top end stopped being an exception.",
+        kicker: "03 / The table",
+        title: "The gap showed up in the standings too.",
         body:
-          "Between 1992 and 2004, Depor repeatedly finished among the best and made Riazor a European stop. The final positions show how long that stability lasted.",
+          "After the goal-difference curves, the table gives the run a simpler shape: between 1992 and 2004, Depor repeatedly finished among the best and made Riazor a European stop.",
         stat: "1992-2004: thirds, seconds, champions, and European nights.",
       },
       {

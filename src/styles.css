@@ -5,7 +5,7 @@
   --white: #ffffff;
   --warning: #ff624f;
   --display-font: "Arial Narrow", "Aptos Narrow", "Roboto Condensed", "Helvetica Neue Condensed",
-    "Franklin Gothic Condensed", Impact, sans-serif;
+    "Franklin Gothic Condensed", "Helvetica Neue", Arial, sans-serif;
   --data-font: ui-monospace, "SFMono-Regular", "SF Mono", Menlo, Consolas, "Liberation Mono", monospace;
   color: var(--white);
   background: var(--depor-blue);
@@ -611,7 +611,8 @@ h1 span {
 
 @media (max-width: 860px) {
   html.scroll-magic {
-    scroll-snap-type: y proximity;
+    scroll-padding-top: 48px;
+    scroll-snap-type: y mandatory;
   }
 
   .hero,
@@ -700,8 +701,17 @@ h1 span {
   }
 
   .chapter--sequence .sequence-panel {
-    min-height: calc(100vh - 48px);
-    padding-top: calc(var(--sequence-chart-mobile-height) + 48px);
+    min-height: 100vh;
+    min-height: 100svh;
+    justify-content: flex-start;
+    padding: calc(var(--sequence-chart-mobile-height) + 24px) 20px 58px;
+    opacity: 0.42;
+    scroll-snap-align: start;
+    scroll-snap-stop: always;
+  }
+
+  .chapter--sequence .sequence-panel.is-active {
+    opacity: 1;
   }
 
   .loss-ledger {
