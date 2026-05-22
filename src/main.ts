@@ -197,6 +197,7 @@ type TooltipContent = { title: string; body: string };
 type TooltipSelection = d3.Selection<HTMLDivElement, unknown, null, undefined>;
 type LegendItem = { label: string; color: string };
 type LabelBox = { x: number; y: number; width: number; height: number };
+type GoalDiffStepId = "all" | "best" | "worst" | "depor-title" | "depor-fall" | "depor-now";
 type OpponentCardLayout = LabelBox & { moment: OpponentMoment; pointX: number; pointY: number };
 type OpponentMoment = {
   season: string;
@@ -245,7 +246,7 @@ const OPPONENT_MOMENTS: OpponentMoment[] = [
     venue: "Riazor",
     polarity: "high",
     impact: 3.4,
-    note: "A early statement that Riazor could swallow giants.",
+    note: "An early Riazor result against a league heavyweight.",
     source: "Football-Data",
     sourceUrl: "https://www.football-data.co.uk/mmz4281/9394/SP1.csv",
     labelDx: 8,
@@ -260,7 +261,7 @@ const OPPONENT_MOMENTS: OpponentMoment[] = [
     venue: "Riazor",
     polarity: "high",
     impact: 3.6,
-    note: "The title season did not just survive Madrid; it ran through them.",
+    note: "A title-season result that confirmed the gap had closed.",
     source: "Football-Data",
     sourceUrl: "https://www.football-data.co.uk/mmz4281/9900/SP1.csv",
     labelDx: -42,
@@ -275,7 +276,7 @@ const OPPONENT_MOMENTS: OpponentMoment[] = [
     venue: "Riazor",
     polarity: "high",
     impact: 3.1,
-    note: "Two late goals turned a European heavyweight into another Riazor victim.",
+    note: "Two late goals against a Champions League benchmark.",
     source: "UEFA",
     sourceUrl: "https://www.uefa.com/uefachampionsleague/news/017d-0e6a314d9511-4b77428a1884-1000--comeback-kings-deportivo-stun-united/",
     labelDx: 26,
@@ -290,7 +291,7 @@ const OPPONENT_MOMENTS: OpponentMoment[] = [
     venue: "Riazor",
     polarity: "high",
     impact: 4.25,
-    note: "The comeback: 0-3 down after the first leg, 5-4 up on aggregate after Riazor.",
+    note: "The comeback from 0-3 down in the first leg to 5-4 on aggregate.",
     source: "UEFA",
     sourceUrl: "https://www.uefa.com/uefachampionsleague/news/019c-0e6c12450ff2-294c584e2602-1000--dazzling-depor-ditch-milan/",
     labelDx: 18,
@@ -305,7 +306,7 @@ const OPPONENT_MOMENTS: OpponentMoment[] = [
     venue: "Riazor",
     polarity: "low",
     impact: 3.25,
-    note: "The reserve side of the rival city won at Riazor.",
+    note: "The rival city's reserve side won at Riazor.",
     source: "BDFutbol",
     sourceUrl: "https://www.bdfutbol.com/en/t/t2020-2113.html?tab=partits",
     labelDx: -190,
@@ -320,7 +321,7 @@ const OPPONENT_MOMENTS: OpponentMoment[] = [
     venue: "Riazor",
     polarity: "low",
     impact: 3,
-    note: "A home defeat that made the category feel real.",
+    note: "A home defeat that reflected the new competitive level.",
     source: "BDFutbol",
     sourceUrl: "https://www.bdfutbol.com/en/t/t2020-2113.html?tab=partits",
     labelDx: -235,
@@ -426,6 +427,7 @@ let currentLanguage: Language = initialLanguage();
 let currentCopy = translations[currentLanguage];
 let storyData: StoryData | null = null;
 let resizeObservers: ResizeObserver[] = [];
+let sequenceObservers: IntersectionObserver[] = [];
 let snapNavigationCleanup: (() => void) | null = null;
 
 const app = document.querySelector<HTMLDivElement>("#app");
@@ -467,6 +469,8 @@ function renderApp(data: StoryData) {
   snapNavigationCleanup = null;
   resizeObservers.forEach((observer) => observer.disconnect());
   resizeObservers = [];
+  sequenceObservers.forEach((observer) => observer.disconnect());
+  sequenceObservers = [];
   root.innerHTML = "";
   root.append(renderHero(data));
   currentCopy.chapters.forEach((chapter) => {
@@ -476,6 +480,7 @@ function renderApp(data: StoryData) {
   root.append(renderSources(data));
 
   renderAllCharts(data);
+  observeSequences();
   observeChapters();
   setupSnapNavigation();
   scrollToInitialHash();
@@ -620,9 +625,10 @@ function setStructuredData(data: StoryData | null, canonicalUrl: string) {
 }
 
 function buildStructuredData(data: StoryData | null, canonicalUrl: string) {
-  const sourceCitations = data?.sources.map((source) => source.url) ?? [
+  const sourceCitations = data ? sourceLinks(data).map((source) => source.url) : [
     "https://www.football-data.co.uk/spainm.php",
     "https://www.bdfutbol.com/es/e/e13.html",
+    "https://www.statscrew.com/worldfootball/stats/t-DEPCO346",
     "https://as.com/futbol/segunda/el-depor-con-dos-balas-para-el-ascenso-y-rivales-sin-margen-de-error-f202605-n/",
     "https://www.laliga.com/laliga-hypermotion/clasificacion",
     "https://www.transfermarkt.co/deportivo-la-coruna/besucherzahlenentwicklung/verein/897",
@@ -764,6 +770,10 @@ function renderChapter({
   data: StoryData;
   chart: ChartRenderer;
 }): HTMLElement {
+  if (id === "nube") {
+    return renderSequenceChapter({ id, title, data });
+  }
+
   const section = document.createElement("section");
   section.id = id;
   section.className = "chapter";
@@ -789,6 +799,92 @@ function renderChapter({
 
   section.append(figure, copy);
   return section;
+}
+
+function renderSequenceChapter({
+  id,
+  title,
+  data,
+}: {
+  id: string;
+  title: string;
+  data: StoryData;
+}): HTMLElement {
+  const panels = currentCopy.charts.goalDiff.sequence;
+  const section = document.createElement("section");
+  section.id = id;
+  section.className = "chapter chapter--sequence";
+  section.dataset.chart = id;
+  section.dataset.goalDiffStep = "all";
+
+  const figure = document.createElement("figure");
+  figure.className = "chart-shell";
+  const chartNode = document.createElement("div");
+  chartNode.className = "chart";
+  chartNode.setAttribute("role", "img");
+  chartNode.setAttribute("aria-label", title);
+  chartNode.dataset.renderer = id;
+  figure.append(chartNode);
+
+  const sequence = document.createElement("div");
+  sequence.className = "chapter-sequence";
+  panels.forEach((panel, index) => {
+    const copy = document.createElement("article");
+    copy.className = `chapter-copy sequence-panel${index === 0 ? " is-active" : ""}`;
+    copy.dataset.sequenceStep = panel.step;
+    copy.innerHTML = `
+      <p class="eyebrow">${panel.kicker}</p>
+      <h2>${panel.title}</h2>
+      <p>${panel.body}</p>
+      <p class="stat-line">${panel.stat}</p>
+    `;
+    const addon = renderGoalDiffSequenceAddon(panel.step, data);
+    if (addon) {
+      copy.classList.add("sequence-panel--with-addon");
+      copy.append(addon);
+    }
+    sequence.append(copy);
+  });
+
+  section.append(figure, sequence);
+  return section;
+}
+
+function renderGoalDiffSequenceAddon(step: GoalDiffStepId, data: StoryData) {
+  if (step !== "worst") return null;
+  const losses = logronesLosses(data);
+  if (!losses.length) return null;
+
+  const ledger = document.createElement("aside");
+  ledger.className = "loss-ledger";
+
+  const header = document.createElement("div");
+  header.className = "loss-ledger__header";
+  const title = document.createElement("strong");
+  title.textContent = currentCopy.charts.goalDiff.lossLedger.title(losses.length);
+  const subtitle = document.createElement("span");
+  subtitle.textContent = currentCopy.charts.goalDiff.lossLedger.subtitle;
+  header.append(title, subtitle);
+
+  const list = document.createElement("ol");
+  list.className = "loss-ledger__list";
+  for (const loss of losses) {
+    const item = document.createElement("li");
+    const round = document.createElement("span");
+    round.className = "loss-ledger__round";
+    round.textContent = `${currentCopy.charts.goalDiff.lossLedger.roundPrefix}${String(loss.round).padStart(2, "0")}`;
+    const opponent = document.createElement("span");
+    opponent.className = "loss-ledger__opponent";
+    opponent.textContent = `${loss.venue === "H" ? currentCopy.charts.goalDiff.lossLedger.home : currentCopy.charts.goalDiff.lossLedger.away} ${displayTeam(loss.opponent)}`;
+    const score = document.createElement("span");
+    score.className = "loss-ledger__score";
+    score.textContent = `${loss.gf}-${loss.ga}`;
+    item.append(round, opponent, score);
+    list.append(item);
+  }
+
+  ledger.append(header, list);
+  return ledger;
 }
 
 function renderSources(data: StoryData): HTMLElement {
@@ -852,12 +948,15 @@ function baseSvg(element: HTMLElement, minHeight = 460) {
 }
 
 function drawGoalDiffCloud(element: HTMLElement, data: StoryData) {
-  const { svg, tooltip, width, height } = baseSvg(element);
+  const elementWithCleanup = element as HTMLElement & { goalDiffCleanup?: () => void };
+  elementWithCleanup.goalDiffCleanup?.();
+
+  const { svg, width, height } = baseSvg(element);
   const margin = responsiveMargin(width);
+  const section = element.closest<HTMLElement>(".chapter--sequence");
   const points = (data.goal_diff_race ?? []).filter((point) => point.season_start >= 1993);
   const series = [...d3.group(points, (point) => `${point.team}__${point.season}`).values()];
   const deporSeries = series.filter((values) => values[0]?.is_depor);
-  const contextSeries = series.filter((values) => !values[0]?.is_depor);
   const finalPoints = series.map((values) => values[values.length - 1]).filter((point): point is GoalDiffPoint => Boolean(point));
   const bestFinal = d3.max(finalPoints, (point) => point.gd);
   const worstFinal = d3.min(finalPoints, (point) => point.gd);
@@ -865,120 +964,368 @@ function drawGoalDiffCloud(element: HTMLElement, data: StoryData) {
   const worstSeries = series.find((values) => values[values.length - 1]?.gd === worstFinal);
   const maxRound = d3.max(points, (d) => d.round) ?? 42;
   const maxAbsGd = Math.ceil((d3.max(points, (d) => Math.abs(d.gd)) ?? 80) / 10) * 10;
-  const yTicks = d3.range(-maxAbsGd, maxAbsGd + 1, 20);
-  const x = d3.scaleLinear().domain([0, maxRound]).range([margin.left, width - margin.right]);
-  const y = d3.scaleLinear().domain([-maxAbsGd, maxAbsGd]).range([height - margin.bottom, margin.top + 36]);
-  const line = d3
-    .line<GoalDiffPoint>()
-    .x((d) => x(d.round))
-    .y((d) => y(d.gd))
-    .curve(d3.curveLinear);
+  const states = goalDiffViewStates(bestSeries, worstSeries, deporSeries, maxRound, maxAbsGd);
+  const panels = section ? [...section.querySelectorAll<HTMLElement>(".sequence-panel[data-sequence-step]")] : [];
+  const xScale = d3.scaleLinear().range([margin.left, width - margin.right]);
+  const yScale = d3.scaleLinear().range([height - margin.bottom, margin.top + 36]);
+  const clipId = `goal-diff-clip-${Math.random().toString(36).slice(2)}`;
 
-  drawGrid(svg, x, y, width, height, margin, yTicks);
   svg
+    .append("defs")
+    .append("clipPath")
+    .attr("id", clipId)
+    .append("rect")
+    .attr("x", margin.left)
+    .attr("y", margin.top + 36)
+    .attr("width", width - margin.left - margin.right)
+    .attr("height", height - margin.top - margin.bottom - 36);
+
+  const gridLayer = svg.append("g").attr("class", "goal-diff-grid");
+  const zeroLine = svg
     .append("line")
     .attr("x1", margin.left)
     .attr("x2", width - margin.right)
-    .attr("y1", y(0))
-    .attr("y2", y(0))
     .attr("stroke", BLUE)
     .attr("stroke-width", 2.5)
     .attr("stroke-opacity", 0.9);
-
-  svg
+  const pathLayer = svg
     .append("g")
     .attr("class", "context-goal-diff")
-    .selectAll("path")
-    .data(contextSeries)
+    .attr("clip-path", `url(#${clipId})`);
+  const paths = pathLayer
+    .selectAll<SVGPathElement, GoalDiffPoint[]>("path")
+    .data(series, (values) => goalDiffSeriesKey(values as GoalDiffPoint[]))
     .join("path")
     .attr("fill", "none")
-    .attr("stroke", "rgba(255,255,255,0.2)")
-    .attr("stroke-width", 1.15)
-    .attr("d", line);
-
-  svg
-    .append("g")
-    .attr("class", "extreme-goal-diff")
-    .selectAll("path")
-    .data([bestSeries, worstSeries].filter((values): values is GoalDiffPoint[] => Boolean(values)))
-    .join("path")
-    .attr("fill", "none")
-    .attr("stroke", (values) => (values[values.length - 1].gd >= 0 ? "#febe10" : WARN))
-    .attr("stroke-width", 2.8)
-    .attr("stroke-opacity", 0.95)
-    .attr("d", line);
-
-  svg
-    .append("g")
-    .attr("class", "depor-goal-diff")
-    .selectAll("path")
-    .data(deporSeries)
-    .join("path")
-    .attr("fill", "none")
-    .attr("stroke", (values) => (values[0]?.season === "1999-00" ? BLUE : "rgba(255,255,255,0.76)"))
-    .attr("stroke-width", (values) => (values[0]?.season === "1999-00" ? 4.4 : 2.2))
-    .attr("stroke-opacity", (values) => (values[0]?.season === "1999-00" ? 1 : 0.72))
-    .attr("d", line);
-
-  const deporPoints = points.filter((point) => point.is_depor && point.round > 0);
-  bindTooltip(
-    svg
-      .selectAll("circle.goal-diff-hit")
-      .data(deporPoints)
-      .join("circle")
-      .attr("class", "tooltip-hit goal-diff-hit")
-      .attr("cx", (d) => x(d.round))
-      .attr("cy", (d) => y(d.gd))
-      .attr("r", 9),
-    tooltip,
-    (d) => ({
-      title: `${d.season} · ${currentCopy.common.round} ${d.round}`,
-      body: `${venueLabel(d.venue)} ${currentCopy.common.against} ${displayTeam(d.opponent)}. ${currentCopy.common.goalFor} ${d.gf}, ${currentCopy.common.goalAgainst} ${d.ga}, ${currentCopy.common.goalDiff} ${signed(d.gd)}.`,
-    }),
-  );
-
-  for (const season of ["1999-00", "2017-18", "2025-26"]) {
-    const values = deporSeries.find((row) => row[0]?.season === season);
-    const last = values?.[values.length - 1];
-    if (!last) continue;
-    const labelY = season === "1999-00" ? y(last.gd) - 54 : season === "2025-26" ? y(last.gd) + 14 : y(last.gd) - 18;
-    const box = label(svg, x(last.round) - 162, labelY, season, `Dépor: ${signed(last.gd)} ${currentCopy.common.goalDiff}`);
-    labelLeader(svg, x(last.round), y(last.gd), box, BLUE);
-  }
-
-  if (bestSeries) {
-    const last = bestSeries[bestSeries.length - 1];
-    const box = label(
-      svg,
-      x(last.round) - 168,
-      y(last.gd) + 14,
-      currentCopy.charts.goalDiff.bestLine,
-      `${displayTeam(last.team)} ${last.season}: ${signed(last.gd)} ${currentCopy.common.goalDiff}`,
-    );
-    labelLeader(svg, x(last.round), y(last.gd), box, "#febe10");
-  }
-  if (worstSeries) {
-    const last = worstSeries[worstSeries.length - 1];
-    const box = label(
-      svg,
-      x(last.round) - 168,
-      y(last.gd) - 44,
-      currentCopy.charts.goalDiff.worstLine,
-      `${displayTeam(last.team)} ${last.season}: ${signed(last.gd)} ${currentCopy.common.goalDiff}`,
-    );
-    labelLeader(svg, x(last.round), y(last.gd), box, WARN);
-  }
-
-  svg
+    .attr("stroke-linejoin", "round")
+    .attr("stroke-linecap", "round");
+  const labelLayer = svg.append("g").attr("class", "goal-diff-focus-label fixed-label");
+  const contextLabel = svg
     .append("text")
     .attr("x", margin.left)
     .attr("y", 60)
     .attr("class", "context-label")
     .attr("fill", "rgba(255,255,255,0.82)")
     .text(currentCopy.charts.goalDiff.contextLabel);
-  chartTitle(svg, margin.left, 34, currentCopy.charts.goalDiff.title);
+
+  chartTitle(svg, margin.left, 34, width < 560 ? "GF - GC" : currentCopy.charts.goalDiff.title);
   axisLabel(svg, width - margin.right, height - 12, currentCopy.common.round);
   axisLabel(svg, 18, margin.top + 18, currentCopy.common.goalDiff);
+
+  let animationFrame = 0;
+  const update = () => {
+    animationFrame = 0;
+    const position = section ? goalDiffScrollPosition(section, states.length) : 0;
+    const lowerIndex = Math.floor(position);
+    const upperIndex = Math.min(states.length - 1, lowerIndex + 1);
+    const rawMix = position - lowerIndex;
+    const mix = rawMix;
+    const lower = states[lowerIndex] ?? states[0];
+    const upper = states[upperIndex] ?? lower;
+    const activeIndex = Math.round(position);
+    const active = states[activeIndex] ?? lower;
+    const domain = interpolateGoalDiffDomain(lower.domain, upper.domain, mix);
+    const highlight = goalDiffHighlightWeights(lower, upper, mix);
+    const focusAmount = d3.max([...highlight.values()], (item) => item.weight) ?? 0;
+    const labelFocusAmount = focusAmount * goalDiffLabelSettledAmount(position);
+
+    xScale.domain(domain.round);
+    yScale.domain(domain.gd);
+    const line = d3
+      .line<GoalDiffPoint>()
+      .x((d) => xScale(d.round))
+      .y((d) => yScale(d.gd))
+      .curve(d3.curveLinear);
+
+    renderGoalDiffGrid(gridLayer, xScale, yScale, domain.gd, width, height, margin);
+    zeroLine.attr("y1", yScale(0)).attr("y2", yScale(0));
+    contextLabel.attr("opacity", Math.max(0, 1 - focusAmount * 1.8));
+    paths
+      .attr("d", (values) => line(values) ?? "")
+      .attr("stroke", (values) => highlight.get(goalDiffSeriesKey(values))?.color ?? "rgba(255,255,255,0.28)")
+      .attr("stroke-opacity", (values) => {
+        const weight = highlight.get(goalDiffSeriesKey(values))?.weight ?? 0;
+        return weight > 0 ? 0.22 + weight * 0.7 : 0.28 - focusAmount * 0.18;
+      })
+      .attr("stroke-width", (values) => {
+        const weight = highlight.get(goalDiffSeriesKey(values))?.weight ?? 0;
+        return 1.05 + weight * 2.85;
+      });
+
+    section?.setAttribute("data-goal-diff-step", active.id);
+    panels.forEach((panel) => panel.classList.toggle("is-active", panel.dataset.sequenceStep === active.id));
+    renderGoalDiffFocusLabel(labelLayer, active, xScale, yScale, width, height, labelFocusAmount);
+  };
+
+  const requestUpdate = () => {
+    if (!animationFrame) {
+      animationFrame = window.requestAnimationFrame(update);
+    }
+  };
+
+  window.addEventListener("scroll", requestUpdate, { passive: true });
+  update();
+  elementWithCleanup.goalDiffCleanup = () => {
+    window.removeEventListener("scroll", requestUpdate);
+    if (animationFrame) {
+      window.cancelAnimationFrame(animationFrame);
+    }
+  };
+}
+
+function goalDiffSeriesKey(values: GoalDiffPoint[]) {
+  const first = values[0];
+  return first ? `${first.team}__${first.season}` : "";
+}
+
+function logronesLosses(data: StoryData) {
+  const rows = data.goal_diff_race
+    .filter((point) => point.team === "Logrones" && point.season === "1994-95")
+    .sort((a, b) => a.round - b.round);
+  return rows.flatMap((point, index) => {
+    if (point.result !== "L") return [];
+    const previous = rows[index - 1];
+    if (!previous) return [];
+    return [
+      {
+        round: point.round,
+        venue: point.venue,
+        opponent: point.opponent,
+        gf: point.gf - previous.gf,
+        ga: point.ga - previous.ga,
+      },
+    ];
+  });
+}
+
+type GoalDiffViewState = {
+  id: GoalDiffStepId;
+  targetSeries?: GoalDiffPoint[];
+  color: string;
+  domain: { round: [number, number]; gd: [number, number] };
+};
+
+function goalDiffViewStates(
+  bestSeries: GoalDiffPoint[] | undefined,
+  worstSeries: GoalDiffPoint[] | undefined,
+  deporSeries: GoalDiffPoint[][],
+  maxRound: number,
+  maxAbsGd: number,
+): GoalDiffViewState[] {
+  const allDomain = { round: [0, maxRound] as [number, number], gd: [-maxAbsGd, maxAbsGd] as [number, number] };
+  const withDomain = (id: GoalDiffStepId, targetSeries: GoalDiffPoint[] | undefined, color: string): GoalDiffViewState => ({
+    id,
+    targetSeries,
+    color,
+    domain: goalDiffDomain(id, targetSeries, maxRound, maxAbsGd),
+  });
+
+  return [
+    { id: "all", color: BLUE, domain: allDomain },
+    withDomain("best", bestSeries, "#febe10"),
+    withDomain("worst", worstSeries, WARN),
+    withDomain("depor-title", deporSeries.find((values) => values[0]?.season === "1999-00"), BLUE),
+    withDomain("depor-fall", deporSeries.find((values) => values[0]?.season === "2017-18"), WARN),
+    withDomain("depor-now", deporSeries.find((values) => values[0]?.season === "2025-26"), "#80f0bd"),
+  ];
+}
+
+function goalDiffDomain(
+  step: GoalDiffStepId,
+  targetSeries: GoalDiffPoint[] | undefined,
+  maxRound: number,
+  maxAbsGd: number,
+) {
+  if (step === "all" || !targetSeries) {
+    return { round: [0, maxRound] as [number, number], gd: [-maxAbsGd, maxAbsGd] as [number, number] };
+  }
+
+  const values = targetSeries.filter((point) => point.round > 0);
+  const minGd = d3.min(values, (point) => point.gd) ?? 0;
+  const maxGd = d3.max(values, (point) => point.gd) ?? 0;
+  const padding = step === "depor-title" || step === "depor-now" ? 8 : 12;
+  let yMin = Math.floor((minGd - padding) / 10) * 10;
+  let yMax = Math.ceil((maxGd + padding) / 10) * 10;
+
+  if (step === "best") yMin = Math.min(0, yMin);
+  if (step === "worst" || step === "depor-fall") yMax = Math.max(10, yMax);
+  if (yMax - yMin < 34) {
+    const midpoint = (yMax + yMin) / 2;
+    yMin = Math.floor((midpoint - 17) / 10) * 10;
+    yMax = Math.ceil((midpoint + 17) / 10) * 10;
+  }
+
+  return { round: [0, maxRound] as [number, number], gd: [yMin, yMax] as [number, number] };
+}
+
+function interpolateGoalDiffDomain(
+  from: GoalDiffViewState["domain"],
+  to: GoalDiffViewState["domain"],
+  mix: number,
+): GoalDiffViewState["domain"] {
+  return {
+    round: [
+      d3.interpolateNumber(from.round[0], to.round[0])(mix),
+      d3.interpolateNumber(from.round[1], to.round[1])(mix),
+    ],
+    gd: [d3.interpolateNumber(from.gd[0], to.gd[0])(mix), d3.interpolateNumber(from.gd[1], to.gd[1])(mix)],
+  };
+}
+
+function goalDiffHighlightWeights(
+  lower: GoalDiffViewState,
+  upper: GoalDiffViewState,
+  mix: number,
+): Map<string, { weight: number; color: string }> {
+  const highlights = new Map<string, { weight: number; color: string }>();
+  for (const [state, weight] of [
+    [lower, 1 - mix],
+    [upper, mix],
+  ] as const) {
+    if (!state.targetSeries || weight <= 0.02) continue;
+    const key = goalDiffSeriesKey(state.targetSeries);
+    const existing = highlights.get(key);
+    if (!existing || weight > existing.weight) {
+      highlights.set(key, { weight, color: state.color });
+    }
+  }
+  return highlights;
+}
+
+function goalDiffLabelSettledAmount(position: number) {
+  const distance = Math.abs(position - Math.round(position));
+  return clamp(1 - distance / 0.42, 0, 1);
+}
+
+function goalDiffScrollPosition(section: HTMLElement, stateCount: number) {
+  const panels = [...section.querySelectorAll<HTMLElement>(".sequence-panel[data-sequence-step]")];
+  if (panels.length > 1) {
+    const firstTop = panels[0].getBoundingClientRect().top + window.scrollY;
+    const lastTop = panels[Math.min(panels.length - 1, stateCount - 1)].getBoundingClientRect().top + window.scrollY;
+    return clamp(((window.scrollY - firstTop) / Math.max(1, lastTop - firstTop)) * (stateCount - 1), 0, stateCount - 1);
+  }
+
+  const sectionTop = section.getBoundingClientRect().top + window.scrollY;
+  const travel = Math.max(1, section.offsetHeight - window.innerHeight);
+  return clamp(((window.scrollY - sectionTop) / travel) * (stateCount - 1), 0, stateCount - 1);
+}
+
+function renderGoalDiffGrid(
+  layer: d3.Selection<SVGGElement, unknown, null, undefined>,
+  x: d3.ScaleLinear<number, number>,
+  y: d3.ScaleLinear<number, number>,
+  yDomain: [number, number],
+  width: number,
+  height: number,
+  margin: { top: number; right: number; bottom: number; left: number },
+) {
+  const yTicks = goalDiffTicks(yDomain);
+  layer
+    .selectAll("line.y-grid")
+    .data(yTicks, (tick) => `${tick}`)
+    .join("line")
+    .attr("class", "y-grid")
+    .attr("x1", margin.left)
+    .attr("x2", width - margin.right)
+    .attr("y1", (d) => y(d))
+    .attr("y2", (d) => y(d))
+    .attr("stroke", GRID)
+    .attr("stroke-width", 1);
+  layer
+    .selectAll("text.y-tick")
+    .data(yTicks, (tick) => `${tick}`)
+    .join("text")
+    .attr("class", "axis-text y-tick")
+    .attr("x", margin.left - 12)
+    .attr("y", (d) => y(d) + 4)
+    .attr("text-anchor", "end")
+    .text((d) => d);
+  layer
+    .selectAll("line.x-grid")
+    .data(x.ticks(6), (tick) => `${tick}`)
+    .join("line")
+    .attr("class", "x-grid")
+    .attr("x1", (d) => x(d))
+    .attr("x2", (d) => x(d))
+    .attr("y1", margin.top)
+    .attr("y2", height - margin.bottom)
+    .attr("stroke", "rgba(255,255,255,0.13)")
+    .attr("stroke-width", 1);
+}
+
+function goalDiffTicks(domain: [number, number]) {
+  const start = Math.ceil(domain[0] / 20) * 20;
+  const end = Math.floor(domain[1] / 20) * 20;
+  const ticks = d3.range(start, end + 1, 20);
+  if (domain[0] < 0 && domain[1] > 0 && !ticks.includes(0)) {
+    ticks.push(0);
+  }
+  return ticks.sort((a, b) => a - b);
+}
+
+function goalDiffStepLabel(step: GoalDiffStepId, last: GoalDiffPoint) {
+  if (step === "best") return currentCopy.charts.goalDiff.bestLine;
+  if (step === "worst") return currentCopy.charts.goalDiff.worstLine;
+  return last.season;
+}
+
+function renderGoalDiffFocusLabel(
+  layer: d3.Selection<SVGGElement, unknown, null, undefined>,
+  state: GoalDiffViewState,
+  x: d3.ScaleLinear<number, number>,
+  y: d3.ScaleLinear<number, number>,
+  width: number,
+  height: number,
+  focusAmount: number,
+) {
+  layer.html("");
+  if (!state.targetSeries || focusAmount < 0.28) return;
+
+  const last = state.targetSeries[state.targetSeries.length - 1];
+  const anchorX = x(last.round);
+  const anchorY = y(last.gd);
+  const labelWidth = width < 560 ? 142 : 168;
+  const body = `${displayTeam(last.team)} ${last.season}: ${signed(last.gd)} ${currentCopy.common.goalDiff}`;
+  const bodyLines = wrapLabelText(body, Math.max(20, Math.floor((labelWidth - 20) / 6.2)));
+  const labelHeight = 34 + bodyLines.length * 14;
+  const labelX = clamp(anchorX - (width < 560 ? 134 : 168), 18, width - labelWidth - 18);
+  const labelY = clamp(anchorY + (last.gd < 0 ? -52 : 16), 56, height - labelHeight - 18);
+  const box = { x: labelX, y: labelY, width: labelWidth, height: labelHeight };
+  const target = nearestLabelEdgePoint(anchorX, anchorY, box);
+
+  layer.attr("opacity", Math.min(1, (focusAmount - 0.28) / 0.28));
+  layer
+    .append("line")
+    .attr("x1", anchorX)
+    .attr("y1", anchorY)
+    .attr("x2", target.x)
+    .attr("y2", target.y)
+    .attr("stroke", state.color)
+    .attr("stroke-width", 2.2)
+    .attr("stroke-dasharray", "6 4")
+    .attr("stroke-linecap", "square");
+  layer
+    .append("circle")
+    .attr("cx", anchorX)
+    .attr("cy", anchorY)
+    .attr("r", 4.2)
+    .attr("fill", state.color)
+    .attr("stroke", LOW_BLUE)
+    .attr("stroke-width", 2);
+
+  const group = layer.append("g").attr("transform", `translate(${labelX},${labelY})`);
+  group
+    .append("rect")
+    .attr("width", labelWidth)
+    .attr("height", labelHeight)
+    .attr("fill", LOW_BLUE)
+    .attr("stroke", DARK)
+    .attr("stroke-width", 2);
+  group.append("text").attr("x", 10).attr("y", 19).attr("class", "label-title").text(goalDiffStepLabel(state.id, last));
+  const bodyText = group.append("text").attr("x", 10).attr("y", 38).attr("class", "label-body");
+  bodyLines.forEach((line, index) => {
+    bodyText.append("tspan").attr("x", 10).attr("dy", index === 0 ? 0 : 14).text(line);
+  });
 }
 
 function drawTitlePath(element: HTMLElement, data: StoryData) {
@@ -1039,13 +1386,14 @@ function drawTitlePath(element: HTMLElement, data: StoryData) {
   for (const values of paths) {
     const lastPoint = values[values.length - 1];
     if (!lastPoint) continue;
+    const labelOnRight = lastPoint.round >= 40 || width < 560;
     svg
       .append("text")
-      .attr("x", x(lastPoint.round) + (lastPoint.round >= 40 ? -8 : 8))
+      .attr("x", labelOnRight ? Math.min(x(lastPoint.round) - 8, width - margin.right - 4) : x(lastPoint.round) + 8)
       .attr("y", y(lastPoint.comparable_points) + (lastPoint.season === "1993-94" ? -12 : 4))
       .attr("class", "context-label")
       .attr("fill", lastPoint.season === "1999-00" ? BLUE : titleWarningColor(lastPoint.season))
-      .attr("text-anchor", lastPoint.round >= 40 ? "end" : "start")
+      .attr("text-anchor", labelOnRight ? "end" : "start")
       .text(`${lastPoint.season} · ${lastPoint.finish}º`);
   }
 
@@ -1201,126 +1549,202 @@ function drawFinishTimeline(element: HTMLElement, data: StoryData) {
 
 function drawPpgDrift(element: HTMLElement, data: StoryData) {
   const { svg, tooltip, width, height } = baseSvg(element);
-  const margin = { ...responsiveMargin(width), bottom: width < 560 ? 74 : 66 };
-  const seasons = data.seasons.filter((season) => season.season_start >= 1999);
-  const ppgContext = data.ppg_context.filter((point) => point.season_start >= 1999);
-  const x = d3
-    .scaleLinear()
-    .domain(d3.extent(seasons, (d) => d.season_start) as [number, number])
-    .range([margin.left, width - margin.right]);
-  const maxPpg = Math.max(
-    d3.max(seasons, (d) => d.ppg) ?? 2,
-    d3.max(ppgContext, (d) => d.leader_ppg) ?? 2,
-  );
-  const y = d3.scaleLinear().domain([0.7, Math.max(2.15, maxPpg + 0.1)]).range([height - margin.bottom, margin.top]);
-  const bar = d3.scaleLinear().domain([-0.75, 1]).range([height - margin.bottom, margin.top]);
-  const ppgContextSegments = splitPpgContext(ppgContext);
+  const margin = { ...responsiveMargin(width), top: width < 560 ? 88 : 96, bottom: width < 560 ? 72 : 64 };
+  const rows = ppgEraRows(data);
+  const x = d3.scaleLinear().domain([0.7, 2]).range([margin.left, width - margin.right]);
+  const y = d3
+    .scalePoint<string>()
+    .domain(rows.map((row) => row.id))
+    .range([margin.top + 34, height - margin.bottom - 34])
+    .padding(0.5);
+  const xTicks = [0.8, 1, 1.2, 1.4, 1.6, 1.8, 2];
+  const plotTop = margin.top + 10;
+  const plotBottom = height - margin.bottom;
+  const barStart = x(0.7);
 
-  drawSeasonBands(svg, seasons, x, width, height, margin);
-  drawGrid(svg, x, y, width, height, margin, [1, 1.25, 1.5, 1.75, 2]);
-  for (const segment of ppgContextSegments) {
-    svg
-      .append("path")
-      .datum(segment)
-      .attr("fill", "none")
-      .attr("stroke", "#febe10")
-      .attr("stroke-width", 2.5)
-      .attr("stroke-opacity", 0.55)
-      .attr(
-        "d",
-        d3
-          .line<PpgContextPoint>()
-          .x((d) => x(d.season_start))
-          .y((d) => y(d.leader_ppg))
-          .curve(d3.curveMonotoneX),
-      );
-    svg
-      .append("path")
-      .datum(segment)
-      .attr("fill", "none")
-      .attr("stroke", "rgba(255,255,255,0.45)")
-      .attr("stroke-width", 2)
-      .attr("stroke-dasharray", "7 7")
-      .attr(
-        "d",
-        d3
-          .line<PpgContextPoint>()
-          .x((d) => x(d.season_start))
-          .y((d) => y(d.median_ppg))
-          .curve(d3.curveMonotoneX),
-      );
-  }
-  const lastPpgContext = ppgContext[ppgContext.length - 1];
-  if (lastPpgContext) {
-    svg
-      .append("text")
-      .attr("x", x(lastPpgContext.season_start) - 108)
-      .attr("y", y(lastPpgContext.leader_ppg) - 12)
-      .attr("class", "context-label")
-      .attr("fill", "#febe10")
-      .text(currentCopy.charts.ppg.leader);
-    svg
-      .append("text")
-      .attr("x", x(lastPpgContext.season_start) - 90)
-      .attr("y", y(lastPpgContext.median_ppg) + 18)
-      .attr("class", "context-label")
-      .attr("fill", "rgba(255,255,255,0.72)")
-      .text(currentCopy.charts.ppg.median);
-  }
+  chartTitle(svg, margin.left, 34, currentCopy.charts.ppg.title);
   svg
-    .selectAll("rect.gd")
-    .data(seasons)
-    .join("rect")
-    .attr("class", "gd")
-    .attr("x", (d) => x(d.season_start) - 4)
-    .attr("y", (d) => Math.min(bar(0), bar(d.gd_per_match)))
-    .attr("width", 8)
-    .attr("height", (d) => Math.abs(bar(0) - bar(d.gd_per_match)))
-    .attr("fill", (d) => (d.gd_per_match >= 0 ? "rgba(255,255,255,0.28)" : "rgba(255,98,79,0.72)"));
+    .append("text")
+    .attr("x", margin.left)
+    .attr("y", 62)
+    .attr("class", "context-label")
+    .attr("fill", "rgba(255,255,255,0.8)")
+    .text(currentCopy.charts.ppg.context);
+
+  svg
+    .selectAll("line.ppg-grid")
+    .data(xTicks)
+    .join("line")
+    .attr("class", "ppg-grid")
+    .attr("x1", (d) => x(d))
+    .attr("x2", (d) => x(d))
+    .attr("y1", plotTop)
+    .attr("y2", plotBottom)
+    .attr("stroke", (d) => (d === 1 ? "rgba(255,255,255,0.45)" : "rgba(255,255,255,0.16)"))
+    .attr("stroke-width", (d) => (d === 1 ? 2 : 1));
+
+  svg
+    .selectAll("text.ppg-tick")
+    .data(xTicks)
+    .join("text")
+    .attr("class", "axis-text ppg-tick")
+    .attr("x", (d) => x(d))
+    .attr("y", height - margin.bottom + 32)
+    .attr("text-anchor", "middle")
+    .text((d) => formatDecimal(d));
+
+  svg
+    .append("text")
+    .attr("x", width - margin.right)
+    .attr("y", height - margin.bottom + 54)
+    .attr("class", "axis-text")
+    .attr("text-anchor", "end")
+    .text("PPG");
+
   svg
     .append("path")
-    .datum(seasons)
+    .datum(rows)
     .attr("fill", "none")
-    .attr("stroke", DARK)
-    .attr("stroke-width", 4)
+    .attr("stroke", "rgba(255,255,255,0.42)")
+    .attr("stroke-width", 2.4)
+    .attr("stroke-dasharray", "7 7")
     .attr(
       "d",
       d3
-        .line<Season>()
-        .x((d) => x(d.season_start))
-        .y((d) => y(d.ppg))
-        .curve(d3.curveMonotoneX),
+        .line<PpgEraRow>()
+        .x((d) => x(d.avgPpg))
+        .y((d) => y(d.id) ?? 0),
     );
+
   svg
-    .selectAll("circle")
-    .data(seasons)
+    .selectAll("rect.ppg-track")
+    .data(rows)
+    .join("rect")
+    .attr("class", "ppg-track")
+    .attr("x", barStart)
+    .attr("y", (d) => (y(d.id) ?? 0) - 12)
+    .attr("width", x(2) - barStart)
+    .attr("height", 24)
+    .attr("fill", "rgba(255,255,255,0.08)");
+
+  svg
+    .selectAll("rect.ppg-era")
+    .data(rows)
+    .join("rect")
+    .attr("class", "ppg-era")
+    .attr("x", barStart)
+    .attr("y", (d) => (y(d.id) ?? 0) - 12)
+    .attr("width", (d) => Math.max(2, x(d.avgPpg) - barStart))
+    .attr("height", 24)
+    .attr("fill", (d) => d.color)
+    .attr("fill-opacity", 0.72);
+
+  svg
+    .selectAll("circle.ppg-era-point")
+    .data(rows)
     .join("circle")
-    .attr("cx", (d) => x(d.season_start))
-    .attr("cy", (d) => y(d.ppg))
-    .attr("r", 4)
-    .attr("fill", (d) => (d.tier === 3 ? WARN : BLUE))
-    .attr("stroke", DARK);
+    .attr("class", "ppg-era-point")
+    .attr("cx", (d) => x(d.avgPpg))
+    .attr("cy", (d) => y(d.id) ?? 0)
+    .attr("r", width < 560 ? 6 : 7)
+    .attr("fill", (d) => d.color)
+    .attr("stroke", DARK)
+    .attr("stroke-width", 2.5);
+
+  svg
+    .selectAll("text.ppg-era-title")
+    .data(rows)
+    .join("text")
+    .attr("class", "context-label ppg-era-title")
+    .attr("x", margin.left)
+    .attr("y", (d) => (y(d.id) ?? 0) - 24)
+    .attr("fill", BLUE)
+    .text((d) => `${d.range} · ${d.label}`);
+
+  svg
+    .selectAll("text.ppg-era-value")
+    .data(rows)
+    .join("text")
+    .attr("class", "label-title ppg-era-value")
+    .attr("x", (d) => (width < 560 && x(d.avgPpg) > width - margin.right - 104 ? x(d.avgPpg) - 12 : x(d.avgPpg) + 12))
+    .attr("y", (d) => (y(d.id) ?? 0) + 5)
+    .attr("text-anchor", (d) => (width < 560 && x(d.avgPpg) > width - margin.right - 104 ? "end" : "start"))
+    .attr("fill", (d) => d.color)
+    .text((d) => `${formatDecimal(d.avgPpg)} PPG`);
+
+  svg
+    .selectAll("text.ppg-era-detail")
+    .data(rows)
+    .join("text")
+    .attr("class", "axis-text ppg-era-detail")
+    .attr("x", margin.left)
+    .attr("y", (d) => (y(d.id) ?? 0) + 34)
+    .attr("fill", "rgba(255,255,255,0.76)")
+    .text(
+      (d) =>
+        `${currentCopy.charts.ppg.seasonCount(d.seasons.length)} · ${signedDecimal(d.avgGd)} ${
+          currentCopy.charts.ppg.goalDiffPerMatch
+        }`,
+    );
+
   bindTooltip(
     svg
-      .selectAll("circle.ppg-hit")
-      .data(seasons)
-      .join("circle")
+      .selectAll("rect.ppg-hit")
+      .data(rows)
+      .join("rect")
       .attr("class", "tooltip-hit ppg-hit")
-      .attr("cx", (d) => x(d.season_start))
-      .attr("cy", (d) => y(d.ppg))
-      .attr("r", 15),
+      .attr("x", barStart)
+      .attr("y", (d) => (y(d.id) ?? 0) - 26)
+      .attr("width", x(2) - barStart)
+      .attr("height", 62),
     tooltip,
     (d) => ({
-      title: `${d.season} · ${divisionLabel(d.division)}`,
-      body: `${formatDecimal(d.ppg)} ${currentCopy.common.pointsPerGame}; ${formatDecimal(d.gd_per_match)} ${currentCopy.common.goalsPerGame}.`,
+      title: `${d.range} · ${d.label}`,
+      body: `${formatDecimal(d.avgPpg)} ${currentCopy.common.pointsPerGame}; ${signedDecimal(d.avgGd)} ${
+        currentCopy.charts.ppg.goalDiffPerMatch
+      }. ${currentCopy.charts.ppg.seasonCount(d.seasons.length)}.`,
     }),
   );
+}
 
-  label(svg, x(1999) - 12, y(1.816) - 76, "2000", currentCopy.charts.ppg.label2000);
-  label(svg, x(2019) - 80, y(1.214) + 36, "2020", currentCopy.charts.ppg.label2020);
-  drawSeasonTicks(svg, seasons, x, height - margin.bottom + 30, width < 560);
-  chartTitle(svg, margin.left, 34, currentCopy.charts.ppg.title);
-  axisLabel(svg, 18, margin.top + 16, "PPG");
+type PpgEraId = "peak" | "survival" | "relegation";
+type PpgEraRow = {
+  id: PpgEraId;
+  range: string;
+  label: string;
+  seasons: Season[];
+  avgPpg: number;
+  avgGd: number;
+  color: string;
+};
+
+function ppgEraRows(data: StoryData): PpgEraRow[] {
+  const definitions: { id: PpgEraId; start: number; end: number; color: string }[] = [
+    { id: "peak", start: 1999, end: 2003, color: BLUE },
+    { id: "survival", start: 2004, end: 2010, color: "#febe10" },
+    { id: "relegation", start: 2012, end: 2017, color: WARN },
+  ];
+
+  return definitions
+    .map((definition) => {
+      const seasons = data.seasons.filter(
+        (season) =>
+          season.tier === 1 &&
+          season.season_start >= definition.start &&
+          season.season_start <= definition.end,
+      );
+      const copy = currentCopy.charts.ppg.eras[definition.id];
+      return {
+        id: definition.id,
+        range: copy.range,
+        label: copy.label,
+        seasons,
+        avgPpg: d3.mean(seasons, (season) => season.ppg) ?? 0,
+        avgGd: d3.mean(seasons, (season) => season.gd_per_match) ?? 0,
+        color: definition.color,
+      };
+    })
+    .filter((row) => row.seasons.length > 0);
 }
 
 function drawTopScorerStack(element: HTMLElement, data: StoryData) {
@@ -1866,7 +2290,7 @@ function drawGrid(
     .selectAll("text.y-tick")
     .data(yTicks)
     .join("text")
-    .attr("class", "axis-text")
+    .attr("class", "axis-text y-tick")
     .attr("x", margin.left - 12)
     .attr("y", (d) => y(d) + 4)
     .attr("text-anchor", "end")
@@ -2502,16 +2926,49 @@ function observeChapters() {
   document.querySelectorAll(".chapter").forEach((chapter) => observer.observe(chapter));
 }
 
+function observeSequences() {
+  const panels = [...document.querySelectorAll<HTMLElement>(".sequence-panel[data-sequence-step]")];
+  if (!panels.length) return;
+
+  const activatePanel = (panel: HTMLElement) => {
+    const section = panel.closest<HTMLElement>(".chapter--sequence");
+    const step = panel.dataset.sequenceStep as GoalDiffStepId | undefined;
+    if (!section || !step) return;
+
+    section.dataset.goalDiffStep = step;
+    section.querySelectorAll(".sequence-panel").forEach((item) => item.classList.toggle("is-active", item === panel));
+  };
+
+  const observer = new IntersectionObserver(
+    (entries) => {
+      const visible = entries
+        .filter((entry) => entry.isIntersecting)
+        .sort((a, b) => b.intersectionRatio - a.intersectionRatio)[0];
+      if (visible?.target instanceof HTMLElement) {
+        activatePanel(visible.target);
+      }
+    },
+    { rootMargin: "-38% 0px -38% 0px", threshold: [0, 0.25, 0.5, 0.75] },
+  );
+
+  panels.forEach((panel) => observer.observe(panel));
+  sequenceObservers.push(observer);
+}
+
 function setupSnapNavigation() {
-  const sections = [...document.querySelectorAll<HTMLElement>(".hero, .chapter, .sources")];
+  const sections = [
+    ...document.querySelectorAll<HTMLElement>(".hero, .chapter:not(.chapter--sequence), .sequence-panel, .sources"),
+  ];
   if (!sections.length) return;
 
   document.documentElement.classList.add("scroll-magic");
 
   const desktopQuery = window.matchMedia("(min-width: 861px)");
   const reducedMotionQuery = window.matchMedia("(prefers-reduced-motion: reduce)");
-  const cooldownMs = 680;
-  let lastMoveAt = 0;
+  const cooldownMs = 560;
+  const sequenceScrollDurationMs = 1120;
+  let moveLockedUntil = 0;
+  let scrollAnimationFrame = 0;
   let touchStartX: number | null = null;
   let touchStartY: number | null = null;
   let touchStartedOnControl = false;
@@ -2531,26 +2988,82 @@ function setupSnapNavigation() {
     return bestIndex;
   };
 
+  const directionalIndex = (direction: number) => {
+    const scrollTop = window.scrollY;
+    const offset = direction > 0 ? 24 : -24;
+    const positions = sections.map((section, index) => ({
+      index,
+      top: section.getBoundingClientRect().top + scrollTop,
+    }));
+    if (direction > 0) {
+      return positions.find((position) => position.top > scrollTop + offset)?.index ?? currentIndex() + direction;
+    }
+    return [...positions].reverse().find((position) => position.top < scrollTop + offset)?.index ?? currentIndex() + direction;
+  };
+
   const updateUrlForSection = (section: HTMLElement) => {
-    const nextUrl = section.id ? `#${section.id}` : `${location.pathname}${location.search}`;
+    const sequenceParent = section.closest<HTMLElement>(".chapter--sequence");
+    const hashId = section.id || sequenceParent?.id;
+    const nextUrl = hashId ? `#${hashId}` : `${location.pathname}${location.search}`;
     history.replaceState(null, "", nextUrl);
   };
 
+  const sequenceParent = (section: HTMLElement | undefined) =>
+    section?.closest<HTMLElement>(".chapter--sequence") ?? null;
+
+  const isInternalSequenceMove = (current: HTMLElement | undefined, target: HTMLElement | undefined) => {
+    const currentSequence = sequenceParent(current);
+    const targetSequence = sequenceParent(target);
+    return Boolean(currentSequence && targetSequence && currentSequence === targetSequence);
+  };
+
+  const animateScrollTo = (top: number, durationMs: number) => {
+    if (scrollAnimationFrame) {
+      window.cancelAnimationFrame(scrollAnimationFrame);
+    }
+    document.documentElement.classList.add("sequence-scrolling");
+    const startTop = window.scrollY;
+    const delta = top - startTop;
+    const startAt = performance.now();
+    const step = (now: number) => {
+      const progress = clamp((now - startAt) / durationMs, 0, 1);
+      const eased = 1 - Math.pow(1 - progress, 3);
+      window.scrollTo({ top: startTop + delta * eased, left: 0, behavior: "auto" });
+      if (progress < 1) {
+        scrollAnimationFrame = window.requestAnimationFrame(step);
+      } else {
+        scrollAnimationFrame = 0;
+        document.documentElement.classList.remove("sequence-scrolling");
+      }
+    };
+    scrollAnimationFrame = window.requestAnimationFrame(step);
+  };
+
   const goToIndex = (index: number) => {
+    const current = sections[currentIndex()];
     const target = sections[clamp(index, 0, sections.length - 1)];
     if (!target) return;
-    lastMoveAt = Date.now();
+    const sequenceMove = isInternalSequenceMove(current, target);
+    const targetTop = target.getBoundingClientRect().top + window.scrollY;
+    const durationMs = sequenceMove ? sequenceScrollDurationMs : cooldownMs;
+    moveLockedUntil = Date.now() + durationMs * 0.78;
     updateUrlForSection(target);
-    target.scrollIntoView({
-      block: "start",
-      behavior: reducedMotionQuery.matches ? "auto" : "smooth",
-    });
+    if (reducedMotionQuery.matches) {
+      window.scrollTo(0, targetTop);
+    } else if (sequenceMove) {
+      animateScrollTo(targetTop, durationMs);
+    } else {
+      target.scrollIntoView({
+        block: "start",
+        behavior: "smooth",
+      });
+    }
   };
 
   const moveBy = (direction: number) => {
     if (!desktopQuery.matches) return;
-    if (Date.now() - lastMoveAt < cooldownMs) return;
-    goToIndex(currentIndex() + direction);
+    if (Date.now() < moveLockedUntil) return;
+    goToIndex(directionalIndex(direction));
   };
 
   const isEditableTarget = (target: EventTarget | null) =>
@@ -2621,6 +3134,10 @@ function setupSnapNavigation() {
 
   snapNavigationCleanup = () => {
     document.documentElement.classList.remove("scroll-magic");
+    if (scrollAnimationFrame) {
+      window.cancelAnimationFrame(scrollAnimationFrame);
+    }
+    document.documentElement.classList.remove("sequence-scrolling");
     window.removeEventListener("wheel", onWheel);
     window.removeEventListener("touchstart", onTouchStart);
     window.removeEventListener("touchmove", onTouchMove);
@@ -2661,6 +3178,10 @@ function displayTeam(team: string) {
     Castellon: "Castellón",
     Espanol: "Espanyol",
     Logrones: "Logroñés",
+    "Ath Bilbao": "Athletic",
+    "Ath Madrid": "Atlético",
+    "Sp Gijon": "Sporting",
+    Sociedad: "Real Sociedad",
   };
   return map[team] ?? team;
 }
@@ -2683,6 +3204,10 @@ function formatDecimal(value: number) {
 
 function signed(value: number) {
   return value > 0 ? `+${value}` : `${value}`;
+}
+
+function signedDecimal(value: number) {
+  return value > 0 ? `+${formatDecimal(value)}` : formatDecimal(value);
 }
 
 function resultLabel(result: TitlePoint["result"]) {

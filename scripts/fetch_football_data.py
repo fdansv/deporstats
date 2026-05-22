@@ -187,18 +187,18 @@ CURATED_SEASONS: list[dict[str, Any]] = [
 MILESTONES = [
     {
         "season": "1990-91",
-        "title": "A porta á elite",
+        "title": "Volta a Primeira",
         "body": "O Dépor sobe e volve a Primeira despois de dezaoito anos fóra.",
     },
     {
         "season": "1992-93",
-        "title": "O susto convértese en ameaza",
-        "body": "Bebeto, Mauro Silva e un terceiro posto: o club deixa de parecer convidado.",
+        "title": "O salto do Súper Dépor",
+        "body": "Bebeto, Mauro Silva e un terceiro posto colocan o club na zona alta.",
     },
     {
         "season": "1993-94",
-        "title": "Un penalti e unha ferida",
-        "body": "Subcampión con 18 goles encaixados. A Liga queda a unha distancia cruel.",
+        "title": "Subcampión por pouco",
+        "body": "O equipo encaixa só 18 goles e perde a Liga na última xornada.",
     },
     {
         "season": "1999-00",
@@ -208,31 +208,31 @@ MILESTONES = [
     {
         "season": "2001-02",
         "title": "Centenariazo",
-        "body": "A Copa no Bernabéu engade outra clase de insolencia ao expediente.",
+        "body": "A Copa no Bernabéu amplía unha etapa de títulos e presenza europea.",
     },
     {
         "season": "2010-11",
         "title": "Primeira caída",
-        "body": "O club baixa a Segunda. A historia xa non sabe como volver ao ton anterior.",
+        "body": "O club baixa a Segunda e comeza unha década máis irregular.",
     },
     {
         "season": "2017-18",
-        "title": "A porta péchase",
-        "body": "Descenso de Primeira cunha sensación menos dramática ca definitiva.",
+        "title": "Último descenso de Primeira",
+        "body": "A perda de categoría deixa o club de novo en Segunda.",
     },
     {
         "season": "2019-20",
         "title": "Segunda B",
-        "body": "O Dépor cae fóra do fútbol profesional. O gráfico empeza a parecer unha broma mala.",
+        "body": "O Dépor cae fóra do fútbol profesional por primeira vez neste tramo.",
     },
     {
         "season": "2023-24",
-        "title": "Riazor tira da corda",
-        "body": "O ascenso a Segunda corta catro anos de castigo.",
+        "title": "Ascenso a Segunda",
+        "body": "O ascenso corta catro anos seguidos na terceira escala.",
     },
     {
         "season": "2025-26",
-        "title": "A porta volve estar aberta",
+        "title": "En ascenso directo",
         "body": "A 21 de maio de 2026, o Dépor é segundo con 74 puntos en 40 partidos.",
     },
 ]
@@ -253,7 +253,7 @@ ATTENDANCE_CALLOUTS = [
     {
         "season": "2023-24",
         "attendance": 24000,
-        "label": "Riazor volve encherse para saír do pozo",
+        "label": "Riazor supera o contexto da categoría",
         "source": "prensa / rexistros de asistencia",
     },
 ]

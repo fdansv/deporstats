@@ -1,6 +1,6 @@
 # deporstats
 
-Sitio brutalista en galego sobre o Deportivo de La Coruña: do título de Liga de 2000 á beira do regreso a Primeira.
+Sitio brutalista en galego sobre o Deportivo da Coruña: do título de Liga de 2000 á carreira polo ascenso.
 
 ## App
 

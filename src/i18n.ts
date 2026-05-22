@@ -13,14 +13,14 @@ export const translations = {
     html: {
       lang: "gl",
       title: "O Dépor, en datos",
-      socialTitle: "O Dépor, en datos: da Liga de 2000 á porta do regreso",
+      socialTitle: "O Dépor, en datos: do título de 2000 á carreira polo ascenso",
       description:
-        "Un relato de datos sobre o Deportivo de La Coruña: do título de Liga de 2000 á beira do regreso.",
+        "Un relato de datos sobre o Deportivo da Coruña: do título de Liga de 2000 á carreira polo ascenso.",
       socialDescription:
         "Visualizacións interactivas sobre o Deportivo da Coruña: Liga 1999-00, caída ata a Segunda B e Primeira RFEF, Riazor e carreira polo ascenso en 2025-26.",
       keywords:
         "Dépor, Deportivo da Coruña, Deportivo de La Coruña, Riazor, LaLiga, Segunda División, Primeira RFEF, ascenso, datos fútbol",
-      imageAlt: "Gráfico editorial de deporstats sobre o Dépor, Riazor e a volta cara arriba",
+      imageAlt: "Gráfico editorial de deporstats sobre o Dépor, Riazor e a carreira polo ascenso",
       locale: "gl_ES",
     },
     language: {
@@ -40,103 +40,103 @@ export const translations = {
       aria: "Navegación principal",
       links: {
         cume: "O cume",
-        nube: "A nube",
+        nube: "O contexto",
         ascensor: "A caída",
         porta: "A volta",
       },
     },
     hero: {
       eyebrow: "Real Club Deportivo da Coruña · relato de datos",
-      titleLines: ["O Dépor e a ", "ciencia ", "exacta de ", "caer."],
+      titleLines: ["O Dépor, ", "do título ", "á carreira ", "polo ascenso."],
       lead: (points: number) =>
-        `Un club gaña a Liga no ano 2000. Vinte anos despois acabou mirando unha ruta que dicía Segunda B e Primeira RFEF, e preguntándose se aínda había outro andar por baixo. Agora, con ${points} puntos, volve mirar cara arriba.`,
+        `O Dépor gañou a Liga en 1999-00 con 69 puntos. Dúas décadas despois caeu fóra do fútbol profesional. Agora, con ${points} puntos, sostén unha praza de ascenso directo.`,
       statsAria: "Resumo estatístico",
       stats: {
         titlePoints: "puntos no título",
         tiers: "categorías percorridas",
         statusDate: (date: string) => `a ${date}`,
       },
-      ticker: ["1999-00 CAMPIÓN", "2019-20 DESCENSO", "2023-24 ASCENSO", "2025-26 Á PORTA"],
+      ticker: ["1999-00 CAMPIÓN", "2019-20 DESCENSO", "2023-24 ASCENSO", "2025-26 EN ASCENSO"],
     },
     chapters: [
       {
         id: "cume",
         kicker: "01 / O cume",
-        title: "A Liga gañouse coma se alguén deixase unha porta aberta.",
+        title: "A Liga de 2000 foi a culminación dunha década de aviso.",
         body:
-          "O Dépor non chegou a 1999-00 coma unha aparición mística. Levaba anos avisando. A diferenza é que esta vez a liña de puntos non se rompeu no último día.",
-        stat: "69 puntos, 66 goles, unha cidade sen sono.",
+          "O Dépor xa fora terceiro e dúas veces subcampión. En 1999-00 mantivo o pulso ata o final e pechou a Liga en Riazor ante o Espanyol.",
+        stat: "69 puntos, 66 goles e o primeiro título de Liga do club.",
       },
       {
         id: "nube",
-        kicker: "02 / A nube",
-        title: "Todas as tempadas empezan en cero. Case ningunha remata igual.",
+        kicker: "02 / O contexto",
+        title: "O contexto explica a dimensión do título.",
         body:
-          "Cada liña é unha tempada dun equipo que compartiu división co Dépor nos CSV reproducibles desde 1993-94. Todas saen do mesmo punto. A maioría desaparece no ruído. A liña branca é a nosa teima.",
+          "As liñas comparan a diferenza de goles acumulada dos equipos que compartiron división co Dépor desde 1993-94. O Dépor campión non foi a mellor curva do arquivo; foi a que chegou enteira á última xornada.",
         stat: "Diferenza de goles acumulada por xornada: marcados menos encaixados.",
       },
       {
         id: "alto",
         kicker: "03 / Vivir no alto",
-        title: "Durante un intre, a rareza foi que isto parecese normal.",
+        title: "A zona alta deixou de ser unha excepción.",
         body:
-          "Terceiros, segundos, campións, noites europeas. O gráfico non explica como soaba Riazor, pero si explica que o Dépor pasou de convidado a problema estrutural para a Liga.",
-        stat: "1992-2004: a zona alta deixou de ser unha visita.",
+          "Entre 1992 e 2004, o Dépor rematou repetidamente entre os mellores e fixo de Riazor unha escala europea. O posto final mostra canto durou esa estabilidade.",
+        stat: "1992-2004: terceiros, segundos, campións e noites europeas.",
       },
       {
         id: "fuga",
         kicker: "04 / A fuga lenta",
-        title: "Non foi unha caída. Primeiro foi unha perda de presión.",
+        title: "O desgaste chegou antes do descenso.",
         body:
-          "Os puntos por partido baixan antes de que chegue o desastre. A diferenza de goles, que fora unha declaración de autoridade, vai converténdose nunha pregunta incómoda.",
-        stat: "Do 1,9 PPG ao fútbol de supervivencia.",
+          "Para non mesturar categorías, o gráfico compara só tempadas de Primeira. O Dépor pasa dunha media de 1,86 puntos por partido no ciclo europeo a 0,93 nos últimos cursos antes do descenso de 2018.",
+        stat: "En Primeira: 1,86 PPG entre 1999 e 2004; 0,93 PPG entre 2012 e 2018.",
       },
       {
         id: "goles",
         kicker: "05 / Os goles",
-        title: "Ás veces un equipo enteiro cabía nun nome.",
+        title: "Os goles tamén contan como estaba repartido o equipo.",
         body:
-          "Cada barra é a produción ligueira do Dépor. A franxa amarela é o máximo goleador desa tempada: cando medra demasiado, a historia deixa de ser coral.",
-        stat: "Makaay 2002-03: 29 goles, Bota de Ouro e saída inmediata cara ao Bayern.",
+          "A barra separa o máximo goleador do resto. Cando a franxa de Makaay medra en 2002-03, resume tanto a súa Bota de Ouro como a dependencia ofensiva daquela tempada.",
+        stat: "Makaay 2002-03: 29 goles, Bota de Ouro e traspaso ao Bayern.",
       },
       {
         id: "ascensor",
-        kicker: "06 / O ascensor roto",
-        title: "Hai descensos. E logo está debuxar unha escaleira cara ao soto.",
+        kicker: "06 / A caída",
+        title: "A caída levou o club fóra do fútbol profesional.",
         body:
-          "O club que fora campión de Liga en 2000 xogou catro anos seguidos entre Segunda División B e Primeira RFEF. Nun gráfico limpo, iso parece unha decisión xeométrica. Na vida real foi ruído.",
+          "Despois do descenso de 2019-20, o Dépor pasou catro tempadas entre Segunda B, Primeira RFEF e Primeira Federación. A escala de categorías deixa ver a profundidade do golpe.",
         stat: "Primeira -> Segunda -> Segunda B / Primeira RFEF -> Segunda.",
       },
       {
         id: "rivais",
         kicker: "07 / A lista de rivais",
-        title: "O calendario pasou de ameazar a dar vértixe.",
+        title: "A lista de rivais mide o cambio de escenario.",
         body:
-          "A traxedia estatística precisa nomes. Cando unha historia inclúe Milan e Manchester United nun extremo, e logo Celta B, Unionistas ou Guijuelo no outro, o eixo Y xa non abonda.",
-        stat: "O opoñente tamén é unha métrica.",
+          "Milan e Manchester United quedan nun extremo da memoria. Celta B, Unionistas, Guijuelo ou Coruxo aparecen no outro. O contraste pon nomes ao salto entre competicións.",
+        stat: "O rival tamén é unha métrica.",
       },
       {
         id: "riazor",
         kicker: "08 / Riazor",
-        title: "Riazor quedoulle grande á Primeira RFEF.",
+        title: "Riazor sostivo cifras de outra categoría.",
         body:
-          "O que sostén a parte esperanzadora non é só a táboa. É que, nos anos máis pequenos do calendario, Riazor seguiu parecendo demasiado grande para a categoría.",
-        stat: "A asistencia converteu a humillación en teimosía.",
+          "Mesmo nos anos de terceira escala, a asistencia mantivo ao Dépor por riba do seu contexto competitivo. A bancada non corrixe a clasificación, pero axuda a explicar a volta.",
+        stat: "A asistencia mantivo presión de club grande.",
       },
       {
         id: "porta",
-        kicker: "09 / A porta de volta",
-        title: "A 21 de maio de 2026, a liña volve tocar a porta.",
+        kicker: "09 / A volta",
+        title: "A 21 de maio de 2026, o regreso segue aberto.",
         body:
-          "Con 74 puntos en 40 partidos, o Dépor está en ascenso directo. Isto aínda non é final. Precisamente por iso funciona como final provisional: hai unha escaleira e agora apunta cara arriba.",
-        stat: "Segundo, 74 puntos, dúas xornadas por diante.",
+          "Con 74 puntos en 40 partidos, o Dépor ocupa posto de ascenso directo. Faltan dúas xornadas, así que o dato é unha fotografía de carreira, non unha chegada.",
+        stat: "Segundo, 74 puntos, dúas xornadas por xogar.",
       },
     ],
     sources: {
       kicker: "Fontes e método",
-      title: "Datos fríos, historia quente.",
+      title: "Fontes, datas e límites.",
       body:
-        "Os partidos de Primeira e Segunda veñen de Football-Data. Os anos fóra do arquivo CSV están curados a nivel de tempada e marcados coa súa fonte. A situación 2025-26 está datada porque a táboa aínda respira.",
+        "Os partidos de Primeira e Segunda veñen de Football-Data. Os anos fóra do arquivo CSV están curados a nivel de tempada e marcados coa súa fonte. A situación 2025-26 está datada porque a clasificación aínda pode cambiar.",
     },
     sourceNotes: {
       "Football-Data.co.uk": "CSV de partidos en Primeira e Segunda.",
@@ -149,7 +149,7 @@ export const translations = {
       "Quincemil / El Español": "Récord de asistencia en Primeira Federación.",
     },
     attendanceLabels: {
-      "2011-12": "Segunda tamén puxo Riazor en modo grande",
+      "2011-12": "Riazor respondeu tamén en Segunda",
       "2020-21": "a tempada COVID ten asterisco",
     },
     attendanceRecordLabels: {
@@ -226,37 +226,107 @@ export const translations = {
         2: "Segunda",
         3: "Segunda B / 1ª RFEF",
       },
-      noDramaSeason: "Tempada sen etiqueta dramática, que tamén é un dato.",
+      noDramaSeason: "Tempada sen etiqueta salientable.",
     },
     charts: {
       goalDiff: {
         title: "GF - GC acumulado por xornada",
-        contextLabel: "liñas apagadas: resto da liga · liñas brancas: Dépor",
+        contextLabel: "liñas apagadas: tempadas completas do arquivo",
         bestLine: "Mellor liña",
         worstLine: "Peor liña",
+        sequence: [
+          {
+            step: "all",
+            kicker: "02 / O contexto",
+            title: "O contexto explica a dimensión do título.",
+            body:
+              "As liñas comparan a diferenza de goles acumulada dos equipos que compartiron división co Dépor desde 1993-94. O Dépor campión non foi a mellor curva do arquivo.",
+            stat: "Diferenza de goles acumulada por xornada: marcados menos encaixados.",
+          },
+          {
+            step: "best",
+            kicker: "02.1 / O teito",
+            title: "O Barça 2014-15 marca o teito do arquivo.",
+            body:
+              "A mellor traxectoria acaba cun +89 de diferenza de goles. Serve como referencia para ler o título do Dépor: máis competitivo que dominante.",
+            stat: "Barcelona 2014-15: +89 DG.",
+          },
+          {
+            step: "worst",
+            kicker: "02.2 / O chan",
+            title: "O Logroñés 1994-95 marca o chan.",
+            body:
+              "A curva remata en -64. A lista de derrotas explica por que esa liña é máis ca un extremo estatístico.",
+            stat: "Logroñés 1994-95: -64 DG.",
+          },
+          {
+            step: "depor-title",
+            kicker: "02.3 / Dépor arriba",
+            title: "O Dépor campión aguantou onde antes se escapara a Liga.",
+            body:
+              "A diferenza de goles non foi excepcional dentro do arquivo. O valor está na regularidade: 69 puntos e unha última xornada resolta en Riazor.",
+            stat: "Dépor 1999-00: campión con +22 DG.",
+          },
+          {
+            step: "depor-fall",
+            kicker: "02.4 / Dépor abaixo",
+            title: "En 2017-18 a tendencia xa era de descenso.",
+            body:
+              "O -38 de diferenza de goles resume unha tempada con pouca resposta. A liña non fala dun tramo malo, senón dun curso enteiro por baixo do nivel da categoría.",
+            stat: "Dépor 2017-18: -38 DG.",
+          },
+          {
+            step: "depor-now",
+            kicker: "02.5 / Dépor agora",
+            title: "A 2025-26 aínda lle quedan dúas xornadas.",
+            body:
+              "A lectura debe quedar datada: +20 en 40 partidos e posto de ascenso directo a 21 de maio de 2026. A curva apunta arriba, pero a táboa segue aberta.",
+            stat: "Dépor 2025-26: +20 DG en 40 partidos.",
+          },
+        ],
+        lossLedger: {
+          title: (count: number) => `${count} derrotas`,
+          subtitle: "Logroñés 1994-95 · marcador desde a súa perspectiva",
+          roundPrefix: "X",
+          home: "vs",
+          away: "@",
+        },
       },
       titlePath: {
-        title: "Avisos antes do título: ritmo de puntos",
+        title: "Antes do título: puntos",
         finalTitle: "19/05/2000",
         finalBody: "Riazor: 2-0 ao Espanyol",
-        breakBody: "0-0 co Valencia: a liña rompe no último día",
+        breakBody: "0-0 co Valencia: a Liga escápase no último día",
         finalStretch: "última recta",
         warningLines: "avisos anteriores",
         comparablePoints: "puntos equivalentes",
       },
       finish: {
-        title: "Posto na Liga: do medo ao título",
+        title: "Posto final por tempada",
         topBandLabel: "zona 1º-3º",
         topBandTitle: "Postos 1º-3º",
         topBandBody: (hits: number, total: number, start: number, end: number) =>
           `Entre ${start} e ${end}, o Dépor rematou entre os tres primeiros en ${hits} de ${total} tempadas.`,
       },
       ppg: {
-        title: "Puntos por partido e goles",
-        leader: "líder da división",
-        median: "mediana",
-        label2000: "a máquina aínda funciona",
-        label2020: "a liña deixa de parecer profesional",
+        title: "Media PPG en Primeira",
+        context: "só tempadas de Primeira División",
+        goalDiffPerMatch: "DG/partido",
+        seasonCount: (count: number) => `${count} tempadas`,
+        eras: {
+          peak: {
+            range: "1999-04",
+            label: "ciclo de zona alta",
+          },
+          survival: {
+            range: "2004-11",
+            label: "a permanencia faise norma",
+          },
+          relegation: {
+            range: "2012-18",
+            label: "Primeira xa non se sostén",
+          },
+        },
       },
       scorers: {
         title: "Goles: equipo e goleador",
@@ -264,32 +334,32 @@ export const translations = {
         topScorer: "máximo goleador",
         axis: "goles de Liga",
         outlierTitle: "2002-03 · Makaay",
-        outlierBody: "29 goles, Bota de Ouro e logo Bayern",
+        outlierBody: "29 goles, Bota de Ouro e traspaso ao Bayern",
         provisional: "dato provisional",
       },
       tier: {
-        title: "Altitude competitiva por tempada",
-        label2000: "campión arriba de todo",
-        label2020: "catro anos no pozo",
+        title: "Categoría por tempada",
+        label2000: "campión de Primeira",
+        label2020: "catro cursos na terceira escala",
         label2026: "segunda praza provisional",
       },
       opponents: {
-        title: "Resultados que non deberían vivir no mesmo club",
-        high: "vitorias arriba: o Dépor facía pequeno o grande",
-        low: "derrotas abaixo: a terceira facía pequeno o Dépor",
-        center: "mesmo escudo",
+        title: "Rivais: dous calendarios",
+        high: "arriba: noites contra Madrid, United e Milan",
+        low: "abaixo: derrotas no fútbol de terceira escala",
+        center: "mesmo club",
       },
       attendance: {
-        title: "Asistencia: chamadas de atención",
+        title: "Asistencia en Riazor",
         labelTitle: "Riazor",
-        labelBody: "asistencia aproximada en anos onde a categoría dicía unha cousa e a bancada outra",
+        labelBody: "media aproximada por tempada; as chamadas sinalan anos con rexistros fóra de escala",
         axis: "asistencia media",
         partial: "2025-26 parcial",
       },
       promotion: {
-        title: "Hypermotion 2025-26: ascenso",
+        title: "Ascenso 2025-26",
         labelTitle: "21/05/2026",
-        labelBody: "o dato aínda non é sentenza",
+        labelBody: "segundo con dúas xornadas por xogar",
       },
     },
   },
@@ -297,14 +367,14 @@ export const translations = {
     html: {
       lang: "es",
       title: "El Dépor, en datos",
-      socialTitle: "El Dépor, en datos: de la Liga de 2000 a la puerta del regreso",
+      socialTitle: "El Dépor, en datos: del título de 2000 a la carrera por el ascenso",
       description:
-        "Un relato de datos sobre el Deportivo de La Coruña: del título de Liga de 2000 al borde del regreso.",
+        "Un relato de datos sobre el Deportivo de La Coruña: del título de Liga de 2000 a la carrera por el ascenso.",
       socialDescription:
         "Visualizaciones interactivas sobre el Deportivo de La Coruña: Liga 1999-00, caída hasta Segunda B y Primera RFEF, Riazor y carrera por el ascenso en 2025-26.",
       keywords:
         "Dépor, Deportivo de La Coruña, Deportivo La Coruña, Riazor, LaLiga, Segunda División, Primera RFEF, ascenso, datos fútbol",
-      imageAlt: "Gráfico editorial de deporstats sobre el Dépor, Riazor y la vuelta hacia arriba",
+      imageAlt: "Gráfico editorial de deporstats sobre el Dépor, Riazor y la carrera por el ascenso",
       locale: "es_ES",
     },
     language: {
@@ -324,103 +394,103 @@ export const translations = {
       aria: "Navegación principal",
       links: {
         cume: "La cumbre",
-        nube: "La nube",
+        nube: "El contexto",
         ascensor: "La caída",
         porta: "La vuelta",
       },
     },
     hero: {
       eyebrow: "Real Club Deportivo de La Coruña · relato de datos",
-      titleLines: ["El Dépor y la ", "ciencia ", "exacta de ", "caer."],
+      titleLines: ["El Dépor, ", "del título ", "a la carrera ", "por ascender."],
       lead: (points: number) =>
-        `Un club gana la Liga en el año 2000. Veinte años después acabó mirando una ruta que decía Segunda B y Primera RFEF, y preguntándose si todavía había otro piso por debajo. Ahora, con ${points} puntos, vuelve a mirar hacia arriba.`,
+        `El Dépor ganó la Liga en 1999-00 con 69 puntos. Dos décadas después cayó fuera del fútbol profesional. Ahora, con ${points} puntos, sostiene una plaza de ascenso directo.`,
       statsAria: "Resumen estadístico",
       stats: {
         titlePoints: "puntos en el título",
         tiers: "categorías recorridas",
         statusDate: (date: string) => `a ${date}`,
       },
-      ticker: ["1999-00 CAMPEÓN", "2019-20 DESCENSO", "2023-24 ASCENSO", "2025-26 A LA PUERTA"],
+      ticker: ["1999-00 CAMPEÓN", "2019-20 DESCENSO", "2023-24 ASCENSO", "2025-26 EN ASCENSO"],
     },
     chapters: [
       {
         id: "cume",
         kicker: "01 / La cumbre",
-        title: "La Liga se ganó como si alguien hubiese dejado una puerta abierta.",
+        title: "La Liga de 2000 fue la culminación de una década de aviso.",
         body:
-          "El Dépor no llegó a 1999-00 como una aparición mística. Llevaba años avisando. La diferencia es que esta vez la línea de puntos no se rompió el último día.",
-        stat: "69 puntos, 66 goles, una ciudad sin sueño.",
+          "El Dépor ya había sido tercero y dos veces subcampeón. En 1999-00 sostuvo el pulso hasta el final y cerró la Liga en Riazor ante el Espanyol.",
+        stat: "69 puntos, 66 goles y el primer título de Liga del club.",
       },
       {
         id: "nube",
-        kicker: "02 / La nube",
-        title: "Todas las temporadas empiezan en cero. Casi ninguna termina igual.",
+        kicker: "02 / El contexto",
+        title: "El contexto explica la dimensión del título.",
         body:
-          "Cada línea es una temporada de un equipo que compartió división con el Dépor en los CSV reproducibles desde 1993-94. Todas salen del mismo punto. La mayoría desaparece en el ruido. La línea blanca es nuestra obsesión.",
+          "Las líneas comparan la diferencia de goles acumulada de los equipos que compartieron división con el Dépor desde 1993-94. El Dépor campeón no fue la mejor curva del archivo; fue la que llegó entera a la última jornada.",
         stat: "Diferencia de goles acumulada por jornada: marcados menos encajados.",
       },
       {
         id: "alto",
         kicker: "03 / Vivir arriba",
-        title: "Durante un instante, lo raro fue que esto pareciese normal.",
+        title: "La zona alta dejó de ser una excepción.",
         body:
-          "Terceros, segundos, campeones, noches europeas. El gráfico no explica cómo sonaba Riazor, pero sí explica que el Dépor pasó de invitado a problema estructural para la Liga.",
-        stat: "1992-2004: la zona alta dejó de ser una visita.",
+          "Entre 1992 y 2004, el Dépor terminó repetidamente entre los mejores e hizo de Riazor una escala europea. El puesto final muestra cuánto duró esa estabilidad.",
+        stat: "1992-2004: terceros, segundos, campeones y noches europeas.",
       },
       {
         id: "fuga",
         kicker: "04 / La fuga lenta",
-        title: "No fue una caída. Primero fue una pérdida de presión.",
+        title: "El desgaste llegó antes del descenso.",
         body:
-          "Los puntos por partido bajan antes de que llegue el desastre. La diferencia de goles, que había sido una declaración de autoridad, va convirtiéndose en una pregunta incómoda.",
-        stat: "Del 1,9 PPG al fútbol de supervivencia.",
+          "Para no mezclar categorías, el gráfico compara solo temporadas de Primera. El Dépor pasa de una media de 1,86 puntos por partido en el ciclo europeo a 0,93 en los últimos cursos antes del descenso de 2018.",
+        stat: "En Primera: 1,86 PPG entre 1999 y 2004; 0,93 PPG entre 2012 y 2018.",
       },
       {
         id: "goles",
         kicker: "05 / Los goles",
-        title: "A veces un equipo entero cabía en un nombre.",
+        title: "Los goles también cuentan cómo estaba repartido el equipo.",
         body:
-          "Cada barra es la producción liguera del Dépor. La franja amarilla es el máximo goleador de esa temporada: cuando crece demasiado, la historia deja de ser coral.",
-        stat: "Makaay 2002-03: 29 goles, Bota de Oro y salida inmediata hacia el Bayern.",
+          "La barra separa al máximo goleador del resto. Cuando la franja de Makaay crece en 2002-03, resume tanto su Bota de Oro como la dependencia ofensiva de aquella temporada.",
+        stat: "Makaay 2002-03: 29 goles, Bota de Oro y traspaso al Bayern.",
       },
       {
         id: "ascensor",
-        kicker: "06 / El ascensor roto",
-        title: "Hay descensos. Y luego está dibujar una escalera hacia el sótano.",
+        kicker: "06 / La caída",
+        title: "La caída llevó al club fuera del fútbol profesional.",
         body:
-          "El club que fue campeón de Liga en 2000 jugó cuatro años seguidos entre Segunda División B y Primera RFEF. En un gráfico limpio, eso parece una decisión geométrica. En la vida real fue ruido.",
+          "Tras el descenso de 2019-20, el Dépor pasó cuatro temporadas entre Segunda B, Primera RFEF y Primera Federación. La escala de categorías muestra la profundidad del golpe.",
         stat: "Primera -> Segunda -> Segunda B / Primera RFEF -> Segunda.",
       },
       {
         id: "rivais",
         kicker: "07 / La lista de rivales",
-        title: "El calendario pasó de amenazar a dar vértigo.",
+        title: "La lista de rivales mide el cambio de escenario.",
         body:
-          "La tragedia estadística necesita nombres. Cuando una historia incluye Milan y Manchester United en un extremo, y luego Celta B, Unionistas o Guijuelo en el otro, el eje Y ya no alcanza.",
+          "Milan y Manchester United quedan en un extremo de la memoria. Celta B, Unionistas, Guijuelo o Coruxo aparecen en el otro. El contraste pone nombres al salto entre competiciones.",
         stat: "El rival también es una métrica.",
       },
       {
         id: "riazor",
         kicker: "08 / Riazor",
-        title: "A Riazor le quedó pequeña la Primera RFEF.",
+        title: "Riazor sostuvo cifras de otra categoría.",
         body:
-          "Lo que sostiene la parte esperanzadora no es solo la tabla. Es que, en los años más pequeños del calendario, Riazor siguió pareciendo demasiado grande para la categoría.",
-        stat: "La asistencia convirtió la humillación en terquedad.",
+          "Incluso en los años de tercera escala, la asistencia mantuvo al Dépor por encima de su contexto competitivo. La grada no corrige la clasificación, pero ayuda a explicar la vuelta.",
+        stat: "La asistencia mantuvo presión de club grande.",
       },
       {
         id: "porta",
-        kicker: "09 / La puerta de vuelta",
-        title: "El 21 de mayo de 2026, la línea vuelve a tocar la puerta.",
+        kicker: "09 / La vuelta",
+        title: "El 21 de mayo de 2026, el regreso sigue abierto.",
         body:
-          "Con 74 puntos en 40 partidos, el Dépor está en ascenso directo. Esto aún no es final. Precisamente por eso funciona como final provisional: hay una escalera y ahora apunta hacia arriba.",
-        stat: "Segundo, 74 puntos, dos jornadas por delante.",
+          "Con 74 puntos en 40 partidos, el Dépor ocupa puesto de ascenso directo. Faltan dos jornadas, así que el dato es una fotografía de carrera, no una llegada.",
+        stat: "Segundo, 74 puntos, dos jornadas por jugar.",
       },
     ],
     sources: {
       kicker: "Fuentes y método",
-      title: "Datos fríos, historia caliente.",
+      title: "Fuentes, fechas y límites.",
       body:
-        "Los partidos de Primera y Segunda vienen de Football-Data. Los años fuera del archivo CSV están curados a nivel de temporada y marcados con su fuente. La situación 2025-26 está fechada porque la tabla todavía respira.",
+        "Los partidos de Primera y Segunda vienen de Football-Data. Los años fuera del archivo CSV están curados a nivel de temporada y marcados con su fuente. La situación 2025-26 está fechada porque la clasificación todavía puede cambiar.",
     },
     sourceNotes: {
       "Football-Data.co.uk": "CSV de partidos en Primera y Segunda.",
@@ -433,7 +503,7 @@ export const translations = {
       "Quincemil / El Español": "Récord de asistencia en Primera Federación.",
     },
     attendanceLabels: {
-      "2011-12": "Segunda también puso Riazor en modo grande",
+      "2011-12": "Riazor respondió también en Segunda",
       "2020-21": "la temporada COVID tiene asterisco",
     },
     attendanceRecordLabels: {
@@ -510,37 +580,107 @@ export const translations = {
         2: "Segunda",
         3: "Segunda B / 1ª RFEF",
       },
-      noDramaSeason: "Temporada sin etiqueta dramática, que también es un dato.",
+      noDramaSeason: "Temporada sin etiqueta destacada.",
     },
     charts: {
       goalDiff: {
         title: "GF - GC acumulado por jornada",
-        contextLabel: "líneas apagadas: resto de la liga · líneas blancas: Dépor",
+        contextLabel: "líneas apagadas: temporadas completas del archivo",
         bestLine: "Mejor línea",
         worstLine: "Peor línea",
+        sequence: [
+          {
+            step: "all",
+            kicker: "02 / El contexto",
+            title: "El contexto explica la dimensión del título.",
+            body:
+              "Las líneas comparan la diferencia de goles acumulada de los equipos que compartieron división con el Dépor desde 1993-94. El Dépor campeón no fue la mejor curva del archivo.",
+            stat: "Diferencia de goles acumulada por jornada: marcados menos encajados.",
+          },
+          {
+            step: "best",
+            kicker: "02.1 / El techo",
+            title: "El Barça 2014-15 marca el techo del archivo.",
+            body:
+              "La mejor trayectoria acaba con un +89 de diferencia de goles. Sirve como referencia para leer el título del Dépor: más competitivo que dominante.",
+            stat: "Barcelona 2014-15: +89 DG.",
+          },
+          {
+            step: "worst",
+            kicker: "02.2 / El suelo",
+            title: "El Logroñés 1994-95 marca el suelo.",
+            body:
+              "La curva termina en -64. La lista de derrotas explica por qué esa línea es algo más que un extremo estadístico.",
+            stat: "Logroñés 1994-95: -64 DG.",
+          },
+          {
+            step: "depor-title",
+            kicker: "02.3 / Dépor arriba",
+            title: "El Dépor campeón aguantó donde antes se había escapado la Liga.",
+            body:
+              "La diferencia de goles no fue excepcional dentro del archivo. El valor está en la regularidad: 69 puntos y una última jornada resuelta en Riazor.",
+            stat: "Dépor 1999-00: campeón con +22 DG.",
+          },
+          {
+            step: "depor-fall",
+            kicker: "02.4 / Dépor abajo",
+            title: "En 2017-18 la tendencia ya era de descenso.",
+            body:
+              "El -38 de diferencia de goles resume una temporada con poca respuesta. La línea no habla de un tramo malo, sino de un curso entero por debajo del nivel de la categoría.",
+            stat: "Dépor 2017-18: -38 DG.",
+          },
+          {
+            step: "depor-now",
+            kicker: "02.5 / Dépor ahora",
+            title: "A 2025-26 todavía le quedan dos jornadas.",
+            body:
+              "La lectura debe quedar fechada: +20 en 40 partidos y puesto de ascenso directo a 21 de mayo de 2026. La curva apunta arriba, pero la tabla sigue abierta.",
+            stat: "Dépor 2025-26: +20 DG en 40 partidos.",
+          },
+        ],
+        lossLedger: {
+          title: (count: number) => `${count} derrotas`,
+          subtitle: "Logroñés 1994-95 · marcador desde su perspectiva",
+          roundPrefix: "J",
+          home: "vs",
+          away: "@",
+        },
       },
       titlePath: {
-        title: "Avisos antes del título: ritmo de puntos",
+        title: "Antes del título: puntos",
         finalTitle: "19/05/2000",
         finalBody: "Riazor: 2-0 al Espanyol",
-        breakBody: "0-0 con el Valencia: la línea se rompe el último día",
+        breakBody: "0-0 con el Valencia: la Liga se escapa el último día",
         finalStretch: "última recta",
         warningLines: "avisos anteriores",
         comparablePoints: "puntos equivalentes",
       },
       finish: {
-        title: "Puesto en la Liga: del miedo al título",
+        title: "Puesto final por temporada",
         topBandLabel: "zona 1º-3º",
         topBandTitle: "Puestos 1º-3º",
         topBandBody: (hits: number, total: number, start: number, end: number) =>
           `Entre ${start} y ${end}, el Dépor terminó entre los tres primeros en ${hits} de ${total} temporadas.`,
       },
       ppg: {
-        title: "Puntos por partido y goles",
-        leader: "líder de la división",
-        median: "mediana",
-        label2000: "la máquina aún funciona",
-        label2020: "la línea deja de parecer profesional",
+        title: "Media PPG en Primera",
+        context: "solo temporadas de Primera División",
+        goalDiffPerMatch: "DG/partido",
+        seasonCount: (count: number) => `${count} temporadas`,
+        eras: {
+          peak: {
+            range: "1999-04",
+            label: "ciclo de zona alta",
+          },
+          survival: {
+            range: "2004-11",
+            label: "la permanencia se hace norma",
+          },
+          relegation: {
+            range: "2012-18",
+            label: "Primera ya no se sostiene",
+          },
+        },
       },
       scorers: {
         title: "Goles: equipo y goleador",
@@ -548,32 +688,32 @@ export const translations = {
         topScorer: "máximo goleador",
         axis: "goles de Liga",
         outlierTitle: "2002-03 · Makaay",
-        outlierBody: "29 goles, Bota de Oro y luego Bayern",
+        outlierBody: "29 goles, Bota de Oro y traspaso al Bayern",
         provisional: "dato provisional",
       },
       tier: {
-        title: "Altitud competitiva por temporada",
-        label2000: "campeón arriba de todo",
-        label2020: "cuatro años en el pozo",
+        title: "Categoría por temporada",
+        label2000: "campeón de Primera",
+        label2020: "cuatro cursos en la tercera escala",
         label2026: "segunda plaza provisional",
       },
       opponents: {
-        title: "Resultados que no deberían vivir en el mismo club",
-        high: "victorias arriba: el Dépor hacía pequeño lo grande",
-        low: "derrotas abajo: la tercera hacía pequeño al Dépor",
-        center: "mismo escudo",
+        title: "Rivales: dos calendarios",
+        high: "arriba: noches contra Madrid, United y Milan",
+        low: "abajo: derrotas en el fútbol de tercera escala",
+        center: "mismo club",
       },
       attendance: {
-        title: "Asistencia: llamadas de atención",
+        title: "Asistencia en Riazor",
         labelTitle: "Riazor",
-        labelBody: "asistencia aproximada en años donde la categoría decía una cosa y la grada otra",
+        labelBody: "media aproximada por temporada; las llamadas señalan años con registros fuera de escala",
         axis: "asistencia media",
         partial: "2025-26 parcial",
       },
       promotion: {
-        title: "Hypermotion 2025-26: ascenso",
+        title: "Ascenso 2025-26",
         labelTitle: "21/05/2026",
-        labelBody: "el dato todavía no es sentencia",
+        labelBody: "segundo con dos jornadas por jugar",
       },
     },
   },
@@ -581,14 +721,14 @@ export const translations = {
     html: {
       lang: "en",
       title: "Depor, in data",
-      socialTitle: "Depor, in data: from the 2000 La Liga title to the way back",
+      socialTitle: "Depor, in data: from the 2000 title to the promotion race",
       description:
-        "A data story about Deportivo de La Coruna: from the 2000 La Liga title to the edge of a return.",
+        "A data story about Deportivo de La Coruna: from the 2000 La Liga title to the promotion race.",
       socialDescription:
         "Interactive visualizations on Deportivo de La Coruna: the 1999-00 La Liga title, the fall into Segunda B and Primera RFEF, Riazor, and the 2025-26 promotion race.",
       keywords:
         "Depor, Deportivo de La Coruna, Deportivo La Coruna, Riazor, LaLiga, Segunda Division, Primera RFEF, promotion, football data",
-      imageAlt: "Editorial deporstats graphic about Depor, Riazor, and the climb back up",
+      imageAlt: "Editorial deporstats graphic about Depor, Riazor, and the promotion race",
       locale: "en_US",
     },
     language: {
@@ -608,103 +748,103 @@ export const translations = {
       aria: "Main navigation",
       links: {
         cume: "Summit",
-        nube: "Cloud",
+        nube: "Context",
         ascensor: "Fall",
         porta: "Return",
       },
     },
     hero: {
       eyebrow: "Real Club Deportivo de La Coruna · data story",
-      titleLines: ["Depor and the ", "exact ", "science of ", "falling."],
+      titleLines: ["Depor, ", "from the title ", "to the promotion ", "race."],
       lead: (points: number) =>
-        `A club wins La Liga in 2000. Twenty years later it found itself staring at a route marked Segunda B and Primera RFEF, wondering whether there was another floor below. Now, with ${points} points, it is looking up again.`,
+        `Depor won La Liga in 1999-00 with 69 points. Two decades later it had fallen out of professional football. Now, with ${points} points, it holds an automatic promotion place.`,
       statsAria: "Statistical summary",
       stats: {
         titlePoints: "points in the title season",
         tiers: "tiers crossed",
         statusDate: (date: string) => `as of ${date}`,
       },
-      ticker: ["1999-00 CHAMPIONS", "2019-20 RELEGATION", "2023-24 PROMOTION", "2025-26 AT THE DOOR"],
+      ticker: ["1999-00 CHAMPIONS", "2019-20 RELEGATION", "2023-24 PROMOTION", "2025-26 IN PROMOTION"],
     },
     chapters: [
       {
         id: "cume",
         kicker: "01 / The summit",
-        title: "La Liga was won as if someone had left a door open.",
+        title: "The 2000 title finished a decade of warnings.",
         body:
-          "Depor did not arrive in 1999-00 like a mystical apparition. It had been warning everyone for years. The difference is that this time the points line did not break on the final day.",
-        stat: "69 points, 66 goals, a sleepless city.",
+          "Depor had already finished third and twice as runner-up. In 1999-00, it held the pace to the end and sealed La Liga at Riazor against Espanyol.",
+        stat: "69 points, 66 goals, and the club's first league title.",
       },
       {
         id: "nube",
-        kicker: "02 / The cloud",
-        title: "Every season starts at zero. Almost none ends the same way.",
+        kicker: "02 / The context",
+        title: "The context explains the size of the title.",
         body:
-          "Each line is a season from a team that shared a division with Depor in the reproducible CSVs since 1993-94. They all begin from the same point. Most disappear into the noise. The white line is the obsession.",
+          "The lines compare accumulated goal difference for every team that shared a division with Depor since 1993-94. The champions were not the best curve in the archive; they were the one that reached the final day intact.",
         stat: "Accumulated goal difference by round: scored minus conceded.",
       },
       {
         id: "alto",
         kicker: "03 / Living high",
-        title: "For a moment, the strange thing was that this felt normal.",
+        title: "The top end stopped being an exception.",
         body:
-          "Third, second, champions, European nights. The chart cannot explain how Riazor sounded, but it does show how Depor went from guest to structural problem for La Liga.",
-        stat: "1992-2004: the top end stopped being a visit.",
+          "Between 1992 and 2004, Depor repeatedly finished among the best and made Riazor a European stop. The final positions show how long that stability lasted.",
+        stat: "1992-2004: thirds, seconds, champions, and European nights.",
       },
       {
         id: "fuga",
         kicker: "04 / The slow leak",
-        title: "It was not a fall. First it was a loss of pressure.",
+        title: "The slide started before relegation.",
         body:
-          "Points per game drop before disaster arrives. Goal difference, once a statement of authority, slowly becomes an uncomfortable question.",
-        stat: "From 1.9 PPG to survival football.",
+          "To avoid mixing divisions, the chart compares only Primera seasons. Depor goes from 1.86 points per match in the European cycle to 0.93 in the last top-flight seasons before the 2018 relegation.",
+        stat: "In Primera: 1.86 PPG from 1999 to 2004; 0.93 PPG from 2012 to 2018.",
       },
       {
         id: "goles",
         kicker: "05 / The goals",
-        title: "Sometimes an entire team fit inside one name.",
+        title: "The goals also show how the team was built.",
         body:
-          "Each bar is Depor's league scoring output. The yellow stack is that season's leading scorer: when it gets too tall, the story stops being collective.",
-        stat: "Makaay 2002-03: 29 goals, the Golden Shoe, then Bayern.",
+          "Each bar separates the leading scorer from the rest of the side. When Makaay's share rises in 2002-03, it captures both his Golden Shoe and that season's attacking dependence.",
+        stat: "Makaay 2002-03: 29 goals, the Golden Shoe, and a move to Bayern.",
       },
       {
         id: "ascensor",
-        kicker: "06 / The broken elevator",
-        title: "There are relegations. Then there is drawing a staircase to the basement.",
+        kicker: "06 / The fall",
+        title: "The fall took the club out of professional football.",
         body:
-          "The club that won La Liga in 2000 spent four straight years between Segunda Division B and Primera RFEF. On a clean chart, that looks like geometry. In real life it was noise.",
+          "After the 2019-20 relegation, Depor spent four seasons between Segunda B, Primera RFEF, and Primera Federacion. The tier scale shows how deep the hit went.",
         stat: "Primera -> Segunda -> Segunda B / Primera RFEF -> Segunda.",
       },
       {
         id: "rivais",
         kicker: "07 / The rivals list",
-        title: "The fixture list went from threatening to dizzying.",
+        title: "The rivals list measures the change of stage.",
         body:
-          "Statistical tragedy needs names. When one story includes Milan and Manchester United at one end, then Celta B, Unionistas or Guijuelo at the other, the Y axis is no longer enough.",
+          "Milan and Manchester United sit at one end of the memory. Celta B, Unionistas, Guijuelo, and Coruxo appear at the other. The contrast names the distance between competitions.",
         stat: "The opponent is also a metric.",
       },
       {
         id: "riazor",
         kicker: "08 / Riazor",
-        title: "Riazor was too big for Primera RFEF.",
+        title: "Riazor kept posting numbers from another level.",
         body:
-          "The hopeful part is not only held up by the table. It is that, during the smallest years in the calendar, Riazor still looked too large for the category.",
-        stat: "Attendance turned humiliation into stubbornness.",
+          "Even in the third tier years, attendance kept Depor above its competitive context. The stands do not fix the table, but they help explain the return.",
+        stat: "Attendance kept big-club pressure in place.",
       },
       {
         id: "porta",
         kicker: "09 / The way back",
-        title: "On May 21, 2026, the line is knocking at the door again.",
+        title: "On May 21, 2026, the return is still open.",
         body:
-          "With 74 points from 40 matches, Depor sits in an automatic promotion place. This is not final yet. That is exactly why it works as a provisional ending: there is a staircase, and now it points upward.",
-        stat: "Second, 74 points, two rounds still ahead.",
+          "With 74 points from 40 matches, Depor sits in an automatic promotion place. Two rounds remain, so the number is a race snapshot, not a finish line.",
+        stat: "Second, 74 points, two rounds to play.",
       },
     ],
     sources: {
       kicker: "Sources and method",
-      title: "Cold data, hot story.",
+      title: "Sources, dates, and limits.",
       body:
-        "Primera and Segunda match data comes from Football-Data. Seasons outside the CSV archive are curated at season level and marked with their source. The 2025-26 status is dated because the table is still alive.",
+        "Primera and Segunda match data comes from Football-Data. Seasons outside the CSV archive are curated at season level and marked with their source. The 2025-26 status is dated because the table can still change.",
     },
     sourceNotes: {
       "Football-Data.co.uk": "Primera and Segunda match CSVs.",
@@ -717,7 +857,7 @@ export const translations = {
       "Quincemil / El Español": "Primera Federacion attendance record.",
     },
     attendanceLabels: {
-      "2011-12": "Segunda still put Riazor in big-stadium mode",
+      "2011-12": "Riazor also answered in Segunda",
       "2020-21": "the COVID season needs an asterisk",
     },
     attendanceRecordLabels: {
@@ -794,37 +934,107 @@ export const translations = {
         2: "Segunda",
         3: "Segunda B / 1st RFEF",
       },
-      noDramaSeason: "A season without a dramatic label, which is data too.",
+      noDramaSeason: "A season without a notable label.",
     },
     charts: {
       goalDiff: {
         title: "GF - GA accumulated by round",
-        contextLabel: "muted lines: rest of the league · white lines: Depor",
+        contextLabel: "muted lines: full seasons in the archive",
         bestLine: "Best line",
         worstLine: "Worst line",
+        sequence: [
+          {
+            step: "all",
+            kicker: "02 / The context",
+            title: "The context explains the size of the title.",
+            body:
+              "The lines compare accumulated goal difference for every team that shared a division with Depor since 1993-94. The champions were not the best curve in the archive.",
+            stat: "Accumulated goal difference by round: scored minus conceded.",
+          },
+          {
+            step: "best",
+            kicker: "02.1 / The ceiling",
+            title: "Barcelona 2014-15 sets the archive ceiling.",
+            body:
+              "The best trajectory ends at +89 goal difference. It gives the Depor title a useful reference point: more competitive than dominant.",
+            stat: "Barcelona 2014-15: +89 GD.",
+          },
+          {
+            step: "worst",
+            kicker: "02.2 / The floor",
+            title: "Logroñés 1994-95 sets the archive floor.",
+            body:
+              "The curve finishes at -64. The defeat list explains why that line is more than a statistical extreme.",
+            stat: "Logroñés 1994-95: -64 GD.",
+          },
+          {
+            step: "depor-title",
+            kicker: "02.3 / Depor high",
+            title: "The champions held where the league had slipped before.",
+            body:
+              "The goal difference was not exceptional in the archive. The value is in the regularity: 69 points and a final day settled at Riazor.",
+            stat: "Depor 1999-00: champions with +22 GD.",
+          },
+          {
+            step: "depor-fall",
+            kicker: "02.4 / Depor low",
+            title: "By 2017-18, the trend already pointed down.",
+            body:
+              "The -38 goal difference sums up a season with little response. The line is not one bad spell; it is a full campaign below the level of the division.",
+            stat: "Depor 2017-18: -38 GD.",
+          },
+          {
+            step: "depor-now",
+            kicker: "02.5 / Depor now",
+            title: "The 2025-26 season still has two rounds left.",
+            body:
+              "The reading has to stay dated: +20 in 40 matches and an automatic promotion place on May 21, 2026. The curve points up, but the table remains open.",
+            stat: "Depor 2025-26: +20 GD in 40 matches.",
+          },
+        ],
+        lossLedger: {
+          title: (count: number) => `${count} losses`,
+          subtitle: "Logroñés 1994-95 · score from their perspective",
+          roundPrefix: "R",
+          home: "vs",
+          away: "@",
+        },
       },
       titlePath: {
-        title: "Warnings before the title: points pace",
+        title: "Before the title: points",
         finalTitle: "05/19/2000",
         finalBody: "Riazor: 2-0 over Espanyol",
-        breakBody: "0-0 with Valencia: the line breaks on the final day",
+        breakBody: "0-0 with Valencia: the league slips on the final day",
         finalStretch: "final stretch",
         warningLines: "earlier warnings",
         comparablePoints: "equivalent points",
       },
       finish: {
-        title: "League finish: from fear to the title",
+        title: "Final position by season",
         topBandLabel: "1st-3rd zone",
         topBandTitle: "Places 1st-3rd",
         topBandBody: (hits: number, total: number, start: number, end: number) =>
           `Between ${start} and ${end}, Depor finished in the top three in ${hits} of ${total} seasons.`,
       },
       ppg: {
-        title: "Points per match and goals",
-        leader: "division leader",
-        median: "median",
-        label2000: "the machine still works",
-        label2020: "the line stops looking professional",
+        title: "Average PPG in Primera",
+        context: "Primera Division seasons only",
+        goalDiffPerMatch: "GD/match",
+        seasonCount: (count: number) => `${count} seasons`,
+        eras: {
+          peak: {
+            range: "1999-04",
+            label: "top-end cycle",
+          },
+          survival: {
+            range: "2004-11",
+            label: "survival becomes the norm",
+          },
+          relegation: {
+            range: "2012-18",
+            label: "Primera no longer holds",
+          },
+        },
       },
       scorers: {
         title: "Goals: team and scorer",
@@ -832,32 +1042,32 @@ export const translations = {
         topScorer: "leading scorer",
         axis: "league goals",
         outlierTitle: "2002-03 · Makaay",
-        outlierBody: "29 goals, Golden Shoe, then Bayern",
+        outlierBody: "29 goals, Golden Shoe, and a move to Bayern",
         provisional: "provisional data",
       },
       tier: {
-        title: "Competitive altitude by season",
-        label2000: "champions at the top",
-        label2020: "four years in the hole",
+        title: "Tier by season",
+        label2000: "Primera champions",
+        label2020: "four seasons on the third step",
         label2026: "provisional second place",
       },
       opponents: {
-        title: "Results that should not live in the same club",
-        high: "wins above: Depor made giants look small",
-        low: "losses below: the third tier made Depor look small",
-        center: "same crest",
+        title: "Rivals: two fixture lists",
+        high: "above: nights against Madrid, United, and Milan",
+        low: "below: defeats in third-tier football",
+        center: "same club",
       },
       attendance: {
-        title: "Attendance: warning signs",
+        title: "Attendance at Riazor",
         labelTitle: "Riazor",
-        labelBody: "approximate attendance in years when the category said one thing and the stands said another",
+        labelBody: "approximate season averages; callouts mark years with out-of-scale crowds",
         axis: "average attendance",
         partial: "2025-26 partial",
       },
       promotion: {
-        title: "Hypermotion 2025-26: promotion",
+        title: "Promotion race 2025-26",
         labelTitle: "05/21/2026",
-        labelBody: "the data is not final yet",
+        labelBody: "second with two rounds to play",
       },
     },
   },
