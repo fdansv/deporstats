@@ -436,7 +436,7 @@ function renderChapter({
   chartNode.className = "chart";
   chartNode.setAttribute("role", "img");
   chartNode.setAttribute("aria-label", title);
-  chartNode.dataset.renderer = chart.name;
+  chartNode.dataset.renderer = id;
   figure.append(chartNode);
 
   const copy = document.createElement("article");
@@ -476,21 +476,10 @@ function renderSources(data: StoryData): HTMLElement {
 }
 
 function renderAllCharts(data: StoryData) {
-  const renderers: Record<string, ChartRenderer> = {
-    drawGoalDiffCloud,
-    drawTitlePath,
-    drawFinishTimeline,
-    drawPpgDrift,
-    drawTierAltitude,
-    drawOpponentWall,
-    drawAttendance,
-    drawPromotionRace,
-  };
-
   document.querySelectorAll<HTMLElement>(".chart").forEach((element) => {
-    const rendererName = element.dataset.renderer;
-    if (!rendererName || !renderers[rendererName]) return;
-    renderResponsive(element, (node) => renderers[rendererName](node, data));
+    const rendererId = element.dataset.renderer;
+    if (!rendererId || !CHAPTER_RENDERERS[rendererId]) return;
+    renderResponsive(element, (node) => CHAPTER_RENDERERS[rendererId](node, data));
   });
 }
 
