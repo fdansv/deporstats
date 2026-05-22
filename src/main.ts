@@ -252,7 +252,7 @@ const OPPONENT_MOMENTS: OpponentMoment[] = [
     source: "BDFutbol",
     sourceUrl: "https://www.bdfutbol.com/en/t/t2020-2113.html?tab=partits",
     labelDx: -235,
-    labelDy: -34,
+    labelDy: -12,
   },
   {
     season: "2020-21",
@@ -282,7 +282,7 @@ const OPPONENT_MOMENTS: OpponentMoment[] = [
     source: "BDFutbol",
     sourceUrl: "https://www.bdfutbol.com/en/t/t2020-2113.html?tab=partits",
     labelDx: -84,
-    labelDy: -34,
+    labelDy: -12,
   },
 ];
 const CHAPTER_RENDERERS: Record<string, ChartRenderer> = {
