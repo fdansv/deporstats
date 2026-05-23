@@ -6,6 +6,7 @@ from __future__ import annotations
 import csv
 import datetime as dt
 import json
+import os
 import urllib.request
 from collections import defaultdict
 from pathlib import Path
@@ -270,24 +271,244 @@ MILESTONES = [
     },
 ]
 
-ATTENDANCE_CALLOUTS = [
+ATTENDANCE_SERIES = [
+    {
+        "season": "2005-06",
+        "season_start": 2005,
+        "division": "Primeira División",
+        "tier": 1,
+        "attendance": 19658,
+        "matches": 19,
+        "total": 373500,
+        "source": "Transfermarkt",
+    },
+    {
+        "season": "2006-07",
+        "season_start": 2006,
+        "division": "Primeira División",
+        "tier": 1,
+        "attendance": 22094,
+        "matches": 19,
+        "total": 419789,
+        "source": "Transfermarkt",
+    },
+    {
+        "season": "2007-08",
+        "season_start": 2007,
+        "division": "Primeira División",
+        "tier": 1,
+        "attendance": 18964,
+        "matches": 19,
+        "total": 360311,
+        "source": "Transfermarkt",
+    },
+    {
+        "season": "2008-09",
+        "season_start": 2008,
+        "division": "Primeira División",
+        "tier": 1,
+        "attendance": 18511,
+        "matches": 19,
+        "total": 351711,
+        "source": "Transfermarkt",
+    },
+    {
+        "season": "2009-10",
+        "season_start": 2009,
+        "division": "Primeira División",
+        "tier": 1,
+        "attendance": 16985,
+        "matches": 19,
+        "total": 322711,
+        "source": "Transfermarkt",
+    },
+    {
+        "season": "2010-11",
+        "season_start": 2010,
+        "division": "Primeira División",
+        "tier": 1,
+        "attendance": 20227,
+        "matches": 19,
+        "total": 384311,
+        "source": "Transfermarkt",
+    },
+    {
+        "season": "2011-12",
+        "season_start": 2011,
+        "division": "Segunda División",
+        "tier": 2,
+        "attendance": 26438,
+        "matches": 21,
+        "total": 555200,
+        "source": "Transfermarkt",
+    },
+    {
+        "season": "2012-13",
+        "season_start": 2012,
+        "division": "Primeira División",
+        "tier": 1,
+        "attendance": 29443,
+        "matches": 19,
+        "total": 559421,
+        "source": "Transfermarkt",
+    },
+    {
+        "season": "2013-14",
+        "season_start": 2013,
+        "division": "Segunda División",
+        "tier": 2,
+        "attendance": 22331,
+        "matches": 21,
+        "total": 468942,
+        "source": "Transfermarkt",
+    },
+    {
+        "season": "2014-15",
+        "season_start": 2014,
+        "division": "Primeira División",
+        "tier": 1,
+        "attendance": 20971,
+        "matches": 19,
+        "total": 398454,
+        "source": "Transfermarkt",
+    },
+    {
+        "season": "2015-16",
+        "season_start": 2015,
+        "division": "Primeira División",
+        "tier": 1,
+        "attendance": 23481,
+        "matches": 19,
+        "total": 446142,
+        "source": "Transfermarkt",
+    },
+    {
+        "season": "2016-17",
+        "season_start": 2016,
+        "division": "Primeira División",
+        "tier": 1,
+        "attendance": 22432,
+        "matches": 19,
+        "total": 426216,
+        "source": "Transfermarkt",
+    },
+    {
+        "season": "2017-18",
+        "season_start": 2017,
+        "division": "Primeira División",
+        "tier": 1,
+        "attendance": 20518,
+        "matches": 19,
+        "total": 389842,
+        "source": "Transfermarkt",
+    },
+    {
+        "season": "2018-19",
+        "season_start": 2018,
+        "division": "Segunda División",
+        "tier": 2,
+        "attendance": 16704,
+        "matches": 21,
+        "total": 350783,
+        "source": "Transfermarkt",
+    },
+    {
+        "season": "2019-20",
+        "season_start": 2019,
+        "division": "Segunda División",
+        "tier": 2,
+        "attendance": 17370,
+        "matches": 21,
+        "total": 260556,
+        "source": "Transfermarkt",
+    },
+    {
+        "season": "2020-21",
+        "season_start": 2020,
+        "division": "Segunda División B",
+        "tier": 3,
+        "attendance": 1375,
+        "matches": 12,
+        "total": 5500,
+        "source": "Transfermarkt",
+    },
     {
         "season": "2021-22",
-        "attendance": 20000,
-        "label": "media arredor dos 20.000 en Primeira RFEF",
-        "source": "Wikipedia / prensa",
+        "season_start": 2021,
+        "division": "Primeira RFEF",
+        "tier": 3,
+        "attendance": 13360,
+        "matches": 19,
+        "total": 240479,
+        "source": "Transfermarkt",
     },
     {
         "season": "2022-23",
-        "attendance": 19028,
-        "label": "19.028 de media na Primeira Federación",
-        "source": "Wikipedia",
+        "season_start": 2022,
+        "division": "Primeira Federación",
+        "tier": 3,
+        "attendance": 19043,
+        "matches": 19,
+        "total": 361821,
+        "source": "Transfermarkt",
     },
     {
         "season": "2023-24",
-        "attendance": 24000,
-        "label": "Riazor supera o contexto da categoría",
-        "source": "prensa / rexistros de asistencia",
+        "season_start": 2023,
+        "division": "Primeira Federación",
+        "tier": 3,
+        "attendance": 23177,
+        "matches": 19,
+        "total": 417182,
+        "source": "Transfermarkt",
+    },
+    {
+        "season": "2024-25",
+        "season_start": 2024,
+        "division": "Segunda División",
+        "tier": 2,
+        "attendance": 21509,
+        "matches": 21,
+        "total": 451682,
+        "source": "Transfermarkt",
+    },
+    {
+        "season": "2025-26",
+        "season_start": 2025,
+        "division": "Segunda División",
+        "tier": 2,
+        "attendance": 22936,
+        "matches": 10,
+        "total": 229358,
+        "source": "Transfermarkt",
+        "partial": True,
+    },
+]
+
+ATTENDANCE_RECORDS = [
+    {
+        "id": "primera-federacion-2024",
+        "season": "2023-24",
+        "attendance": 31833,
+        "opponent": "Barcelona B",
+        "date": "2024-05-12",
+        "label": "Primera Federación record",
+        "source": "Quincemil / El Español",
+    },
+]
+
+ATTENDANCE_CALLOUTS = [
+    {
+        "season": "2011-12",
+        "attendance": 26438,
+        "label": "Riazor respondeu tamén en Segunda",
+        "source": "Transfermarkt",
+    },
+    {
+        "season": "2020-21",
+        "attendance": 1375,
+        "label": "a tempada COVID ten asterisco",
+        "source": "Transfermarkt",
     },
 ]
 
@@ -311,6 +532,21 @@ SOURCE_LINKS = [
         "name": "LaLiga",
         "url": "https://www.laliga.com/laliga-hypermotion/clasificacion",
         "note": "Clasificación oficial de LaLiga Hypermotion.",
+    },
+    {
+        "name": "Transfermarkt",
+        "url": "https://www.transfermarkt.co/deportivo-la-coruna/besucherzahlenentwicklung/verein/897",
+        "note": "Evolución de asistencia media por tempada e competición.",
+    },
+    {
+        "name": "La Opinión A Coruña",
+        "url": "https://www.laopinioncoruna.es/deportivo/2024/06/16/tercera-mejor-asistencia-media-riazor-103876820.html",
+        "note": "Contexto local sobre os rexistros recentes de Riazor.",
+    },
+    {
+        "name": "Quincemil / El Español",
+        "url": "https://www.elespanol.com/quincemil/deporte/deportivo/20240512/riazor-bate-nuevo-record-asistencia-primera-rfef-aficionados-estadio/854664702_0.html",
+        "note": "Récord de asistencia en Primeira Federación.",
     },
 ]
 
@@ -365,6 +601,8 @@ def parse_date(value: str) -> str:
 def fetch_raw(code: str, division: str) -> Path:
     RAW_DIR.mkdir(parents=True, exist_ok=True)
     path = RAW_DIR / f"{code}_{division}.csv"
+    if path.exists() and os.environ.get("REFETCH_RAW") != "1":
+        return path
     with urllib.request.urlopen(source_url(code, division), timeout=30) as response:
         path.write_bytes(response.read())
     return path
@@ -614,6 +852,8 @@ def build_datasets() -> None:
         "team_colors": TEAM_COLORS,
         "promotion_table": promotion_table,
         "milestones": MILESTONES,
+        "attendance_series": ATTENDANCE_SERIES,
+        "attendance_records": ATTENDANCE_RECORDS,
         "attendance_callouts": ATTENDANCE_CALLOUTS,
         "opponent_wall": opponent_wall(matches),
         "sources": SOURCE_LINKS,

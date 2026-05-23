@@ -29,6 +29,8 @@ def main() -> None:
     assert len(story["seasons"]) == len(seasons), "JSON season count mismatch"
     assert len(story["matches"]) == len(matches), "JSON match count mismatch"
     assert story["goal_diff_race"], "Missing cumulative goal-difference rows"
+    assert len(story.get("attendance_series", [])) == 21, "Expected full attendance series"
+    assert len(story.get("attendance_records", [])) == 1, "Expected attendance record marker"
 
     season_by_name = {row["season"]: row for row in seasons}
     assert season_by_name["1999-00"]["state"] == "Campión de Liga"

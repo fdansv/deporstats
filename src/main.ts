@@ -2241,7 +2241,8 @@ function drawOpponentWall(element: HTMLElement, data: StoryData) {
 
 function drawAttendance(element: HTMLElement, data: StoryData) {
   const { svg, tooltip, width, height } = baseSvg(element);
-  const margin = { ...responsiveMargin(width), bottom: width < 560 ? 74 : 58 };
+  const compact = width < 560;
+  const margin = { ...responsiveMargin(width), bottom: compact ? 74 : 58 };
   const rows = (data.attendance_series?.length ? data.attendance_series : fallbackAttendanceSeries(data)).sort(
     (a, b) => a.season_start - b.season_start,
   );
@@ -2314,7 +2315,7 @@ function drawAttendance(element: HTMLElement, data: StoryData) {
   bindTooltip(recordMarks, tooltip, attendanceRecordTooltip);
   svg
     .selectAll("text.attendance-season")
-    .data(attendanceTicks(rows, width < 560))
+    .data(attendanceTicks(rows, compact))
     .join("text")
     .attr("class", "axis-text season-tick attendance-season")
     .attr("x", (d) => (x(d.season) ?? 0) + x.bandwidth() / 2)
@@ -2329,47 +2330,51 @@ function drawAttendance(element: HTMLElement, data: StoryData) {
     margin.top + 16,
     width - margin.left - margin.right - 8,
   );
-  for (const callout of data.attendance_callouts) {
-    const row = rows.find((item) => item.season === callout.season);
-    if (!row) continue;
-    const pointX = (x(row.season) ?? 0) + x.bandwidth() / 2;
-    const pointY = y(row.attendance);
-    const labelWidth = width < 560 ? 146 : 178;
-    const labelX = clamp(
-      row.season_start < 2015 ? pointX + 12 : pointX - labelWidth - 12,
-      margin.left,
-      width - margin.right - labelWidth,
-    );
-    const labelY = clamp(
-      row.season_start >= 2023 ? pointY + 18 : row.attendance < 8000 ? pointY - 92 : pointY - 68,
-      margin.top + 60,
-      height - margin.bottom - 74,
-    );
-    const box = label(svg, labelX, labelY, callout.season, attendanceLabel(callout), labelWidth);
-    labelLeader(svg, pointX, pointY, box, attendanceDivisionColor(row.division));
-  }
-  for (const record of records) {
-    const row = rows.find((item) => item.season === record.season);
-    if (!row) continue;
-    const pointX = (x(row.season) ?? 0) + x.bandwidth() / 2;
-    const pointY = y(record.attendance);
-    const labelWidth = width < 560 ? 150 : 184;
-    const labelX = clamp(pointX + 12, margin.left, width - margin.right - labelWidth);
-    const labelY = clamp(pointY + 16, margin.top + 54, height - margin.bottom - 74);
-    const box = label(svg, labelX, labelY, formatNumber(record.attendance), attendanceRecordLabel(record), labelWidth);
-    labelLeader(svg, pointX, pointY, box, BLUE);
-  }
+  if (!compact) {
+    for (const callout of data.attendance_callouts) {
+      const row = rows.find((item) => item.season === callout.season);
+      if (!row) continue;
+      const pointX = (x(row.season) ?? 0) + x.bandwidth() / 2;
+      const pointY = y(row.attendance);
+      const labelWidth = 178;
+      const labelX = clamp(
+        row.season_start < 2015 ? pointX + 12 : pointX - labelWidth - 12,
+        margin.left,
+        width - margin.right - labelWidth,
+      );
+      const labelY = clamp(
+        row.season_start >= 2023 ? pointY + 18 : row.attendance < 8000 ? pointY - 92 : pointY - 68,
+        margin.top + 60,
+        height - margin.bottom - 74,
+      );
+      const box = label(svg, labelX, labelY, callout.season, attendanceLabel(callout), labelWidth);
+      labelLeader(svg, pointX, pointY, box, attendanceDivisionColor(row.division));
+    }
+    for (const record of records) {
+      const row = rows.find((item) => item.season === record.season);
+      if (!row) continue;
+      const pointX = (x(row.season) ?? 0) + x.bandwidth() / 2;
+      const pointY = y(record.attendance);
+      const labelWidth = 184;
+      const labelX = clamp(pointX + 12, margin.left, width - margin.right - labelWidth);
+      const labelY = clamp(pointY + 16, margin.top + 54, height - margin.bottom - 74);
+      const box = label(svg, labelX, labelY, formatNumber(record.attendance), attendanceRecordLabel(record), labelWidth);
+      labelLeader(svg, pointX, pointY, box, BLUE);
+    }
 
-  label(
-    svg,
-    margin.left,
-    height - margin.bottom - 72,
-    currentCopy.charts.attendance.labelTitle,
-    currentCopy.charts.attendance.labelBody,
-  );
+    label(
+      svg,
+      margin.left,
+      height - margin.bottom - 72,
+      currentCopy.charts.attendance.labelTitle,
+      currentCopy.charts.attendance.labelBody,
+    );
+  }
   chartTitle(svg, margin.left, 34, currentCopy.charts.attendance.title);
-  axisLabel(svg, 18, margin.top + 26, currentCopy.charts.attendance.axis);
-  if (rows.some((row) => row.partial)) {
+  if (!compact) {
+    axisLabel(svg, 18, margin.top + 26, currentCopy.charts.attendance.axis);
+  }
+  if (!compact && rows.some((row) => row.partial)) {
     axisLabel(svg, width - margin.right, height - 12, currentCopy.charts.attendance.partial);
   }
 }
