@@ -612,7 +612,7 @@ h1 span {
 @media (max-width: 860px) {
   html.scroll-magic {
     scroll-padding-top: 48px;
-    scroll-snap-type: y mandatory;
+    scroll-snap-type: y proximity;
   }
 
   .hero,
@@ -712,7 +712,7 @@ h1 span {
     opacity: 0.82;
     overflow: clip;
     scroll-snap-align: start;
-    scroll-snap-stop: always;
+    scroll-snap-stop: normal;
   }
 
   .chapter--sequence .sequence-panel.is-active {
