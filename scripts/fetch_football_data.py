@@ -64,6 +64,39 @@ FOOTBALL_DATA_SEASONS = [
     ("2526", "SP2"),
 ]
 
+PROMOTION_CONTEXT_CODES = [
+    "9697",
+    "9798",
+    "9899",
+    "9900",
+    "0001",
+    "0102",
+    "0203",
+    "0304",
+    "0405",
+    "0506",
+    "0607",
+    "0708",
+    "0809",
+    "0910",
+    "1011",
+    "1112",
+    "1213",
+    "1314",
+    "1415",
+    "1516",
+    "1617",
+    "1718",
+    "1819",
+    "1920",
+    "2021",
+    "2122",
+    "2223",
+    "2324",
+    "2425",
+    "2526",
+]
+
 DIVISION_NAMES = {
     "SP1": ("Primeira División", 1),
     "SP2": ("Segunda División", 2),
@@ -337,6 +370,16 @@ def fetch_raw(code: str, division: str) -> Path:
     return path
 
 
+def played_rows(code: str, division: str) -> list[dict[str, str]]:
+    path = fetch_raw(code, division)
+    with path.open(newline="", encoding="utf-8-sig") as handle:
+        return [
+            row
+            for row in csv.DictReader(handle)
+            if row.get("Div") == division and is_played(row)
+        ]
+
+
 def is_played(row: dict[str, str]) -> bool:
     return bool(row.get("HomeTeam") and row.get("AwayTeam") and row.get("FTHG") and row.get("FTAG"))
 
@@ -512,13 +555,7 @@ def build_datasets() -> None:
     ppg_context: list[dict[str, Any]] = []
 
     for code, division in FOOTBALL_DATA_SEASONS:
-        path = fetch_raw(code, division)
-        with path.open(newline="", encoding="utf-8-sig") as handle:
-            rows = [
-                row
-                for row in csv.DictReader(handle)
-                if row.get("Div") == division and is_played(row)
-            ]
+        rows = played_rows(code, division)
         if not rows:
             continue
 
@@ -551,6 +588,7 @@ def build_datasets() -> None:
 
     seasons = [depor_seasons_by_label[season] for season in sorted(depor_seasons_by_label)]
     title_path = cumulative_title_path(matches)
+    promotion_goal_diff_race = promotion_goal_diff_paths()
 
     write_csv(PROCESSED_DIR / "deportivo_1993_2026_matches.csv", matches)
     write_csv(PROCESSED_DIR / "deportivo_seasons.csv", seasons)
@@ -570,6 +608,7 @@ def build_datasets() -> None:
         "title_path": title_path,
         "title_race": title_race,
         "goal_diff_race": goal_diff_race,
+        "promotion_goal_diff_race": promotion_goal_diff_race,
         "finish_context": finish_context,
         "ppg_context": ppg_context,
         "team_colors": TEAM_COLORS,
@@ -692,6 +731,70 @@ def goal_diff_paths(rows: list[dict[str, str]], code: str, division: str) -> lis
                     "source_url": source_url(code, division),
                 }
             )
+    return output
+
+
+def promotion_goal_diff_paths() -> list[dict[str, Any]]:
+    tables_by_team_season_tier: dict[tuple[str, int, int], dict[str, Any]] = {}
+    paths_by_team_season_tier: dict[tuple[str, int, int], list[dict[str, Any]]] = {}
+
+    for code in PROMOTION_CONTEXT_CODES:
+        for division in ("SP1", "SP2"):
+            rows = played_rows(code, division)
+            if not rows:
+                continue
+
+            table = table_rows_for_season(code, division, rows)
+            paths = goal_diff_paths(rows, code, division)
+            year = season_start_year(season_label(code))
+            tier = DIVISION_NAMES[division][1]
+
+            for row in table:
+                tables_by_team_season_tier[(row["team"], year, tier)] = row
+
+            grouped_paths: dict[str, list[dict[str, Any]]] = defaultdict(list)
+            for point in paths:
+                grouped_paths[point["team"]].append(point)
+            for team, values in grouped_paths.items():
+                paths_by_team_season_tier[(team, year, tier)] = values
+
+    output: list[dict[str, Any]] = []
+
+    def append_case(team: str, year: int, tier: int, promotion_case: str) -> None:
+        key = (team, year, tier)
+        table_row = tables_by_team_season_tier[key]
+        next_tier = None
+        if (team, year + 1, 1) in tables_by_team_season_tier:
+            next_tier = 1
+        elif (team, year + 1, 2) in tables_by_team_season_tier:
+            next_tier = 2
+
+        for point in paths_by_team_season_tier.get(key, []):
+            output.append(
+                {
+                    "season": point["season"],
+                    "season_start": point["season_start"],
+                    "division": point["division"],
+                    "tier": point["tier"],
+                    "team": point["team"],
+                    "round": point["round"],
+                    "date": point["date"],
+                    "gd": point["gd"],
+                    "promotion_case": promotion_case,
+                    "finish": table_row["finish"],
+                    "points": table_row["points"],
+                    "returned_to_segunda": next_tier == 2,
+                    "completed_next_season": next_tier in {1, 2},
+                    "source_url": point["source_url"],
+                }
+            )
+
+    for team, year, tier in sorted(tables_by_team_season_tier):
+        if tier == 2 and (team, year + 1, 1) in tables_by_team_season_tier:
+            append_case(team, year, tier, "segunda-promotion")
+        if tier == 1 and (team, year - 1, 2) in tables_by_team_season_tier:
+            append_case(team, year, tier, "primera-after-promotion")
+
     return output
 
 

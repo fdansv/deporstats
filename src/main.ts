@@ -90,6 +90,25 @@ type GoalDiffPoint = {
   source_url: string;
 };
 
+type PromotionGoalDiffPoint = {
+  season: string;
+  season_start: number;
+  division: string;
+  tier: number;
+  team: string;
+  round: number;
+  date: string;
+  gd: number;
+  promotion_case: "segunda-promotion" | "primera-after-promotion";
+  finish: number;
+  points: number;
+  returned_to_segunda: boolean;
+  completed_next_season: boolean;
+  source_url: string;
+};
+
+type GoalDiffLinePoint = GoalDiffPoint | PromotionGoalDiffPoint;
+
 type FinishContextPoint = {
   team: string;
   season: string;
@@ -180,6 +199,7 @@ type StoryData = {
   title_path: TitlePoint[];
   title_race: TitleRacePoint[];
   goal_diff_race: GoalDiffPoint[];
+  promotion_goal_diff_race?: PromotionGoalDiffPoint[];
   finish_context: FinishContextPoint[];
   ppg_context: PpgContextPoint[];
   team_colors: Record<string, string>;
@@ -197,7 +217,15 @@ type TooltipContent = { title: string; body: string };
 type TooltipSelection = d3.Selection<HTMLDivElement, unknown, null, undefined>;
 type LegendItem = { label: string; color: string };
 type LabelBox = { x: number; y: number; width: number; height: number };
-type GoalDiffStepId = "all" | "best" | "worst" | "depor-title" | "depor-fall" | "depor-now";
+type GoalDiffStepId =
+  | "all"
+  | "best"
+  | "worst"
+  | "depor-title"
+  | "depor-fall"
+  | "depor-now"
+  | "depor-promotion"
+  | "primera-after-promotion";
 type OpponentCardLayout = LabelBox & { moment: OpponentMoment; pointX: number; pointY: number };
 type OpponentMoment = {
   season: string;
@@ -957,16 +985,20 @@ function drawGoalDiffCloud(element: HTMLElement, data: StoryData) {
   const margin = compactSequenceChart ? compactGoalDiffMargin(width) : responsiveMargin(width);
   const plotTop = compactSequenceChart ? margin.top : margin.top + 36;
   const points = (data.goal_diff_race ?? []).filter((point) => point.season_start >= 1993);
-  const series = [...d3.group(points, (point) => `${point.team}__${point.season}`).values()];
-  const deporSeries = series.filter((values) => values[0]?.is_depor);
-  const finalPoints = series.map((values) => values[values.length - 1]).filter((point): point is GoalDiffPoint => Boolean(point));
+  const contextSeries = [...d3.group(points, (point) => `${point.team}__${point.season}`).values()];
+  const promotionSeries = promotionGoalDiffSeries(data);
+  const series = mergeGoalDiffSeries(contextSeries, promotionSeries);
+  const deporSeries = contextSeries.filter((values) => values[0]?.is_depor);
+  const finalPoints = contextSeries
+    .map((values) => values[values.length - 1])
+    .filter((point): point is GoalDiffPoint => Boolean(point));
   const bestFinal = d3.max(finalPoints, (point) => point.gd);
   const worstFinal = d3.min(finalPoints, (point) => point.gd);
-  const bestSeries = series.find((values) => values[values.length - 1]?.gd === bestFinal);
-  const worstSeries = series.find((values) => values[values.length - 1]?.gd === worstFinal);
-  const maxRound = d3.max(points, (d) => d.round) ?? 42;
-  const maxAbsGd = Math.ceil((d3.max(points, (d) => Math.abs(d.gd)) ?? 80) / 10) * 10;
-  const states = goalDiffViewStates(bestSeries, worstSeries, deporSeries, maxRound, maxAbsGd);
+  const bestSeries = contextSeries.find((values) => values[values.length - 1]?.gd === bestFinal);
+  const worstSeries = contextSeries.find((values) => values[values.length - 1]?.gd === worstFinal);
+  const maxRound = d3.max(series.flat(), (d) => d.round) ?? 42;
+  const maxAbsGd = Math.ceil((d3.max(series.flat(), (d) => Math.abs(d.gd)) ?? 80) / 10) * 10;
+  const states = goalDiffViewStates(bestSeries, worstSeries, deporSeries, promotionSeries, maxRound, maxAbsGd);
   const panels = section ? [...section.querySelectorAll<HTMLElement>(".sequence-panel[data-sequence-step]")] : [];
   const xScale = d3.scaleLinear().range([margin.left, width - margin.right]);
   const yScale = d3.scaleLinear().range([height - margin.bottom, plotTop]);
@@ -995,8 +1027,8 @@ function drawGoalDiffCloud(element: HTMLElement, data: StoryData) {
     .attr("class", "context-goal-diff")
     .attr("clip-path", `url(#${clipId})`);
   const paths = pathLayer
-    .selectAll<SVGPathElement, GoalDiffPoint[]>("path")
-    .data(series, (values) => goalDiffSeriesKey(values as GoalDiffPoint[]))
+    .selectAll<SVGPathElement, GoalDiffLinePoint[]>("path")
+    .data(series, (values) => goalDiffSeriesKey(values as GoalDiffLinePoint[]))
     .join("path")
     .attr("fill", "none")
     .attr("stroke-linejoin", "round")
@@ -1045,7 +1077,7 @@ function drawGoalDiffCloud(element: HTMLElement, data: StoryData) {
     xScale.domain(domain.round);
     yScale.domain(domain.gd);
     const line = d3
-      .line<GoalDiffPoint>()
+      .line<GoalDiffLinePoint>()
       .x((d) => xScale(d.round))
       .y((d) => yScale(d.gd))
       .curve(d3.curveLinear);
@@ -1086,7 +1118,30 @@ function drawGoalDiffCloud(element: HTMLElement, data: StoryData) {
   };
 }
 
-function goalDiffSeriesKey(values: GoalDiffPoint[]) {
+function promotionGoalDiffSeries(data: StoryData): PromotionGoalDiffPoint[][] {
+  return [...d3.group(data.promotion_goal_diff_race ?? [], (point) => `${point.promotion_case}__${point.team}__${point.season}`).values()].map(
+    (values) => values.sort((a, b) => a.round - b.round),
+  );
+}
+
+function mergeGoalDiffSeries(
+  contextSeries: GoalDiffPoint[][],
+  promotionSeries: PromotionGoalDiffPoint[][],
+): GoalDiffLinePoint[][] {
+  const byKey = new Map<string, GoalDiffLinePoint[]>();
+  for (const values of contextSeries) {
+    byKey.set(goalDiffSeriesKey(values), values);
+  }
+  for (const values of promotionSeries) {
+    const key = goalDiffSeriesKey(values);
+    if (!byKey.has(key)) {
+      byKey.set(key, values);
+    }
+  }
+  return [...byKey.values()];
+}
+
+function goalDiffSeriesKey(values: GoalDiffLinePoint[]) {
   const first = values[0];
   return first ? `${first.team}__${first.season}` : "";
 }
@@ -1113,25 +1168,52 @@ function logronesLosses(data: StoryData) {
 
 type GoalDiffViewState = {
   id: GoalDiffStepId;
-  targetSeries?: GoalDiffPoint[];
+  targetSeries?: GoalDiffLinePoint[];
+  targetGroups?: { series: GoalDiffLinePoint[][]; color: string; emphasis?: number }[];
   color: string;
   domain: { round: [number, number]; gd: [number, number] };
+  labelTitle?: string;
+  labelBody?: string;
 };
 
 function goalDiffViewStates(
   bestSeries: GoalDiffPoint[] | undefined,
   worstSeries: GoalDiffPoint[] | undefined,
   deporSeries: GoalDiffPoint[][],
+  promotionSeries: PromotionGoalDiffPoint[][],
   maxRound: number,
   maxAbsGd: number,
 ): GoalDiffViewState[] {
   const allDomain = { round: [0, maxRound] as [number, number], gd: [-maxAbsGd, maxAbsGd] as [number, number] };
-  const withDomain = (id: GoalDiffStepId, targetSeries: GoalDiffPoint[] | undefined, color: string): GoalDiffViewState => ({
-    id,
-    targetSeries,
-    color,
-    domain: goalDiffDomain(id, targetSeries, maxRound, maxAbsGd),
-  });
+  const withDomain = (
+    id: GoalDiffStepId,
+    targetSeries: GoalDiffLinePoint[] | undefined,
+    color: string,
+    options: Omit<GoalDiffViewState, "id" | "targetSeries" | "color" | "domain"> = {},
+  ): GoalDiffViewState => {
+    const state = { id, targetSeries, color, ...options };
+    return {
+      ...state,
+      domain: goalDiffDomain(id, targetSeries, maxRound, maxAbsGd, options.targetGroups),
+    };
+  };
+  const deporNow = deporSeries.find((values) => values[0]?.season === "2025-26");
+  const promotedSeries = promotionSeries.filter((values) => values[0]?.promotion_case === "segunda-promotion");
+  const primeraAfterPromotionSeries = promotionSeries.filter(
+    (values) => values[0]?.promotion_case === "primera-after-promotion",
+  );
+  const completedPrimeraAfterPromotionSeries = primeraAfterPromotionSeries.filter(
+    (values) => values[values.length - 1]?.completed_next_season,
+  );
+  const returnedToSegundaSeries = completedPrimeraAfterPromotionSeries.filter(
+    (values) => values[values.length - 1]?.returned_to_segunda,
+  );
+  const stayedInPrimeraSeries = completedPrimeraAfterPromotionSeries.filter(
+    (values) => !values[values.length - 1]?.returned_to_segunda,
+  );
+  const worstReturnedSeries = [...returnedToSegundaSeries].sort(
+    (a, b) => (a[a.length - 1]?.gd ?? 0) - (b[b.length - 1]?.gd ?? 0),
+  )[0];
 
   return [
     { id: "all", color: BLUE, domain: allDomain },
@@ -1139,23 +1221,44 @@ function goalDiffViewStates(
     withDomain("worst", worstSeries, WARN),
     withDomain("depor-title", deporSeries.find((values) => values[0]?.season === "1999-00"), BLUE),
     withDomain("depor-fall", deporSeries.find((values) => values[0]?.season === "2017-18"), WARN),
-    withDomain("depor-now", deporSeries.find((values) => values[0]?.season === "2025-26"), "#80f0bd"),
+    withDomain("depor-now", deporNow, "#80f0bd"),
+    withDomain("depor-promotion", deporNow, "#80f0bd", {
+      targetGroups: [{ series: promotedSeries, color: "#febe10", emphasis: 0.76 }],
+      labelTitle: currentCopy.charts.goalDiff.promotionHopeTitle,
+      labelBody: currentCopy.charts.goalDiff.promotionHopeBody(promotedSeries.length),
+    }),
+    withDomain("primera-after-promotion", worstReturnedSeries, WARN, {
+      targetGroups: [
+        { series: stayedInPrimeraSeries, color: "#febe10", emphasis: 0.66 },
+        { series: returnedToSegundaSeries, color: WARN, emphasis: 0.95 },
+      ],
+      labelTitle: currentCopy.charts.goalDiff.afterPromotionTitle,
+      labelBody: currentCopy.charts.goalDiff.afterPromotionBody(
+        returnedToSegundaSeries.length,
+        completedPrimeraAfterPromotionSeries.length,
+      ),
+    }),
   ];
 }
 
 function goalDiffDomain(
   step: GoalDiffStepId,
-  targetSeries: GoalDiffPoint[] | undefined,
+  targetSeries: GoalDiffLinePoint[] | undefined,
   maxRound: number,
   maxAbsGd: number,
+  targetGroups: GoalDiffViewState["targetGroups"] = [],
 ) {
-  if (step === "all" || !targetSeries) {
+  const targetValues = [
+    ...(targetSeries ?? []),
+    ...targetGroups.flatMap((group) => group.series.flat()),
+  ].filter((point) => point.round > 0);
+
+  if (step === "all" || !targetValues.length) {
     return { round: [0, maxRound] as [number, number], gd: [-maxAbsGd, maxAbsGd] as [number, number] };
   }
 
-  const values = targetSeries.filter((point) => point.round > 0);
-  const minGd = d3.min(values, (point) => point.gd) ?? 0;
-  const maxGd = d3.max(values, (point) => point.gd) ?? 0;
+  const minGd = d3.min(targetValues, (point) => point.gd) ?? 0;
+  const maxGd = d3.max(targetValues, (point) => point.gd) ?? 0;
   const padding = step === "depor-title" || step === "depor-now" ? 8 : 12;
   let yMin = Math.floor((minGd - padding) / 10) * 10;
   let yMax = Math.ceil((maxGd + padding) / 10) * 10;
@@ -1191,15 +1294,27 @@ function goalDiffHighlightWeights(
   mix: number,
 ): Map<string, { weight: number; color: string }> {
   const highlights = new Map<string, { weight: number; color: string }>();
-  for (const [state, weight] of [
+  const addSeries = (series: GoalDiffLinePoint[], color: string, weight: number) => {
+    if (weight <= 0.02) return;
+    const key = goalDiffSeriesKey(series);
+    const existing = highlights.get(key);
+    if (!existing || weight >= existing.weight) {
+      highlights.set(key, { weight, color });
+    }
+  };
+
+  for (const [state, stateWeight] of [
     [lower, 1 - mix],
     [upper, mix],
   ] as const) {
-    if (!state.targetSeries || weight <= 0.02) continue;
-    const key = goalDiffSeriesKey(state.targetSeries);
-    const existing = highlights.get(key);
-    if (!existing || weight > existing.weight) {
-      highlights.set(key, { weight, color: state.color });
+    if (state.targetSeries) {
+      addSeries(state.targetSeries, state.color, stateWeight);
+    }
+    for (const group of state.targetGroups ?? []) {
+      const groupWeight = Math.min(1, stateWeight * (group.emphasis ?? 1));
+      for (const series of group.series) {
+        addSeries(series, group.color, groupWeight);
+      }
     }
   }
   return highlights;
@@ -1212,16 +1327,17 @@ function goalDiffLabelSettledAmount(position: number) {
 
 function goalDiffScrollPosition(section: HTMLElement, stateCount: number) {
   const panels = [...section.querySelectorAll<HTMLElement>(".sequence-panel[data-sequence-step]")];
+  const snapTop = window.scrollY + rootScrollPaddingTop();
   if (panels.length > 1) {
     const trackedPanels = panels.slice(0, stateCount);
     const firstTop = trackedPanels[0].getBoundingClientRect().top + window.scrollY;
     const lastTop = trackedPanels[trackedPanels.length - 1].getBoundingClientRect().top + window.scrollY;
-    return clamp(((window.scrollY - firstTop) / Math.max(1, lastTop - firstTop)) * (stateCount - 1), 0, stateCount - 1);
+    return clamp(((snapTop - firstTop) / Math.max(1, lastTop - firstTop)) * (stateCount - 1), 0, stateCount - 1);
   }
 
   const sectionTop = section.getBoundingClientRect().top + window.scrollY;
   const travel = Math.max(1, section.offsetHeight - window.innerHeight);
-  return clamp(((window.scrollY - sectionTop) / travel) * (stateCount - 1), 0, stateCount - 1);
+  return clamp(((snapTop - sectionTop) / travel) * (stateCount - 1), 0, stateCount - 1);
 }
 
 function rootScrollPaddingTop() {
@@ -1283,7 +1399,7 @@ function goalDiffTicks(domain: [number, number]) {
   return ticks.sort((a, b) => a - b);
 }
 
-function goalDiffStepLabel(step: GoalDiffStepId, last: GoalDiffPoint) {
+function goalDiffStepLabel(step: GoalDiffStepId, last: GoalDiffLinePoint) {
   if (step === "best") return currentCopy.charts.goalDiff.bestLine;
   if (step === "worst") return currentCopy.charts.goalDiff.worstLine;
   return last.season;
@@ -1304,8 +1420,8 @@ function renderGoalDiffFocusLabel(
   const last = state.targetSeries[state.targetSeries.length - 1];
   const anchorX = x(last.round);
   const anchorY = y(last.gd);
-  const labelWidth = width < 560 ? 142 : 168;
-  const body = `${displayTeam(last.team)} ${last.season}: ${signed(last.gd)} ${currentCopy.common.goalDiff}`;
+  const labelWidth = state.labelBody ? (width < 560 ? 172 : 218) : width < 560 ? 142 : 168;
+  const body = state.labelBody ?? `${displayTeam(last.team)} ${last.season}: ${signed(last.gd)} ${currentCopy.common.goalDiff}`;
   const bodyLines = wrapLabelText(body, Math.max(20, Math.floor((labelWidth - 20) / 6.2)));
   const labelHeight = 34 + bodyLines.length * 14;
   const labelX = clamp(anchorX - (width < 560 ? 134 : 168), 18, width - labelWidth - 18);
@@ -1341,7 +1457,12 @@ function renderGoalDiffFocusLabel(
     .attr("fill", LOW_BLUE)
     .attr("stroke", DARK)
     .attr("stroke-width", 2);
-  group.append("text").attr("x", 10).attr("y", 19).attr("class", "label-title").text(goalDiffStepLabel(state.id, last));
+  group
+    .append("text")
+    .attr("x", 10)
+    .attr("y", 19)
+    .attr("class", "label-title")
+    .text(state.labelTitle ?? goalDiffStepLabel(state.id, last));
   const bodyText = group.append("text").attr("x", 10).attr("y", 38).attr("class", "label-body");
   bodyLines.forEach((line, index) => {
     bodyText.append("tspan").attr("x", 10).attr("dy", index === 0 ? 0 : 14).text(line);
@@ -2984,13 +3105,16 @@ function setupSnapNavigation() {
   document.documentElement.classList.add("scroll-magic");
 
   const desktopQuery = window.matchMedia("(min-width: 861px)");
+  const mobileQuery = window.matchMedia("(max-width: 860px)");
   const reducedMotionQuery = window.matchMedia("(prefers-reduced-motion: reduce)");
   const cooldownMs = 560;
   const sequenceScrollDurationMs = 1120;
+  const mobileSequenceScrollDurationMs = 420;
   let moveLockedUntil = 0;
   let scrollAnimationFrame = 0;
   let touchStartX: number | null = null;
   let touchStartY: number | null = null;
+  let touchStartSequence: HTMLElement | null = null;
   let touchStartedOnControl = false;
 
   const currentIndex = () => {
@@ -3065,7 +3189,11 @@ function setupSnapNavigation() {
     if (!target) return;
     const sequenceMove = isInternalSequenceMove(current, target);
     const targetTop = target.getBoundingClientRect().top + window.scrollY - rootScrollPaddingTop();
-    const durationMs = sequenceMove ? sequenceScrollDurationMs : cooldownMs;
+    const durationMs = sequenceMove
+      ? mobileQuery.matches
+        ? mobileSequenceScrollDurationMs
+        : sequenceScrollDurationMs
+      : cooldownMs;
     moveLockedUntil = Date.now() + durationMs * 0.78;
     updateUrlForSection(target);
     if (reducedMotionQuery.matches) {
@@ -3080,8 +3208,8 @@ function setupSnapNavigation() {
     }
   };
 
-  const moveBy = (direction: number) => {
-    if (!desktopQuery.matches) return;
+  const moveBy = (direction: number, allowMobileSequence = false) => {
+    if (!desktopQuery.matches && !(allowMobileSequence && mobileQuery.matches)) return;
     if (Date.now() < moveLockedUntil) return;
     goToIndex(directionalIndex(direction));
   };
@@ -3102,12 +3230,24 @@ function setupSnapNavigation() {
     touchStartedOnControl =
       event.target instanceof Element &&
       Boolean(event.target.closest("a, button, input, textarea, select, [contenteditable='true']"));
+    touchStartSequence =
+      mobileQuery.matches && event.target instanceof Element
+        ? event.target.closest<HTMLElement>(".chapter--sequence")
+        : null;
     touchStartX = touch.clientX;
     touchStartY = touch.clientY;
   };
 
   const onTouchMove = (event: TouchEvent) => {
-    if (!desktopQuery.matches || touchStartedOnControl || touchStartX === null || touchStartY === null) return;
+    const mobileSequenceGesture = mobileQuery.matches && touchStartSequence;
+    if (
+      (!desktopQuery.matches && !mobileSequenceGesture) ||
+      touchStartedOnControl ||
+      touchStartX === null ||
+      touchStartY === null
+    ) {
+      return;
+    }
     const touch = event.touches[0];
     if (!touch) return;
     const deltaX = touchStartX - touch.clientX;
@@ -3118,15 +3258,28 @@ function setupSnapNavigation() {
   };
 
   const onTouchEnd = (event: TouchEvent) => {
-    if (!desktopQuery.matches || touchStartedOnControl || touchStartX === null || touchStartY === null) return;
+    const mobileSequenceGesture = mobileQuery.matches && touchStartSequence;
+    if (
+      (!desktopQuery.matches && !mobileSequenceGesture) ||
+      touchStartedOnControl ||
+      touchStartX === null ||
+      touchStartY === null
+    ) {
+      touchStartSequence = null;
+      return;
+    }
     const touch = event.changedTouches[0];
     if (!touch) return;
     const deltaX = touchStartX - touch.clientX;
     const deltaY = touchStartY - touch.clientY;
     touchStartX = null;
     touchStartY = null;
-    if (Math.abs(deltaY) < 48 || Math.abs(deltaY) < Math.abs(deltaX)) return;
-    moveBy(deltaY > 0 ? 1 : -1);
+    if (Math.abs(deltaY) < 48 || Math.abs(deltaY) < Math.abs(deltaX)) {
+      touchStartSequence = null;
+      return;
+    }
+    moveBy(deltaY > 0 ? 1 : -1, Boolean(mobileSequenceGesture));
+    touchStartSequence = null;
   };
 
   const onKeyDown = (event: KeyboardEvent) => {
@@ -3151,6 +3304,7 @@ function setupSnapNavigation() {
   window.addEventListener("touchmove", onTouchMove, { passive: false });
   window.addEventListener("touchend", onTouchEnd, { passive: true });
   window.addEventListener("keydown", onKeyDown);
+  window.addEventListener("hashchange", scrollToInitialHash);
 
   snapNavigationCleanup = () => {
     document.documentElement.classList.remove("scroll-magic");
@@ -3163,6 +3317,7 @@ function setupSnapNavigation() {
     window.removeEventListener("touchmove", onTouchMove);
     window.removeEventListener("touchend", onTouchEnd);
     window.removeEventListener("keydown", onKeyDown);
+    window.removeEventListener("hashchange", scrollToInitialHash);
   };
 }
 
@@ -3172,8 +3327,11 @@ function scrollToInitialHash() {
     window.requestAnimationFrame(() => {
       const target = document.querySelector<HTMLElement>(location.hash);
       if (!target) return;
+      const snapTarget = target.matches(".chapter--sequence")
+        ? target.querySelector<HTMLElement>(".sequence-panel[data-sequence-step]") ?? target
+        : target;
       window.scrollTo({
-        top: target.getBoundingClientRect().top + window.scrollY - rootScrollPaddingTop(),
+        top: snapTarget.getBoundingClientRect().top + window.scrollY - rootScrollPaddingTop(),
         behavior: "auto",
       });
     });

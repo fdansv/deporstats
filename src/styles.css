@@ -690,7 +690,7 @@ h1 span {
   }
 
   .chapter--sequence {
-    --sequence-chart-mobile-height: clamp(270px, 36svh, 330px);
+    --sequence-chart-mobile-height: clamp(188px, 27svh, 236px);
     --sequence-panel-gap: clamp(12px, 2.5svh, 20px);
     scroll-snap-align: none;
     scroll-snap-stop: normal;
@@ -705,14 +705,14 @@ h1 span {
   }
 
   .chapter--sequence .sequence-panel {
-    height: auto;
-    min-height: 0;
+    height: calc(100svh - 48px);
+    min-height: calc(100svh - 48px);
     justify-content: flex-start;
-    padding: calc(var(--sequence-chart-mobile-height) + var(--sequence-panel-gap)) 18px clamp(54px, 9svh, 82px);
+    padding: calc(var(--sequence-chart-mobile-height) + var(--sequence-panel-gap)) 18px 20px;
     opacity: 0.82;
-    overflow: visible;
-    scroll-snap-align: none;
-    scroll-snap-stop: normal;
+    overflow: clip;
+    scroll-snap-align: start;
+    scroll-snap-stop: always;
   }
 
   .chapter--sequence .sequence-panel.is-active {
@@ -812,13 +812,13 @@ h1 span {
   }
 
   .chapter--sequence {
-    --sequence-chart-mobile-height: clamp(250px, 34svh, 305px);
+    --sequence-chart-mobile-height: clamp(168px, 25svh, 210px);
     --sequence-panel-gap: clamp(10px, 2svh, 16px);
   }
 
   .chapter--sequence .sequence-panel {
     padding-right: 14px;
-    padding-bottom: clamp(46px, 8svh, 68px);
+    padding-bottom: 16px;
     padding-left: 14px;
   }
 

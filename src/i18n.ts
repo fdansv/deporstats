@@ -283,6 +283,22 @@ export const translations = {
               "A lectura debe quedar datada: +20 en 40 partidos e posto de ascenso directo a 21 de maio de 2026. A curva apunta arriba, pero a táboa segue aberta.",
             stat: "Dépor 2025-26: +20 DG en 40 partidos.",
           },
+          {
+            step: "depor-promotion",
+            kicker: "02.6 / A pregunta",
+            title: "Entón, sobe o Dépor?",
+            body:
+              "A liña verde recupera o Dépor deste ano. As amarelas son tempadas que si acabaron en ascenso de Segunda a Primeira: non hai unha soa forma de subir, pero todas chegan vivas ao final.",
+            stat: "Dépor contra o arquivo de ascensos Segunda -> Primeira.",
+          },
+          {
+            step: "primera-after-promotion",
+            kicker: "02.7 / O día despois",
+            title: "Subir non remata a costa.",
+            body:
+              "Agora o gráfico mira o primeiro ano en Primeira dos equipos recén ascendidos. A porta abre, si; tamén pode pecharse no mesmo curso.",
+            stat: "O contador do gráfico marca cantos volveron baixar de inmediato.",
+          },
         ],
         lossLedger: {
           title: (count: number) => `${count} derrotas`,
@@ -291,6 +307,11 @@ export const translations = {
           home: "vs",
           away: "@",
         },
+        promotionHopeTitle: "Dépor 2025-26",
+        promotionHopeBody: (count: number) => `${count} liñas do arquivo acabaron subindo de Segunda a Primeira.`,
+        afterPromotionTitle: "Primeira, ano un",
+        afterPromotionBody: (returned: number, total: number) =>
+          `${returned} de ${total} tempadas completas de recén ascendidos remataron con volta inmediata a Segunda.`,
       },
       titlePath: {
         title: "Antes do título: puntos",
@@ -637,6 +658,22 @@ export const translations = {
               "La lectura debe quedar fechada: +20 en 40 partidos y puesto de ascenso directo a 21 de mayo de 2026. La curva apunta arriba, pero la tabla sigue abierta.",
             stat: "Dépor 2025-26: +20 DG en 40 partidos.",
           },
+          {
+            step: "depor-promotion",
+            kicker: "02.6 / La pregunta",
+            title: "Entonces, ¿sube el Dépor?",
+            body:
+              "La línea verde recupera al Dépor de este año. Las amarillas son temporadas que sí acabaron en ascenso de Segunda a Primera: no hay una sola forma de subir, pero todas llegan vivas al final.",
+            stat: "Dépor contra el archivo de ascensos Segunda -> Primera.",
+          },
+          {
+            step: "primera-after-promotion",
+            kicker: "02.7 / El día después",
+            title: "Subir no termina la cuesta.",
+            body:
+              "Ahora el gráfico mira el primer año en Primera de los recién ascendidos. La puerta se abre, sí; también puede cerrarse en el mismo curso.",
+            stat: "El contador del gráfico marca cuántos volvieron a bajar de inmediato.",
+          },
         ],
         lossLedger: {
           title: (count: number) => `${count} derrotas`,
@@ -645,6 +682,11 @@ export const translations = {
           home: "vs",
           away: "@",
         },
+        promotionHopeTitle: "Dépor 2025-26",
+        promotionHopeBody: (count: number) => `${count} líneas del archivo acabaron subiendo de Segunda a Primera.`,
+        afterPromotionTitle: "Primera, año uno",
+        afterPromotionBody: (returned: number, total: number) =>
+          `${returned} de ${total} temporadas completas de recién ascendidos terminaron con vuelta inmediata a Segunda.`,
       },
       titlePath: {
         title: "Antes del título: puntos",
@@ -991,6 +1033,22 @@ export const translations = {
               "The reading has to stay dated: +20 in 40 matches and an automatic promotion place on May 21, 2026. The curve points up, but the table remains open.",
             stat: "Depor 2025-26: +20 GD in 40 matches.",
           },
+          {
+            step: "depor-promotion",
+            kicker: "02.6 / The question",
+            title: "So, does Depor go up?",
+            body:
+              "The green line brings back Depor this year. The yellow lines are seasons that did end with promotion from Segunda to Primera: there is no single shape for going up, but they all stay alive late.",
+            stat: "Depor against the Segunda -> Primera promotion archive.",
+          },
+          {
+            step: "primera-after-promotion",
+            kicker: "02.7 / The day after",
+            title: "Promotion does not end the climb.",
+            body:
+              "Now the chart looks at the first Primera season after promotion. The door opens; it can also close again in the same campaign.",
+            stat: "The chart counter marks how many went straight back down.",
+          },
         ],
         lossLedger: {
           title: (count: number) => `${count} losses`,
@@ -999,6 +1057,11 @@ export const translations = {
           home: "vs",
           away: "@",
         },
+        promotionHopeTitle: "Depor 2025-26",
+        promotionHopeBody: (count: number) => `${count} archive lines ended with promotion from Segunda to Primera.`,
+        afterPromotionTitle: "Primera, year one",
+        afterPromotionBody: (returned: number, total: number) =>
+          `${returned} of ${total} completed newly promoted seasons ended with an immediate return to Segunda.`,
       },
       titlePath: {
         title: "Before the title: points",
