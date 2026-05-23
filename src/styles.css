@@ -695,7 +695,7 @@ h1 span {
     height: auto;
     padding: 14px;
     border-right: 0;
-    border-bottom: 4px solid var(--white);
+    border-bottom: 0;
   }
 
   .chapter--sequence {
@@ -796,6 +796,10 @@ h1 span {
     top: auto;
     height: 100%;
     min-height: 0;
+  }
+
+  .chart {
+    border-width: 2px;
   }
 
   .chart {

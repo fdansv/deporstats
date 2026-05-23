@@ -2117,6 +2117,7 @@ function drawTierAltitude(element: HTMLElement, data: StoryData) {
 function drawOpponentWall(element: HTMLElement, data: StoryData) {
   const { svg, tooltip, width, height } = baseSvg(element);
   void data;
+  const compact = width < 560;
   const margin = {
     top: 74,
     right: width < 620 ? 24 : 42,
@@ -2131,8 +2132,8 @@ function drawOpponentWall(element: HTMLElement, data: StoryData) {
     .scaleLinear()
     .domain([-4.8, 4.8])
     .range([height - margin.bottom, margin.top + 44]);
-  const cardWidth = width < 620 ? 124 : 142;
-  const cardHeight = width < 620 ? 62 : 66;
+  const cardWidth = compact ? Math.min(146, (width - margin.left - margin.right - 10) / 2) : width < 620 ? 124 : 142;
+  const cardHeight = compact ? 42 : width < 620 ? 62 : 66;
   const moments = OPPONENT_MOMENTS;
   const yearTicks = [
     { year: 1994, label: "1994" },
@@ -2505,6 +2506,45 @@ function layoutOpponentMomentCards(
     pointX: x(moment.year),
     pointY: y(moment.polarity === "high" ? moment.impact : -moment.impact),
   });
+  if (width < 560) {
+    const columnGap = 10;
+    const rowGap = 8;
+    const startX = margin.left;
+    const rowX = (index: number) => startX + (index % 2) * (cardWidth + columnGap);
+    const highStartY = margin.top + 66;
+    const lowStartY = centerY + 48;
+    return [
+      ...moments
+        .filter((moment) => moment.polarity === "high")
+        .sort((a, b) => a.year - b.year)
+        .map((moment, index) => {
+          const point = pointFor(moment);
+          return {
+            moment,
+            ...point,
+            width: cardWidth,
+            height: cardHeight,
+            x: rowX(index),
+            y: highStartY + Math.floor(index / 2) * (cardHeight + rowGap),
+          };
+        }),
+      ...moments
+        .filter((moment) => moment.polarity === "low")
+        .sort((a, b) => a.year - b.year || a.opponent.localeCompare(b.opponent))
+        .map((moment, index) => {
+          const point = pointFor(moment);
+          return {
+            moment,
+            ...point,
+            width: cardWidth,
+            height: cardHeight,
+            x: rowX(index),
+            y: lowStartY + Math.floor(index / 2) * (cardHeight + rowGap),
+          };
+        }),
+    ];
+  }
+
   const highMaxY = centerY - cardHeight - 14;
   const high = moments
     .filter((moment) => moment.polarity === "high")
@@ -2589,6 +2629,11 @@ function drawOpponentMomentCard(
 ) {
   const { moment, x, y, width, height, pointX, pointY } = layout;
   const color = moment.polarity === "high" ? BLUE : WARN;
+  const compact = height <= 46;
+  const scoreSize = compact ? 10.5 : 18;
+  const nameSize = compact
+    ? Math.max(7.2, Math.min(9, width / (moment.opponent.length * 0.72)))
+    : Math.max(9, Math.min(11.5, width / (moment.opponent.length * 0.7)));
   const card = { x, y, width, height };
   const target = nearestLabelEdgePoint(pointX, pointY, card);
   svg
@@ -2623,26 +2668,26 @@ function drawOpponentMomentCard(
     .attr("stroke-width", 3);
   group
     .append("text")
-    .attr("x", 8)
-    .attr("y", 19)
+    .attr("x", compact ? 6 : 8)
+    .attr("y", compact ? 14 : 19)
     .attr("class", "opponent-score")
-    .attr("font-size", width < 620 ? 15 : 16)
+    .style("font-size", `${scoreSize}px`)
     .attr("fill", color)
     .text(moment.score);
   group
     .append("text")
-    .attr("x", 8)
-    .attr("y", 41)
+    .attr("x", compact ? 6 : 8)
+    .attr("y", compact ? 28 : 41)
     .attr("class", "opponent-name")
-    .attr("font-size", Math.max(9, Math.min(11.5, width / (moment.opponent.length * 0.7))))
+    .style("font-size", `${nameSize}px`)
     .text(moment.opponent);
   group
     .append("text")
-    .attr("x", 8)
-    .attr("y", height - 9)
+    .attr("x", compact ? 6 : 8)
+    .attr("y", height - (compact ? 6 : 9))
     .attr("class", "label-body")
-    .attr("font-size", 8)
-    .text(`${moment.season} · ${moment.competition}`);
+    .style("font-size", `${compact ? 6.4 : 10}px`)
+    .text(compact ? moment.season : `${moment.season} · ${moment.competition}`);
 }
 
 function opponentTooltip(moment: OpponentMoment) {
