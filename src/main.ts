@@ -926,6 +926,9 @@ function renderSources(data: StoryData): HTMLElement {
       <p>
         ${currentCopy.sources.body}
       </p>
+      <p class="credit">
+        ${currentCopy.sources.credit} <a href="https://github.com/fdansv" target="_blank" rel="noreferrer">Francisco Dans</a>.
+      </p>
     </div>
     <ul>
       ${sources

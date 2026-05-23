@@ -469,6 +469,15 @@ h1 span {
   line-height: 1.35;
 }
 
+.sources .credit {
+  margin-top: 22px;
+  font-family: var(--data-font);
+  font-size: 13px;
+  font-weight: 900;
+  line-height: 1.35;
+  text-transform: uppercase;
+}
+
 .error {
   min-height: 100vh;
   padding: 40px;
