@@ -1070,7 +1070,7 @@ function drawGoalDiffCloud(element: HTMLElement, data: StoryData) {
   const contextLabel = svg
     .append("text")
     .attr("x", margin.left)
-    .attr("y", compactSequenceChart ? 48 : 60)
+    .attr("y", compactSequenceChart ? 38 : 60)
     .attr("class", "context-label")
     .attr("fill", "rgba(255,255,255,0.82)")
     .attr("display", compactSequenceChart ? "none" : null)
@@ -1079,14 +1079,14 @@ function drawGoalDiffCloud(element: HTMLElement, data: StoryData) {
   chartTitle(
     svg,
     margin.left,
-    compactSequenceChart ? 28 : 34,
+    compactSequenceChart ? 24 : 34,
     width < 560 ? "GF - GC" : currentCopy.charts.goalDiff.title,
   );
   axisLabel(svg, width - margin.right, height - (compactSequenceChart ? 8 : 12), currentCopy.common.round);
   axisLabel(
     svg,
     compactSequenceChart ? 10 : 18,
-    compactSequenceChart ? margin.top - 8 : margin.top + 18,
+    compactSequenceChart ? margin.top - 6 : margin.top + 18,
     currentCopy.common.goalDiff,
   );
 
@@ -3383,10 +3383,10 @@ function responsiveMargin(width: number) {
 
 function compactGoalDiffMargin(width: number) {
   return {
-    top: 72,
-    right: width < 380 ? 14 : 18,
-    bottom: 32,
-    left: width < 380 ? 34 : 40,
+    top: 52,
+    right: width < 380 ? 10 : 12,
+    bottom: 24,
+    left: width < 380 ? 30 : 34,
   };
 }
 
