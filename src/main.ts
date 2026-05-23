@@ -951,9 +951,11 @@ function drawGoalDiffCloud(element: HTMLElement, data: StoryData) {
   const elementWithCleanup = element as HTMLElement & { goalDiffCleanup?: () => void };
   elementWithCleanup.goalDiffCleanup?.();
 
-  const { svg, width, height } = baseSvg(element);
-  const margin = responsiveMargin(width);
   const section = element.closest<HTMLElement>(".chapter--sequence");
+  const compactSequenceChart = Boolean(section && window.matchMedia("(max-width: 860px)").matches);
+  const { svg, width, height } = baseSvg(element, compactSequenceChart ? 1 : 460);
+  const margin = compactSequenceChart ? compactGoalDiffMargin(width) : responsiveMargin(width);
+  const plotTop = compactSequenceChart ? margin.top : margin.top + 36;
   const points = (data.goal_diff_race ?? []).filter((point) => point.season_start >= 1993);
   const series = [...d3.group(points, (point) => `${point.team}__${point.season}`).values()];
   const deporSeries = series.filter((values) => values[0]?.is_depor);
@@ -967,7 +969,7 @@ function drawGoalDiffCloud(element: HTMLElement, data: StoryData) {
   const states = goalDiffViewStates(bestSeries, worstSeries, deporSeries, maxRound, maxAbsGd);
   const panels = section ? [...section.querySelectorAll<HTMLElement>(".sequence-panel[data-sequence-step]")] : [];
   const xScale = d3.scaleLinear().range([margin.left, width - margin.right]);
-  const yScale = d3.scaleLinear().range([height - margin.bottom, margin.top + 36]);
+  const yScale = d3.scaleLinear().range([height - margin.bottom, plotTop]);
   const clipId = `goal-diff-clip-${Math.random().toString(36).slice(2)}`;
 
   svg
@@ -976,9 +978,9 @@ function drawGoalDiffCloud(element: HTMLElement, data: StoryData) {
     .attr("id", clipId)
     .append("rect")
     .attr("x", margin.left)
-    .attr("y", margin.top + 36)
+    .attr("y", plotTop)
     .attr("width", width - margin.left - margin.right)
-    .attr("height", height - margin.top - margin.bottom - 36);
+    .attr("height", height - margin.bottom - plotTop);
 
   const gridLayer = svg.append("g").attr("class", "goal-diff-grid");
   const zeroLine = svg
@@ -1003,14 +1005,25 @@ function drawGoalDiffCloud(element: HTMLElement, data: StoryData) {
   const contextLabel = svg
     .append("text")
     .attr("x", margin.left)
-    .attr("y", 60)
+    .attr("y", compactSequenceChart ? 48 : 60)
     .attr("class", "context-label")
     .attr("fill", "rgba(255,255,255,0.82)")
+    .attr("display", compactSequenceChart ? "none" : null)
     .text(currentCopy.charts.goalDiff.contextLabel);
 
-  chartTitle(svg, margin.left, 34, width < 560 ? "GF - GC" : currentCopy.charts.goalDiff.title);
-  axisLabel(svg, width - margin.right, height - 12, currentCopy.common.round);
-  axisLabel(svg, 18, margin.top + 18, currentCopy.common.goalDiff);
+  chartTitle(
+    svg,
+    margin.left,
+    compactSequenceChart ? 28 : 34,
+    width < 560 ? "GF - GC" : currentCopy.charts.goalDiff.title,
+  );
+  axisLabel(svg, width - margin.right, height - (compactSequenceChart ? 8 : 12), currentCopy.common.round);
+  axisLabel(
+    svg,
+    compactSequenceChart ? 10 : 18,
+    compactSequenceChart ? margin.top - 8 : margin.top + 18,
+    currentCopy.common.goalDiff,
+  );
 
   let animationFrame = 0;
   const update = () => {
@@ -3173,6 +3186,15 @@ function responsiveMargin(width: number) {
     right: width < 560 ? 22 : 42,
     bottom: 54,
     left: width < 560 ? 48 : 72,
+  };
+}
+
+function compactGoalDiffMargin(width: number) {
+  return {
+    top: 72,
+    right: width < 380 ? 14 : 18,
+    bottom: 32,
+    left: width < 380 ? 34 : 40,
   };
 }
 
