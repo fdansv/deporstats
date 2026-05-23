@@ -226,6 +226,13 @@ type GoalDiffStepId =
   | "depor-now"
   | "depor-promotion"
   | "primera-after-promotion";
+type GoalDiffSequencePanel = {
+  step: GoalDiffStepId;
+  kicker: string;
+  title: string;
+  body: string;
+  stat: string;
+};
 type OpponentCardLayout = LabelBox & { moment: OpponentMoment; pointX: number; pointY: number };
 type OpponentMoment = {
   season: string;
@@ -437,6 +444,7 @@ const TOP_SCORERS: TopScorerData[] = [
 
 const CHAPTER_RENDERERS: Record<string, ChartRenderer> = {
   nube: drawGoalDiffCloud,
+  conclusion: drawGoalDiffCloud,
   cume: drawTitlePath,
   alto: drawFinishTimeline,
   fuga: drawPpgDrift,
@@ -799,7 +807,17 @@ function renderChapter({
   chart: ChartRenderer;
 }): HTMLElement {
   if (id === "nube") {
-    return renderSequenceChapter({ id, title, data });
+    return renderSequenceChapter({ id, title, data, panels: currentCopy.charts.goalDiff.sequence });
+  }
+
+  if (id === "conclusion") {
+    return renderSequenceChapter({
+      id,
+      title,
+      data,
+      panels: currentCopy.charts.goalDiff.conclusionSequence,
+      variant: "final",
+    });
   }
 
   const section = document.createElement("section");
@@ -833,17 +851,20 @@ function renderSequenceChapter({
   id,
   title,
   data,
+  panels,
+  variant,
 }: {
   id: string;
   title: string;
   data: StoryData;
+  panels: readonly GoalDiffSequencePanel[];
+  variant?: "final";
 }): HTMLElement {
-  const panels = currentCopy.charts.goalDiff.sequence;
   const section = document.createElement("section");
   section.id = id;
-  section.className = "chapter chapter--sequence";
+  section.className = `chapter chapter--sequence${variant === "final" ? " chapter--sequence-final" : ""}`;
   section.dataset.chart = id;
-  section.dataset.goalDiffStep = "all";
+  section.dataset.goalDiffStep = panels[0]?.step ?? "all";
 
   const figure = document.createElement("figure");
   figure.className = "chart-shell";
@@ -1001,8 +1022,17 @@ function drawGoalDiffCloud(element: HTMLElement, data: StoryData) {
   const worstSeries = contextSeries.find((values) => values[values.length - 1]?.gd === worstFinal);
   const maxRound = d3.max(series.flat(), (d) => d.round) ?? 42;
   const maxAbsGd = Math.ceil((d3.max(series.flat(), (d) => Math.abs(d.gd)) ?? 80) / 10) * 10;
-  const states = goalDiffViewStates(bestSeries, worstSeries, deporSeries, promotionSeries, maxRound, maxAbsGd);
   const panels = section ? [...section.querySelectorAll<HTMLElement>(".sequence-panel[data-sequence-step]")] : [];
+  const stateMap = new Map(
+    goalDiffViewStates(bestSeries, worstSeries, deporSeries, promotionSeries, maxRound, maxAbsGd).map((state) => [
+      state.id,
+      state,
+    ]),
+  );
+  const sequenceStates = panels
+    .map((panel) => panel.dataset.sequenceStep)
+    .flatMap((step) => (step && stateMap.has(step as GoalDiffStepId) ? [stateMap.get(step as GoalDiffStepId)!] : []));
+  const states = sequenceStates.length ? sequenceStates : [...stateMap.values()];
   const xScale = d3.scaleLinear().range([margin.left, width - margin.right]);
   const yScale = d3.scaleLinear().range([height - margin.bottom, plotTop]);
   const clipId = `goal-diff-clip-${Math.random().toString(36).slice(2)}`;
@@ -1428,7 +1458,8 @@ function renderGoalDiffFocusLabel(
   const bodyLines = wrapLabelText(body, Math.max(20, Math.floor((labelWidth - 20) / 6.2)));
   const labelHeight = 34 + bodyLines.length * 14;
   const labelX = clamp(anchorX - (width < 560 ? 134 : 168), 18, width - labelWidth - 18);
-  const labelY = clamp(anchorY + (last.gd < 0 ? -52 : 16), 56, height - labelHeight - 18);
+  const labelBottomPadding = width < 560 ? 52 : 18;
+  const labelY = clamp(anchorY + (last.gd < 0 ? -52 : 16), 56, height - labelHeight - labelBottomPadding);
   const box = { x: labelX, y: labelY, width: labelWidth, height: labelHeight };
   const target = nearestLabelEdgePoint(anchorX, anchorY, box);
 

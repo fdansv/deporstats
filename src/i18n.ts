@@ -131,6 +131,14 @@ export const translations = {
           "Con 74 puntos en 40 partidos, o Dépor ocupa posto de ascenso directo. Faltan dúas xornadas, así que o dato é unha fotografía de carreira, non unha chegada.",
         stat: "Segundo, 74 puntos, dúas xornadas por xogar.",
       },
+      {
+        id: "conclusion",
+        kicker: "10 / A pregunta",
+        title: "E agora: sube o Dépor?",
+        body:
+          "A conclusión volve á nube de diferenza de goles para comparar a liña actual cos ascensos recentes e co que lles pasou despois aos recén chegados a Primeira.",
+        stat: "Ascender é a porta; quedarse é outra historia.",
+      },
     ],
     sources: {
       kicker: "Fontes e método",
@@ -284,9 +292,11 @@ export const translations = {
               "A lectura debe quedar datada: +20 en 40 partidos e posto de ascenso directo a 21 de maio de 2026. A curva apunta arriba, pero a táboa segue aberta.",
             stat: "Dépor 2025-26: +20 DG en 40 partidos.",
           },
+        ],
+        conclusionSequence: [
           {
             step: "depor-promotion",
-            kicker: "02.6 / A pregunta",
+            kicker: "10.1 / A pregunta",
             title: "Entón, sobe o Dépor?",
             body:
               "A liña verde recupera o Dépor deste ano. As amarelas son tempadas que si acabaron en ascenso de Segunda a Primeira: non hai unha soa forma de subir, pero todas chegan vivas ao final.",
@@ -294,7 +304,7 @@ export const translations = {
           },
           {
             step: "primera-after-promotion",
-            kicker: "02.7 / O día despois",
+            kicker: "10.2 / O día despois",
             title: "Subir non remata a costa.",
             body:
               "Agora o gráfico mira o primeiro ano en Primeira dos equipos recén ascendidos. A porta abre, si; tamén pode pecharse no mesmo curso.",
@@ -507,6 +517,14 @@ export const translations = {
           "Con 74 puntos en 40 partidos, el Dépor ocupa puesto de ascenso directo. Faltan dos jornadas, así que el dato es una fotografía de carrera, no una llegada.",
         stat: "Segundo, 74 puntos, dos jornadas por jugar.",
       },
+      {
+        id: "conclusion",
+        kicker: "10 / La pregunta",
+        title: "Y ahora: ¿sube el Dépor?",
+        body:
+          "La conclusión vuelve a la nube de diferencia de goles para comparar la línea actual con los ascensos recientes y con lo que les pasó después a los recién llegados a Primera.",
+        stat: "Ascender es la puerta; quedarse es otra historia.",
+      },
     ],
     sources: {
       kicker: "Fuentes y método",
@@ -660,9 +678,11 @@ export const translations = {
               "La lectura debe quedar fechada: +20 en 40 partidos y puesto de ascenso directo a 21 de mayo de 2026. La curva apunta arriba, pero la tabla sigue abierta.",
             stat: "Dépor 2025-26: +20 DG en 40 partidos.",
           },
+        ],
+        conclusionSequence: [
           {
             step: "depor-promotion",
-            kicker: "02.6 / La pregunta",
+            kicker: "10.1 / La pregunta",
             title: "Entonces, ¿sube el Dépor?",
             body:
               "La línea verde recupera al Dépor de este año. Las amarillas son temporadas que sí acabaron en ascenso de Segunda a Primera: no hay una sola forma de subir, pero todas llegan vivas al final.",
@@ -670,7 +690,7 @@ export const translations = {
           },
           {
             step: "primera-after-promotion",
-            kicker: "02.7 / El día después",
+            kicker: "10.2 / El día después",
             title: "Subir no termina la cuesta.",
             body:
               "Ahora el gráfico mira el primer año en Primera de los recién ascendidos. La puerta se abre, sí; también puede cerrarse en el mismo curso.",
@@ -883,6 +903,14 @@ export const translations = {
           "With 74 points from 40 matches, Depor sits in an automatic promotion place. Two rounds remain, so the number is a race snapshot, not a finish line.",
         stat: "Second, 74 points, two rounds to play.",
       },
+      {
+        id: "conclusion",
+        kicker: "10 / The question",
+        title: "So now: does Depor go up?",
+        body:
+          "The conclusion returns to the goal-difference cloud to compare the current line with recent promotion seasons and with what happened next to newly promoted Primera teams.",
+        stat: "Promotion opens the door; staying up is another story.",
+      },
     ],
     sources: {
       kicker: "Sources and method",
@@ -1036,9 +1064,11 @@ export const translations = {
               "The reading has to stay dated: +20 in 40 matches and an automatic promotion place on May 21, 2026. The curve points up, but the table remains open.",
             stat: "Depor 2025-26: +20 GD in 40 matches.",
           },
+        ],
+        conclusionSequence: [
           {
             step: "depor-promotion",
-            kicker: "02.6 / The question",
+            kicker: "10.1 / The question",
             title: "So, does Depor go up?",
             body:
               "The green line brings back Depor this year. The yellow lines are seasons that did end with promotion from Segunda to Primera: there is no single shape for going up, but they all stay alive late.",
@@ -1046,7 +1076,7 @@ export const translations = {
           },
           {
             step: "primera-after-promotion",
-            kicker: "02.7 / The day after",
+            kicker: "10.2 / The day after",
             title: "Promotion does not end the climb.",
             body:
               "Now the chart looks at the first Primera season after promotion. The door opens; it can also close again in the same campaign.",

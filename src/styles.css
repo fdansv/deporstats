@@ -699,10 +699,14 @@ h1 span {
   }
 
   .chapter--sequence {
-    --sequence-chart-mobile-height: clamp(188px, 27svh, 236px);
+    --sequence-chart-mobile-height: clamp(230px, 34svh, 300px);
     --sequence-panel-gap: clamp(12px, 2.5svh, 20px);
     scroll-snap-align: none;
     scroll-snap-stop: normal;
+  }
+
+  .chapter--sequence-final {
+    --sequence-chart-mobile-height: clamp(300px, 45svh, 410px);
   }
 
   .chapter--sequence .chart-shell {
@@ -821,8 +825,12 @@ h1 span {
   }
 
   .chapter--sequence {
-    --sequence-chart-mobile-height: clamp(168px, 25svh, 210px);
+    --sequence-chart-mobile-height: clamp(224px, 32svh, 286px);
     --sequence-panel-gap: clamp(10px, 2svh, 16px);
+  }
+
+  .chapter--sequence-final {
+    --sequence-chart-mobile-height: clamp(286px, 43svh, 380px);
   }
 
   .chapter--sequence .sequence-panel {
