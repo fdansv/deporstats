@@ -217,6 +217,17 @@ type TooltipContent = { title: string; body: string };
 type TooltipSelection = d3.Selection<HTMLDivElement, unknown, null, undefined>;
 type LegendItem = { label: string; color: string };
 type LabelBox = { x: number; y: number; width: number; height: number };
+type GoalDiffRenderedSeries = {
+  key: string;
+  path: string;
+  priority: number;
+};
+type GoalDiffScrollMetrics = {
+  panelTops: number[];
+  scrollPaddingTop: number;
+  sectionTop: number;
+  travel: number;
+};
 type GoalDiffStepId =
   | "all"
   | "best"
@@ -458,6 +469,10 @@ const CHAPTER_RENDERERS: Record<string, ChartRenderer> = {
 const SITE_URL = "https://francisco.dance/deporstats/";
 const DATE_PUBLISHED = "2026-05-21";
 const LANGUAGE_QUERY_PARAM = "lang";
+const CHART_PARTY_LINKS = [
+  { title: "Every NFL Score Ever", url: "https://www.youtube.com/watch?v=9l5C8cGMueY" },
+  { title: "The Browns live in Hell", url: "https://www.youtube.com/watch?v=_gZndxEvFNk" },
+];
 
 let currentLanguage: Language = initialLanguage();
 let currentCopy = translations[currentLanguage];
@@ -950,6 +965,12 @@ function renderSources(data: StoryData): HTMLElement {
       <p class="credit">
         ${currentCopy.sources.credit} <a href="https://github.com/fdansv" target="_blank" rel="noreferrer">Francisco Dans</a>.
       </p>
+      <p class="credit">
+        ${currentCopy.sources.inspiration}
+        ${CHART_PARTY_LINKS.map(
+          (link) => `<a href="${link.url}" target="_blank" rel="noreferrer">${link.title}</a>`,
+        ).join(" · ")}.
+      </p>
     </div>
     <ul>
       ${sources
@@ -1033,8 +1054,22 @@ function drawGoalDiffCloud(element: HTMLElement, data: StoryData) {
     .map((panel) => panel.dataset.sequenceStep)
     .flatMap((step) => (step && stateMap.has(step as GoalDiffStepId) ? [stateMap.get(step as GoalDiffStepId)!] : []));
   const states = sequenceStates.length ? sequenceStates : [...stateMap.values()];
+  const allDomain = stateMap.get("all")?.domain ?? {
+    round: [0, maxRound] as [number, number],
+    gd: [-maxAbsGd, maxAbsGd] as [number, number],
+  };
+  const baseXScale = d3.scaleLinear().domain(allDomain.round).range([margin.left, width - margin.right]);
+  const baseYScale = d3.scaleLinear().domain(allDomain.gd).range([height - margin.bottom, plotTop]);
   const xScale = d3.scaleLinear().range([margin.left, width - margin.right]);
   const yScale = d3.scaleLinear().range([height - margin.bottom, plotTop]);
+  const baseLine = d3
+    .line<GoalDiffLinePoint>()
+    .x((d) => baseXScale(d.round))
+    .y((d) => baseYScale(d.gd))
+    .curve(d3.curveLinear);
+  const renderedSeries = buildGoalDiffRenderedSeries(series, states, baseLine);
+  const backgroundPath = renderedSeries.map((values) => values.path).join("");
+  const highlightedSeries = renderedSeries.filter((values) => values.priority > 0).sort((a, b) => a.priority - b.priority);
   const clipId = `goal-diff-clip-${Math.random().toString(36).slice(2)}`;
 
   svg
@@ -1059,13 +1094,28 @@ function drawGoalDiffCloud(element: HTMLElement, data: StoryData) {
     .append("g")
     .attr("class", "context-goal-diff")
     .attr("clip-path", `url(#${clipId})`);
-  const paths = pathLayer
-    .selectAll<SVGPathElement, GoalDiffLinePoint[]>("path")
-    .data(series, (values) => goalDiffSeriesKey(values as GoalDiffLinePoint[]))
-    .join("path")
+  const background = pathLayer
+    .append("path")
+    .attr("class", "goal-diff-background")
+    .attr("d", backgroundPath)
     .attr("fill", "none")
+    .attr("stroke", "rgba(255,255,255,0.28)")
+    .attr("stroke-width", 1.05)
     .attr("stroke-linejoin", "round")
-    .attr("stroke-linecap", "round");
+    .attr("stroke-linecap", "round")
+    .attr("vector-effect", "non-scaling-stroke");
+  const highlightLayer = pathLayer.append("g").attr("class", "goal-diff-highlights");
+  const highlightPaths = highlightLayer
+    .selectAll<SVGPathElement, GoalDiffRenderedSeries>("path")
+    .data(highlightedSeries, (values) => values.key)
+    .join("path")
+    .attr("d", (values) => values.path)
+    .attr("fill", "none")
+    .attr("stroke-opacity", 0)
+    .attr("stroke-width", 1.05)
+    .attr("stroke-linejoin", "round")
+    .attr("stroke-linecap", "round")
+    .attr("vector-effect", "non-scaling-stroke");
   const labelLayer = svg.append("g").attr("class", "goal-diff-focus-label fixed-label");
   const legendLayer = svg.append("g").attr("class", "goal-diff-state-legend fixed-label");
   const contextLabel = svg
@@ -1092,9 +1142,11 @@ function drawGoalDiffCloud(element: HTMLElement, data: StoryData) {
   );
 
   let animationFrame = 0;
+  let activeStep: GoalDiffStepId | null = null;
+  let scrollMetrics = section ? measureGoalDiffScrollMetrics(section, states.length) : null;
   const update = () => {
     animationFrame = 0;
-    const position = section ? goalDiffScrollPosition(section, states.length) : 0;
+    const position = scrollMetrics ? goalDiffScrollPosition(scrollMetrics, states.length) : 0;
     const lowerIndex = Math.floor(position);
     const upperIndex = Math.min(states.length - 1, lowerIndex + 1);
     const rawMix = position - lowerIndex;
@@ -1110,37 +1162,28 @@ function drawGoalDiffCloud(element: HTMLElement, data: StoryData) {
 
     xScale.domain(domain.round);
     yScale.domain(domain.gd);
-    const line = d3
-      .line<GoalDiffLinePoint>()
-      .x((d) => xScale(d.round))
-      .y((d) => yScale(d.gd))
-      .curve(d3.curveLinear);
 
+    pathLayer.attr("transform", goalDiffLayerTransform(baseXScale, baseYScale, xScale, yScale));
     renderGoalDiffGrid(gridLayer, xScale, yScale, domain.gd, width, height, margin);
     zeroLine.attr("y1", yScale(0)).attr("y2", yScale(0));
     contextLabel.attr("opacity", Math.max(0, 1 - focusAmount * 1.8));
-    paths
-      .attr("d", (values) => line(values) ?? "")
-      .attr("stroke", (values) => highlight.get(goalDiffSeriesKey(values))?.color ?? "rgba(255,255,255,0.28)")
+    background.attr("stroke-opacity", 0.28 - focusAmount * 0.18);
+    highlightPaths
+      .attr("stroke", (values) => highlight.get(values.key)?.color ?? BLUE)
       .attr("stroke-opacity", (values) => {
-        const weight = highlight.get(goalDiffSeriesKey(values))?.weight ?? 0;
-        return weight > 0 ? 0.22 + weight * 0.7 : 0.28 - focusAmount * 0.18;
+        const weight = highlight.get(values.key)?.weight ?? 0;
+        return weight > 0 ? 0.22 + weight * 0.7 : 0;
       })
       .attr("stroke-width", (values) => {
-        const weight = highlight.get(goalDiffSeriesKey(values))?.weight ?? 0;
+        const weight = highlight.get(values.key)?.weight ?? 0;
         return 1.05 + weight * 2.85;
-      })
-      .sort((a, b) => {
-        const aHighlight = highlight.get(goalDiffSeriesKey(a));
-        const bHighlight = highlight.get(goalDiffSeriesKey(b));
-        return (
-          (aHighlight?.priority ?? 0) - (bHighlight?.priority ?? 0) ||
-          (aHighlight?.weight ?? 0) - (bHighlight?.weight ?? 0)
-        );
       });
 
-    section?.setAttribute("data-goal-diff-step", active.id);
-    panels.forEach((panel) => panel.classList.toggle("is-active", panel.dataset.sequenceStep === active.id));
+    if (active.id !== activeStep) {
+      activeStep = active.id;
+      section?.setAttribute("data-goal-diff-step", active.id);
+      panels.forEach((panel) => panel.classList.toggle("is-active", panel.dataset.sequenceStep === active.id));
+    }
     renderGoalDiffStateLegend(
       legendLayer,
       active.legendItems ?? [],
@@ -1157,11 +1200,17 @@ function drawGoalDiffCloud(element: HTMLElement, data: StoryData) {
       animationFrame = window.requestAnimationFrame(update);
     }
   };
+  const refreshScrollMetrics = () => {
+    scrollMetrics = section ? measureGoalDiffScrollMetrics(section, states.length) : null;
+    requestUpdate();
+  };
 
   window.addEventListener("scroll", requestUpdate, { passive: true });
+  window.addEventListener("resize", refreshScrollMetrics, { passive: true });
   update();
   elementWithCleanup.goalDiffCleanup = () => {
     window.removeEventListener("scroll", requestUpdate);
+    window.removeEventListener("resize", refreshScrollMetrics);
     if (animationFrame) {
       window.cancelAnimationFrame(animationFrame);
     }
@@ -1194,6 +1243,41 @@ function mergeGoalDiffSeries(
 function goalDiffSeriesKey(values: GoalDiffLinePoint[]) {
   const first = values[0];
   return first ? `${first.team}__${first.season}` : "";
+}
+
+function buildGoalDiffRenderedSeries(
+  series: GoalDiffLinePoint[][],
+  states: GoalDiffViewState[],
+  line: d3.Line<GoalDiffLinePoint>,
+): GoalDiffRenderedSeries[] {
+  const priorities = goalDiffHighlightPriorities(states);
+  return series.map((values) => {
+    const key = goalDiffSeriesKey(values);
+    return {
+      key,
+      path: line(values) ?? "",
+      priority: priorities.get(key) ?? 0,
+    };
+  });
+}
+
+function goalDiffHighlightPriorities(states: GoalDiffViewState[]) {
+  const priorities = new Map<string, number>();
+  const addSeries = (series: GoalDiffLinePoint[] | undefined, priority: number) => {
+    if (!series) return;
+    const key = goalDiffSeriesKey(series);
+    priorities.set(key, Math.max(priority, priorities.get(key) ?? 0));
+  };
+
+  for (const state of states) {
+    addSeries(state.targetSeries, 2);
+    for (const group of state.targetGroups ?? []) {
+      for (const series of group.series) {
+        addSeries(series, group.priority ?? 1);
+      }
+    }
+  }
+  return priorities;
 }
 
 function logronesLosses(data: StoryData) {
@@ -1382,19 +1466,54 @@ function goalDiffLabelSettledAmount(position: number) {
   return clamp(1 - distance / 0.42, 0, 1);
 }
 
-function goalDiffScrollPosition(section: HTMLElement, stateCount: number) {
-  const panels = [...section.querySelectorAll<HTMLElement>(".sequence-panel[data-sequence-step]")];
-  const snapTop = window.scrollY + rootScrollPaddingTop();
-  if (panels.length > 1) {
-    const trackedPanels = panels.slice(0, stateCount);
-    const firstTop = trackedPanels[0].getBoundingClientRect().top + window.scrollY;
-    const lastTop = trackedPanels[trackedPanels.length - 1].getBoundingClientRect().top + window.scrollY;
+function measureGoalDiffScrollMetrics(section: HTMLElement, stateCount: number): GoalDiffScrollMetrics {
+  const panels = [...section.querySelectorAll<HTMLElement>(".sequence-panel[data-sequence-step]")].slice(0, stateCount);
+  return {
+    panelTops: panels.map((panel) => panel.getBoundingClientRect().top + window.scrollY),
+    scrollPaddingTop: rootScrollPaddingTop(),
+    sectionTop: section.getBoundingClientRect().top + window.scrollY,
+    travel: Math.max(1, section.offsetHeight - window.innerHeight),
+  };
+}
+
+function goalDiffScrollPosition(metrics: GoalDiffScrollMetrics, stateCount: number) {
+  const snapTop = window.scrollY + metrics.scrollPaddingTop;
+  if (metrics.panelTops.length > 1) {
+    const firstTop = metrics.panelTops[0];
+    const lastTop = metrics.panelTops[metrics.panelTops.length - 1];
     return clamp(((snapTop - firstTop) / Math.max(1, lastTop - firstTop)) * (stateCount - 1), 0, stateCount - 1);
   }
 
-  const sectionTop = section.getBoundingClientRect().top + window.scrollY;
-  const travel = Math.max(1, section.offsetHeight - window.innerHeight);
-  return clamp(((snapTop - sectionTop) / travel) * (stateCount - 1), 0, stateCount - 1);
+  return clamp(((snapTop - metrics.sectionTop) / metrics.travel) * (stateCount - 1), 0, stateCount - 1);
+}
+
+function goalDiffLayerTransform(
+  baseX: d3.ScaleLinear<number, number>,
+  baseY: d3.ScaleLinear<number, number>,
+  x: d3.ScaleLinear<number, number>,
+  y: d3.ScaleLinear<number, number>,
+) {
+  const [x0, x1] = baseX.domain();
+  const [y0, y1] = baseY.domain();
+  const baseX0 = baseX(x0);
+  const baseX1 = baseX(x1);
+  const baseY0 = baseY(y0);
+  const baseY1 = baseY(y1);
+  const scaleX = safeScale(x(x1) - x(x0), baseX1 - baseX0);
+  const scaleY = safeScale(y(y1) - y(y0), baseY1 - baseY0);
+  const translateX = x(x0) - scaleX * baseX0;
+  const translateY = y(y0) - scaleY * baseY0;
+  return `matrix(${formatMatrixValue(scaleX)} 0 0 ${formatMatrixValue(scaleY)} ${formatMatrixValue(
+    translateX,
+  )} ${formatMatrixValue(translateY)})`;
+}
+
+function safeScale(numerator: number, denominator: number) {
+  return denominator === 0 ? 1 : numerator / denominator;
+}
+
+function formatMatrixValue(value: number) {
+  return Number.isFinite(value) ? Number(value.toFixed(4)) : 0;
 }
 
 function rootScrollPaddingTop() {
@@ -1470,38 +1589,49 @@ function renderGoalDiffStateLegend(
   maxWidth: number,
   focusAmount: number,
 ) {
-  layer.html("");
-  if (!items.length || focusAmount < 0.28) return;
+  if (!items.length || focusAmount < 0.28) {
+    layer.attr("opacity", 0);
+    return;
+  }
 
   layer.attr("transform", `translate(${x},${y})`).attr("opacity", Math.min(1, (focusAmount - 0.28) / 0.28));
   let cursor = 0;
   let row = 0;
   const rowHeight = 16;
   const compact = maxWidth < 360;
-  for (const item of items) {
+  const entriesData = items.map((item) => {
     const entryWidth = Math.max(compact ? 92 : 112, item.label.length * (compact ? 5.8 : 7) + 34);
     if (cursor > 0 && cursor + entryWidth > maxWidth) {
       cursor = 0;
       row += rowHeight;
     }
-    const entry = layer.append("g").attr("transform", `translate(${cursor},${row})`);
-    entry
-      .append("line")
-      .attr("x1", 0)
-      .attr("x2", compact ? 16 : 20)
-      .attr("y1", 0)
-      .attr("y2", 0)
-      .attr("stroke", item.color)
-      .attr("stroke-width", 3);
-    entry
-      .append("text")
-      .attr("x", compact ? 22 : 26)
-      .attr("y", 4)
-      .attr("class", "context-label")
-      .attr("fill", item.color)
-      .text(item.label);
+    const entry = { item, x: cursor, y: row };
     cursor += entryWidth;
-  }
+    return entry;
+  });
+
+  const entries = layer
+    .selectAll<SVGGElement, (typeof entriesData)[number]>("g.goal-diff-legend-entry")
+    .data(entriesData, (d) => d.item.label);
+  entries.exit().remove();
+  const entered = entries.enter().append("g").attr("class", "goal-diff-legend-entry");
+  entered.append("line");
+  entered.append("text").attr("class", "context-label");
+  const merged = entered.merge(entries).attr("transform", (d) => `translate(${d.x},${d.y})`);
+  merged
+    .select("line")
+    .attr("x1", 0)
+    .attr("x2", compact ? 16 : 20)
+    .attr("y1", 0)
+    .attr("y2", 0)
+    .attr("stroke", (d) => d.item.color)
+    .attr("stroke-width", 3);
+  merged
+    .select("text")
+    .attr("x", compact ? 22 : 26)
+    .attr("y", 4)
+    .attr("fill", (d) => d.item.color)
+    .text((d) => d.item.label);
 }
 
 function renderGoalDiffFocusLabel(
@@ -1513,8 +1643,10 @@ function renderGoalDiffFocusLabel(
   height: number,
   focusAmount: number,
 ) {
-  layer.html("");
-  if (!state.targetSeries || focusAmount < 0.28) return;
+  if (!state.targetSeries || focusAmount < 0.28) {
+    layer.attr("opacity", 0);
+    return;
+  }
 
   const last = state.targetSeries[state.targetSeries.length - 1];
   const anchorX = x(last.round);
@@ -1531,7 +1663,10 @@ function renderGoalDiffFocusLabel(
 
   layer.attr("opacity", Math.min(1, (focusAmount - 0.28) / 0.28));
   layer
-    .append("line")
+    .selectAll<SVGLineElement, null>("line.goal-diff-label-leader")
+    .data([null])
+    .join("line")
+    .attr("class", "goal-diff-label-leader")
     .attr("x1", anchorX)
     .attr("y1", anchorY)
     .attr("x2", target.x)
@@ -1541,7 +1676,10 @@ function renderGoalDiffFocusLabel(
     .attr("stroke-dasharray", "6 4")
     .attr("stroke-linecap", "square");
   layer
-    .append("circle")
+    .selectAll<SVGCircleElement, null>("circle.goal-diff-label-anchor")
+    .data([null])
+    .join("circle")
+    .attr("class", "goal-diff-label-anchor")
     .attr("cx", anchorX)
     .attr("cy", anchorY)
     .attr("r", 4.2)
@@ -1549,24 +1687,44 @@ function renderGoalDiffFocusLabel(
     .attr("stroke", LOW_BLUE)
     .attr("stroke-width", 2);
 
-  const group = layer.append("g").attr("transform", `translate(${labelX},${labelY})`);
+  const group = layer
+    .selectAll<SVGGElement, null>("g.goal-diff-label-box")
+    .data([null])
+    .join("g")
+    .attr("class", "goal-diff-label-box")
+    .attr("transform", `translate(${labelX},${labelY})`);
   group
-    .append("rect")
+    .selectAll<SVGRectElement, null>("rect.goal-diff-label-bg")
+    .data([null])
+    .join("rect")
+    .attr("class", "goal-diff-label-bg")
     .attr("width", labelWidth)
     .attr("height", labelHeight)
     .attr("fill", LOW_BLUE)
     .attr("stroke", DARK)
     .attr("stroke-width", 2);
   group
-    .append("text")
+    .selectAll<SVGTextElement, null>("text.goal-diff-label-title")
+    .data([null])
+    .join("text")
+    .attr("class", "label-title goal-diff-label-title")
     .attr("x", 10)
     .attr("y", 19)
-    .attr("class", "label-title")
     .text(state.labelTitle ?? goalDiffStepLabel(state.id, last));
-  const bodyText = group.append("text").attr("x", 10).attr("y", 38).attr("class", "label-body");
-  bodyLines.forEach((line, index) => {
-    bodyText.append("tspan").attr("x", 10).attr("dy", index === 0 ? 0 : 14).text(line);
-  });
+  const bodyText = group
+    .selectAll<SVGTextElement, null>("text.goal-diff-label-body")
+    .data([null])
+    .join("text")
+    .attr("class", "label-body goal-diff-label-body")
+    .attr("x", 10)
+    .attr("y", 38);
+  bodyText
+    .selectAll<SVGTSpanElement, string>("tspan")
+    .data(bodyLines)
+    .join("tspan")
+    .attr("x", 10)
+    .attr("dy", (_line, index) => (index === 0 ? 0 : 14))
+    .text((line) => line);
 }
 
 function drawTitlePath(element: HTMLElement, data: StoryData) {

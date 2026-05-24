@@ -146,6 +146,7 @@ export const translations = {
       body:
         "Os partidos de Primeira e Segunda veñen de Football-Data. Os anos fóra do arquivo CSV están curados a nivel de tempada e marcados coa súa fonte. A situación 2025-26 está datada porque a clasificación aínda pode cambiar.",
       credit: "Feito por",
+      inspiration: "Moi inspirado por Jon Bois e Chart Party:",
     },
     sourceNotes: {
       "Football-Data.co.uk": "CSV de partidos en Primeira e Segunda.",
@@ -526,6 +527,7 @@ export const translations = {
       body:
         "Los partidos de Primera y Segunda vienen de Football-Data. Los años fuera del archivo CSV están curados a nivel de temporada y marcados con su fuente. La situación 2025-26 está fechada porque la clasificación todavía puede cambiar.",
       credit: "Hecho por",
+      inspiration: "Muy inspirado por Jon Bois y Chart Party:",
     },
     sourceNotes: {
       "Football-Data.co.uk": "CSV de partidos en Primera y Segunda.",
@@ -906,6 +908,7 @@ export const translations = {
       body:
         "Primera and Segunda match data comes from Football-Data. Seasons outside the CSV archive are curated at season level and marked with their source. The 2025-26 status is dated because the table can still change.",
       credit: "Built by",
+      inspiration: "Heavily inspired by Jon Bois and Chart Party:",
     },
     sourceNotes: {
       "Football-Data.co.uk": "Primera and Segunda match CSVs.",
