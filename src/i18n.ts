@@ -84,20 +84,20 @@ export const translations = {
         stat: "1992-2004: terceiros, segundos, campións e noites europeas.",
       },
       {
-        id: "fuga",
-        kicker: "04 / A fuga lenta",
-        title: "O desgaste chegou antes do descenso.",
-        body:
-          "Para non mesturar categorías, o gráfico compara só tempadas de Primeira. O Dépor pasa dunha media de 1,86 puntos por partido no ciclo europeo a 0,93 nos últimos cursos antes do descenso de 2018.",
-        stat: "En Primeira: 1,86 PPG entre 1999 e 2004; 0,93 PPG entre 2012 e 2018.",
-      },
-      {
         id: "goles",
-        kicker: "05 / Os goles",
+        kicker: "04 / Os goles",
         title: "Os goles tamén contan como estaba repartido o equipo.",
         body:
           "A barra separa o máximo goleador do resto. Cando a franxa de Makaay medra en 2002-03, resume tanto a súa Bota de Ouro como a dependencia ofensiva daquela tempada.",
         stat: "Makaay 2002-03: 29 goles, Bota de Ouro e traspaso ao Bayern.",
+      },
+      {
+        id: "fuga",
+        kicker: "05 / A fuga lenta",
+        title: "O desgaste chegou antes do descenso.",
+        body:
+          "Para non mesturar categorías, o gráfico compara só tempadas de Primeira. O Dépor pasa dunha media de 1,86 puntos por partido no ciclo europeo a 0,93 nos últimos cursos antes do descenso de 2018.",
+        stat: "En Primeira: 1,86 PPG entre 1999 e 2004; 0,93 PPG entre 2012 e 2018.",
       },
       {
         id: "ascensor",
@@ -276,27 +276,19 @@ export const translations = {
               "A diferenza de goles non foi excepcional dentro do arquivo. O valor está na regularidade: 69 puntos e unha última xornada resolta en Riazor.",
             stat: "Dépor 1999-00: campión con +22 DG.",
           },
-          {
-            step: "depor-fall",
-            kicker: "02.4 / Dépor abaixo",
-            title: "En 2017-18 a tendencia xa era de descenso.",
-            body:
-              "O -38 de diferenza de goles resume unha tempada con pouca resposta. A liña non fala dun tramo malo, senón dun curso enteiro por baixo do nivel da categoría.",
-            stat: "Dépor 2017-18: -38 DG.",
-          },
+        ],
+        conclusionSequence: [
           {
             step: "depor-now",
-            kicker: "02.5 / Dépor agora",
+            kicker: "10.1 / Dépor agora",
             title: "A 2025-26 aínda lle quedan dúas xornadas.",
             body:
               "A lectura debe quedar datada: +20 en 40 partidos e posto de ascenso directo a 21 de maio de 2026. A curva apunta arriba, pero a táboa segue aberta.",
             stat: "Dépor 2025-26: +20 DG en 40 partidos.",
           },
-        ],
-        conclusionSequence: [
           {
             step: "depor-promotion",
-            kicker: "10.1 / A pregunta",
+            kicker: "10.2 / A pregunta",
             title: "Entón, sobe o Dépor?",
             body:
               "A liña verde recupera o Dépor deste ano. As amarelas son tempadas que si acabaron en ascenso de Segunda a Primeira: non hai unha soa forma de subir, pero todas chegan vivas ao final.",
@@ -304,7 +296,7 @@ export const translations = {
           },
           {
             step: "primera-after-promotion",
-            kicker: "10.2 / O día despois",
+            kicker: "10.3 / O día despois",
             title: "Subir non remata a costa.",
             body:
               "Agora o gráfico mira o primeiro ano en Primeira dos equipos recén ascendidos. A porta abre, si; tamén pode pecharse no mesmo curso.",
@@ -472,20 +464,20 @@ export const translations = {
         stat: "1992-2004: terceros, segundos, campeones y noches europeas.",
       },
       {
-        id: "fuga",
-        kicker: "04 / La fuga lenta",
-        title: "El desgaste llegó antes del descenso.",
-        body:
-          "Para no mezclar categorías, el gráfico compara solo temporadas de Primera. El Dépor pasa de una media de 1,86 puntos por partido en el ciclo europeo a 0,93 en los últimos cursos antes del descenso de 2018.",
-        stat: "En Primera: 1,86 PPG entre 1999 y 2004; 0,93 PPG entre 2012 y 2018.",
-      },
-      {
         id: "goles",
-        kicker: "05 / Los goles",
+        kicker: "04 / Los goles",
         title: "Los goles también cuentan cómo estaba repartido el equipo.",
         body:
           "La barra separa al máximo goleador del resto. Cuando la franja de Makaay crece en 2002-03, resume tanto su Bota de Oro como la dependencia ofensiva de aquella temporada.",
         stat: "Makaay 2002-03: 29 goles, Bota de Oro y traspaso al Bayern.",
+      },
+      {
+        id: "fuga",
+        kicker: "05 / La fuga lenta",
+        title: "El desgaste llegó antes del descenso.",
+        body:
+          "Para no mezclar categorías, el gráfico compara solo temporadas de Primera. El Dépor pasa de una media de 1,86 puntos por partido en el ciclo europeo a 0,93 en los últimos cursos antes del descenso de 2018.",
+        stat: "En Primera: 1,86 PPG entre 1999 y 2004; 0,93 PPG entre 2012 y 2018.",
       },
       {
         id: "ascensor",
@@ -664,27 +656,19 @@ export const translations = {
               "La diferencia de goles no fue excepcional dentro del archivo. El valor está en la regularidad: 69 puntos y una última jornada resuelta en Riazor.",
             stat: "Dépor 1999-00: campeón con +22 DG.",
           },
-          {
-            step: "depor-fall",
-            kicker: "02.4 / Dépor abajo",
-            title: "En 2017-18 la tendencia ya era de descenso.",
-            body:
-              "El -38 de diferencia de goles resume una temporada con poca respuesta. La línea no habla de un tramo malo, sino de un curso entero por debajo del nivel de la categoría.",
-            stat: "Dépor 2017-18: -38 DG.",
-          },
+        ],
+        conclusionSequence: [
           {
             step: "depor-now",
-            kicker: "02.5 / Dépor ahora",
+            kicker: "10.1 / Dépor ahora",
             title: "A 2025-26 todavía le quedan dos jornadas.",
             body:
               "La lectura debe quedar fechada: +20 en 40 partidos y puesto de ascenso directo a 21 de mayo de 2026. La curva apunta arriba, pero la tabla sigue abierta.",
             stat: "Dépor 2025-26: +20 DG en 40 partidos.",
           },
-        ],
-        conclusionSequence: [
           {
             step: "depor-promotion",
-            kicker: "10.1 / La pregunta",
+            kicker: "10.2 / La pregunta",
             title: "Entonces, ¿sube el Dépor?",
             body:
               "La línea verde recupera al Dépor de este año. Las amarillas son temporadas que sí acabaron en ascenso de Segunda a Primera: no hay una sola forma de subir, pero todas llegan vivas al final.",
@@ -692,7 +676,7 @@ export const translations = {
           },
           {
             step: "primera-after-promotion",
-            kicker: "10.2 / El día después",
+            kicker: "10.3 / El día después",
             title: "Subir no termina la cuesta.",
             body:
               "Ahora el gráfico mira el primer año en Primera de los recién ascendidos. La puerta se abre, sí; también puede cerrarse en el mismo curso.",
@@ -860,20 +844,20 @@ export const translations = {
         stat: "1992-2004: thirds, seconds, champions, and European nights.",
       },
       {
-        id: "fuga",
-        kicker: "04 / The slow leak",
-        title: "The slide started before relegation.",
-        body:
-          "To avoid mixing divisions, the chart compares only Primera seasons. Depor goes from 1.86 points per match in the European cycle to 0.93 in the last top-flight seasons before the 2018 relegation.",
-        stat: "In Primera: 1.86 PPG from 1999 to 2004; 0.93 PPG from 2012 to 2018.",
-      },
-      {
         id: "goles",
-        kicker: "05 / The goals",
+        kicker: "04 / The goals",
         title: "The goals also show how the team was built.",
         body:
           "Each bar separates the leading scorer from the rest of the side. When Makaay's share rises in 2002-03, it captures both his Golden Shoe and that season's attacking dependence.",
         stat: "Makaay 2002-03: 29 goals, the Golden Shoe, and a move to Bayern.",
+      },
+      {
+        id: "fuga",
+        kicker: "05 / The slow leak",
+        title: "The slide started before relegation.",
+        body:
+          "To avoid mixing divisions, the chart compares only Primera seasons. Depor goes from 1.86 points per match in the European cycle to 0.93 in the last top-flight seasons before the 2018 relegation.",
+        stat: "In Primera: 1.86 PPG from 1999 to 2004; 0.93 PPG from 2012 to 2018.",
       },
       {
         id: "ascensor",
@@ -1052,27 +1036,19 @@ export const translations = {
               "The goal difference was not exceptional in the archive. The value is in the regularity: 69 points and a final day settled at Riazor.",
             stat: "Depor 1999-00: champions with +22 GD.",
           },
-          {
-            step: "depor-fall",
-            kicker: "02.4 / Depor low",
-            title: "By 2017-18, the trend already pointed down.",
-            body:
-              "The -38 goal difference sums up a season with little response. The line is not one bad spell; it is a full campaign below the level of the division.",
-            stat: "Depor 2017-18: -38 GD.",
-          },
+        ],
+        conclusionSequence: [
           {
             step: "depor-now",
-            kicker: "02.5 / Depor now",
+            kicker: "10.1 / Depor now",
             title: "The 2025-26 season still has two rounds left.",
             body:
               "The reading has to stay dated: +20 in 40 matches and an automatic promotion place on May 21, 2026. The curve points up, but the table remains open.",
             stat: "Depor 2025-26: +20 GD in 40 matches.",
           },
-        ],
-        conclusionSequence: [
           {
             step: "depor-promotion",
-            kicker: "10.1 / The question",
+            kicker: "10.2 / The question",
             title: "So, does Depor go up?",
             body:
               "The green line brings back Depor this year. The yellow lines are seasons that did end with promotion from Segunda to Primera: there is no single shape for going up, but they all stay alive late.",
@@ -1080,7 +1056,7 @@ export const translations = {
           },
           {
             step: "primera-after-promotion",
-            kicker: "10.2 / The day after",
+            kicker: "10.3 / The day after",
             title: "Promotion does not end the climb.",
             body:
               "Now the chart looks at the first Primera season after promotion. The door opens; it can also close again in the same campaign.",
