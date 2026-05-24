@@ -323,6 +323,8 @@ export const translations = {
         afterPromotionTitle: "Primeira, ano un",
         afterPromotionBody: (returned: number, total: number) =>
           `${returned} de ${total} tempadas completas de recén ascendidos remataron con volta inmediata a Segunda.`,
+        afterPromotionStayedLegend: "seguen en Primeira",
+        afterPromotionReturnedLegend: "volven a Segunda",
       },
       titlePath: {
         title: "Antes do título: puntos",
@@ -709,6 +711,8 @@ export const translations = {
         afterPromotionTitle: "Primera, año uno",
         afterPromotionBody: (returned: number, total: number) =>
           `${returned} de ${total} temporadas completas de recién ascendidos terminaron con vuelta inmediata a Segunda.`,
+        afterPromotionStayedLegend: "siguen en Primera",
+        afterPromotionReturnedLegend: "vuelven a Segunda",
       },
       titlePath: {
         title: "Antes del título: puntos",
@@ -1095,6 +1099,8 @@ export const translations = {
         afterPromotionTitle: "Primera, year one",
         afterPromotionBody: (returned: number, total: number) =>
           `${returned} of ${total} completed newly promoted seasons ended with an immediate return to Segunda.`,
+        afterPromotionStayedLegend: "stayed in Primera",
+        afterPromotionReturnedLegend: "returned to Segunda",
       },
       titlePath: {
         title: "Before the title: points",

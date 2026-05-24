@@ -1067,6 +1067,7 @@ function drawGoalDiffCloud(element: HTMLElement, data: StoryData) {
     .attr("stroke-linejoin", "round")
     .attr("stroke-linecap", "round");
   const labelLayer = svg.append("g").attr("class", "goal-diff-focus-label fixed-label");
+  const legendLayer = svg.append("g").attr("class", "goal-diff-state-legend fixed-label");
   const contextLabel = svg
     .append("text")
     .attr("x", margin.left)
@@ -1128,10 +1129,26 @@ function drawGoalDiffCloud(element: HTMLElement, data: StoryData) {
       .attr("stroke-width", (values) => {
         const weight = highlight.get(goalDiffSeriesKey(values))?.weight ?? 0;
         return 1.05 + weight * 2.85;
+      })
+      .sort((a, b) => {
+        const aHighlight = highlight.get(goalDiffSeriesKey(a));
+        const bHighlight = highlight.get(goalDiffSeriesKey(b));
+        return (
+          (aHighlight?.priority ?? 0) - (bHighlight?.priority ?? 0) ||
+          (aHighlight?.weight ?? 0) - (bHighlight?.weight ?? 0)
+        );
       });
 
     section?.setAttribute("data-goal-diff-step", active.id);
     panels.forEach((panel) => panel.classList.toggle("is-active", panel.dataset.sequenceStep === active.id));
+    renderGoalDiffStateLegend(
+      legendLayer,
+      active.legendItems ?? [],
+      margin.left,
+      compactSequenceChart ? 42 : 64,
+      width - margin.left - margin.right,
+      labelFocusAmount,
+    );
     renderGoalDiffFocusLabel(labelLayer, active, xScale, yScale, width, height, labelFocusAmount);
   };
 
@@ -1202,11 +1219,12 @@ function logronesLosses(data: StoryData) {
 type GoalDiffViewState = {
   id: GoalDiffStepId;
   targetSeries?: GoalDiffLinePoint[];
-  targetGroups?: { series: GoalDiffLinePoint[][]; color: string; emphasis?: number }[];
+  targetGroups?: { series: GoalDiffLinePoint[][]; color: string; emphasis?: number; priority?: number }[];
   color: string;
   domain: { round: [number, number]; gd: [number, number] };
   labelTitle?: string;
   labelBody?: string;
+  legendItems?: LegendItem[];
 };
 
 function goalDiffViewStates(
@@ -1262,6 +1280,7 @@ function goalDiffViewStates(
     }),
     withDomain("primera-after-promotion", worstReturnedSeries, WARN, {
       targetGroups: [
+        ...(deporNow ? [{ series: [deporNow], color: "#80f0bd", emphasis: 1, priority: 3 }] : []),
         { series: stayedInPrimeraSeries, color: "#febe10", emphasis: 0.66 },
         { series: returnedToSegundaSeries, color: WARN, emphasis: 0.95 },
       ],
@@ -1270,6 +1289,11 @@ function goalDiffViewStates(
         returnedToSegundaSeries.length,
         completedPrimeraAfterPromotionSeries.length,
       ),
+      legendItems: [
+        { label: currentCopy.charts.goalDiff.promotionHopeTitle, color: "#80f0bd" },
+        { label: currentCopy.charts.goalDiff.afterPromotionStayedLegend, color: "#febe10" },
+        { label: currentCopy.charts.goalDiff.afterPromotionReturnedLegend, color: WARN },
+      ],
     }),
   ];
 }
@@ -1325,14 +1349,14 @@ function goalDiffHighlightWeights(
   lower: GoalDiffViewState,
   upper: GoalDiffViewState,
   mix: number,
-): Map<string, { weight: number; color: string }> {
-  const highlights = new Map<string, { weight: number; color: string }>();
-  const addSeries = (series: GoalDiffLinePoint[], color: string, weight: number) => {
+): Map<string, { weight: number; color: string; priority: number }> {
+  const highlights = new Map<string, { weight: number; color: string; priority: number }>();
+  const addSeries = (series: GoalDiffLinePoint[], color: string, weight: number, priority: number) => {
     if (weight <= 0.02) return;
     const key = goalDiffSeriesKey(series);
     const existing = highlights.get(key);
-    if (!existing || weight >= existing.weight) {
-      highlights.set(key, { weight, color });
+    if (!existing || priority > existing.priority || (priority === existing.priority && weight >= existing.weight)) {
+      highlights.set(key, { weight, color, priority });
     }
   };
 
@@ -1341,12 +1365,12 @@ function goalDiffHighlightWeights(
     [upper, mix],
   ] as const) {
     if (state.targetSeries) {
-      addSeries(state.targetSeries, state.color, stateWeight);
+      addSeries(state.targetSeries, state.color, stateWeight, 2);
     }
     for (const group of state.targetGroups ?? []) {
       const groupWeight = Math.min(1, stateWeight * (group.emphasis ?? 1));
       for (const series of group.series) {
-        addSeries(series, group.color, groupWeight);
+        addSeries(series, group.color, groupWeight, group.priority ?? 1);
       }
     }
   }
@@ -1436,6 +1460,48 @@ function goalDiffStepLabel(step: GoalDiffStepId, last: GoalDiffLinePoint) {
   if (step === "best") return currentCopy.charts.goalDiff.bestLine;
   if (step === "worst") return currentCopy.charts.goalDiff.worstLine;
   return last.season;
+}
+
+function renderGoalDiffStateLegend(
+  layer: d3.Selection<SVGGElement, unknown, null, undefined>,
+  items: LegendItem[],
+  x: number,
+  y: number,
+  maxWidth: number,
+  focusAmount: number,
+) {
+  layer.html("");
+  if (!items.length || focusAmount < 0.28) return;
+
+  layer.attr("transform", `translate(${x},${y})`).attr("opacity", Math.min(1, (focusAmount - 0.28) / 0.28));
+  let cursor = 0;
+  let row = 0;
+  const rowHeight = 16;
+  const compact = maxWidth < 360;
+  for (const item of items) {
+    const entryWidth = Math.max(compact ? 92 : 112, item.label.length * (compact ? 5.8 : 7) + 34);
+    if (cursor > 0 && cursor + entryWidth > maxWidth) {
+      cursor = 0;
+      row += rowHeight;
+    }
+    const entry = layer.append("g").attr("transform", `translate(${cursor},${row})`);
+    entry
+      .append("line")
+      .attr("x1", 0)
+      .attr("x2", compact ? 16 : 20)
+      .attr("y1", 0)
+      .attr("y2", 0)
+      .attr("stroke", item.color)
+      .attr("stroke-width", 3);
+    entry
+      .append("text")
+      .attr("x", compact ? 22 : 26)
+      .attr("y", 4)
+      .attr("class", "context-label")
+      .attr("fill", item.color)
+      .text(item.label);
+    cursor += entryWidth;
+  }
 }
 
 function renderGoalDiffFocusLabel(
